@@ -1,7 +1,7 @@
 #EXAMUS MOODLE PLUGIN
 
 ## Installation
-1. Download zip, open `Administration→Plugins→Install plugins`, put zip there
+1. Download zip [here](https://github.com/examus/moodle-availability_examus/releases/), open `Administration→Plugins→Install plugins`, put zip there
 2. Go to `Administration→WebServices→Manage Tokens`, Add token for service Examus for Admin User. Examus will use this token for integration
 
 ## Usage
