@@ -58,6 +58,7 @@ class availability_examus_external extends external_api
                     'course_id' => $course->id,
                     'is_proctored' => True,
                     'time_limit_mins' => 60,
+                    'accesscode' => $entry->accesscode,
 //                    'start' => new external_value(PARAM_TEXT, 'exam start', VALUE_OPTIONAL),
 //                    'end' => new external_value(PARAM_TEXT, 'exam end', VALUE_OPTIONAL),
                 )
@@ -83,6 +84,7 @@ class availability_examus_external extends external_api
                         'course_name' => new external_value(PARAM_TEXT, 'exam course name', VALUE_OPTIONAL),
                         'time_limit_mins' => new external_value(PARAM_INT, 'exxam duration', VALUE_OPTIONAL),
                         'is_proctored' => new external_value(PARAM_BOOL, 'exam proctored'),
+                        'accesscode' => new external_value(PARAM_TEXT, 'exam code'),
                         'start' => new external_value(PARAM_TEXT, 'exam start', VALUE_OPTIONAL),
                         'end' => new external_value(PARAM_TEXT, 'exam end', VALUE_OPTIONAL),
                     ), 'module')
