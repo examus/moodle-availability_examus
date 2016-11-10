@@ -117,11 +117,13 @@ class availability_examus_external extends external_api
         $params = self::validate_parameters(self::submit_proctoring_review_parameters(),
             array('accesscode' => $accesscode, 'review_link' => $review_link, 'status' => $status));
 
+        $timenow = time();
         $entry = $DB->get_record('availability_examus', array('accesscode' => $accesscode));
 
         if ($entry) {
             $entry->review_link = $review_link;
             $entry->status = $status;
+            $entry->timemodified = $timenow;
 
             $DB->update_record('availability_examus', $entry);
             return array('success' => True, 'error'=>null);

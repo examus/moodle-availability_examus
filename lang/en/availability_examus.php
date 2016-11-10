@@ -6,3 +6,11 @@ $string['pluginname'] = 'Proctoring by Examus';
 $string['title'] = 'Examus';
 
 $string['use_examus'] = 'Use examus app to view this module';
+$string['settings'] = 'Examus settings';
+$string['status'] = 'Status';
+$string['review'] = 'Review';
+$string['module'] = 'Module';
+$string['new_entry'] = 'New entry';
+
+
+$string[''] = '';

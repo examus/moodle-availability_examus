@@ -4,7 +4,7 @@
     xsi:noNamespaceSchemaLocation="../../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="availability_examus" COMMENT="Default comment for availability_examus, please edit me">
+    <TABLE NAME="availability_examus" COMMENT="List of proctoring attempts">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -12,7 +12,9 @@
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="accesscode" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="status" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT="not_inited" SEQUENCE="false"/>
-        <FIELD NAME="review" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Review data in JSON format"/>
+        <FIELD NAME="review_link" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Review link"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The time this record was created"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The time this record was modified."/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -20,6 +22,9 @@
         <KEY NAME="cmid" TYPE="foreign" FIELDS="cmid" REFTABLE="course_modules" REFFIELDS="id"/>
         <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="accesscode" UNIQUE="true" FIELDS="accesscode"/>
+      </INDEXES>
     </TABLE>
   </TABLES>
 </XMLDB>
