@@ -11,6 +11,7 @@ $string['status'] = 'Status';
 $string['review'] = 'Review';
 $string['module'] = 'Module';
 $string['new_entry'] = 'New entry';
-
+$string['error_setduration'] = 'Duration in minutes';
+$string['duration'] = 'Duration in minutes';
 
 $string[''] = '';

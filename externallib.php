@@ -39,7 +39,7 @@ class availability_examus_external extends external_api
 
         $user = $DB->get_record('user', array('email' => $useremail));
 
-        $entries = $DB->get_records('availability_examus', array('userid' => $user->id));
+        $entries = $DB->get_records('availability_examus', array('userid' => $user->id, 'status' => 'Not inited'));
 
         $answer = array();
         foreach ($entries as $entry) {

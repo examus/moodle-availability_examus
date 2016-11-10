@@ -3,13 +3,18 @@
 namespace availability_examus;
 
 defined('MOODLE_INTERNAL') || die();
+use core_availability\info_module;
 use stdClass;
 
 class condition extends \core_availability\condition
 {
 
+    protected $duration = 60;
     public function __construct($structure)
     {
+        if (!empty($structure->duration)) {
+            $this->duration = $structure->duration;
+        }
     }
 
     private static function delete_empty_entry($userid, $courseid, $cmid)
@@ -25,8 +30,25 @@ class condition extends \core_availability\condition
         return strpos($cm->availability, '"c":[{"type":"examus"}]') !== false;
     }
 
+    public static function has_examus_condition(cm_info $cm) {
+        $econds = self::get_examus_conditions($cm);
+        return (bool)$econds;
+    }
+
+    public static function get_examus_duration(cm_info $cm) {
+        $econds = self::get_examus_conditions($cm);
+        return $econds[0]->duration;
+    }
+
+    private static function get_examus_conditions(cm_info $cm) {
+        $info = new info_module($cm);
+        $tree = $info->get_availability_tree();
+        return $tree->get_all_children('\\availability_examus\\condition');
+    }
+
     public function save()
     {
+        return (object) ['duration' => $this->duration];
     }
 
     public function is_available($not,
@@ -64,9 +86,13 @@ class condition extends \core_availability\condition
     private static function create_entry_if_not_exist($userid, $courseid, $cmid)
     {
         global $DB;
-        $entry = $DB->get_record('availability_examus', array(
-            'userid' => $userid, 'courseid' => $courseid, 'cmid' => $cmid));
-        if (!$entry) {
+        $entries = $DB->get_records(
+            'availability_examus',
+            array('userid' => $userid, 'courseid' => $courseid, 'cmid' => $cmid),
+            $sort='id');
+
+
+        if (count($entries) !== 0) {
             $timenow = time();
             $entry = new stdClass();
             $entry->userid = $userid;
