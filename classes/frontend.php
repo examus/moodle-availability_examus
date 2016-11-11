@@ -7,7 +7,7 @@ defined('MOODLE_INTERNAL') || die();
 class frontend extends \core_availability\frontend {
 
     protected function get_javascript_strings() {
-        return ['title', 'error_setduration', 'duration'];
+        return ['title', 'error_setduration', 'duration', 'link'];
     }
 
     protected function get_javascript_init_params($course, \cm_info $cm = null,

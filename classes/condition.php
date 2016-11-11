@@ -27,7 +27,7 @@ class condition extends \core_availability\condition
     private static function examus_enabled_for($cm)
     {
         # XXX This may fall
-        return strpos($cm->availability, '"c":[{"type":"examus"}]') !== false;
+        return strpos($cm->availability, '"c":[{"type":"examus') !== false;
     }
 
     public static function has_examus_condition(cm_info $cm) {
@@ -92,7 +92,7 @@ class condition extends \core_availability\condition
             $sort='id');
 
 
-        if (count($entries) !== 0) {
+        if (count($entries) == 0) {
             $timenow = time();
             $entry = new stdClass();
             $entry->userid = $userid;

@@ -13,5 +13,6 @@ $string['module'] = 'Module';
 $string['new_entry'] = 'New entry';
 $string['error_setduration'] = 'Duration in minutes';
 $string['duration'] = 'Duration in minutes';
+$string['link'] = 'Logs and video';
 
 $string[''] = '';

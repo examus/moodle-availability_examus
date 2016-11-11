@@ -35,7 +35,7 @@ switch ($action) {
 }
 
 
-$entries = $DB->get_records('availability_examus');
+$entries = $DB->get_records('availability_examus', array(), '-id');
 
 if (!empty($entries)) {
     $table = new flexible_table('availability_examus_table');

@@ -9,7 +9,8 @@ $accesscode = required_param('accesscode', PARAM_RAW);
 $entry = $DB->get_record('availability_examus', array('accesscode' => $accesscode));
 
 if ($entry) {
-    $entry->status = 'started';
+    $entry->status = 'Started';
+    $entry->timemodified = time();
     $DB->update_record('availability_examus', $entry);
     $cmid = $entry->cmid;
 
