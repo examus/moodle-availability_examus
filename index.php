@@ -9,10 +9,6 @@ admin_externalpage_setup('availability_examus_settings');
 
 $action = optional_param('action', '', PARAM_ALPHA);
 
-echo $OUTPUT->header();
-
-echo $OUTPUT->heading(get_string('pluginname', 'availability_examus'));
-
 switch ($action) {
     case 'renew':
         $id = required_param('id', PARAM_TEXT);
@@ -29,10 +25,15 @@ switch ($action) {
             $entry->timemodified = $timenow;
             $DB->insert_record('availability_examus', $entry);
         }
+        redirect('index.php');
         break;
     default:
         break;
 }
+
+echo $OUTPUT->header();
+
+echo $OUTPUT->heading(get_string('pluginname', 'availability_examus'));
 
 
 $entries = $DB->get_records('availability_examus', array(), '-id');
@@ -56,9 +57,15 @@ if (!empty($entries)) {
 
     foreach ($entries as $entry) {
         $row = array();
-        $row[] = $entry->userid;
-        $row[] = $entry->courseid;
-        $row[] = $entry->cmid;
+        $user = $DB->get_record('user', array('id'=> $entry->userid));
+        $row[] = $user->firstname . " " . $user->lastname . "<br>" . $user->email;
+
+        $course = get_course($entry->courseid);
+        $modinfo = get_fast_modinfo($course);
+        $cm = $modinfo->get_cm($entry->cmid);
+
+        $row[] = $course->fullname;
+        $row[] = $cm->get_formatted_name();
         $row[] = $entry->status;
         if ($entry->review_link !== null) {
             $row[] = "<a href='" . $entry->review_link . "'>" . get_string('link', 'availability_examus') . "</a>";

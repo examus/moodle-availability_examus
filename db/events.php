@@ -20,7 +20,7 @@ $observers = [
         'callback' => '\availability_examus\condition::user_enrolment_created_updated'
     ],
     [
-        'eventname' => '/core\event\user_enrolment_deleted',
+        'eventname' => '\core\event\user_enrolment_deleted',
         'callback' => '\availability_examus\condition::user_enrolment_deleted'
     ],
 ];

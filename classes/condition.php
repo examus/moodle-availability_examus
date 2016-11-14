@@ -3,7 +3,9 @@
 namespace availability_examus;
 
 defined('MOODLE_INTERNAL') || die();
+use core_availability\info;
 use core_availability\info_module;
+use moodle_exception;
 use stdClass;
 
 class condition extends \core_availability\condition
@@ -24,40 +26,52 @@ class condition extends \core_availability\condition
             'userid' => $userid, 'courseid' => $courseid, 'cmid' => $cmid, 'status' => 'Not inited'));
     }
 
-    private static function examus_enabled_for($cm)
-    {
-        # XXX This may fall
-        return strpos($cm->availability, '"c":[{"type":"examus') !== false;
-    }
-
-    public static function has_examus_condition(cm_info $cm) {
+    public static function has_examus_condition($cm) {
         $econds = self::get_examus_conditions($cm);
         return (bool)$econds;
     }
 
-    public static function get_examus_duration(cm_info $cm) {
+    public static function get_examus_duration($cm) {
         $econds = self::get_examus_conditions($cm);
-        return $econds[0]->duration;
+        return (int) $econds[0]->duration;
     }
 
-    private static function get_examus_conditions(cm_info $cm) {
+    private static function get_examus_conditions($cm) {
         $info = new info_module($cm);
-        $tree = $info->get_availability_tree();
+        try {
+            $tree = $info->get_availability_tree();
+        } catch(moodle_exception $e) {
+            return null;
+        }
         return $tree->get_all_children('\\availability_examus\\condition');
     }
 
     public function save()
     {
-        return (object) ['duration' => $this->duration];
+        return (object) ['duration' => (int) $this->duration];
     }
 
     public function is_available($not,
                                  \core_availability\info $info, $grabthelot, $userid)
     {
-        if (in_array('examus', $_SESSION)) {
-            $allow = True;
-        } else {
-            $allow = False;
+        global $DB;
+
+
+        $allow = False;
+
+        if (isset($_SESSION['examus'])) {
+            $course = $info->get_course();
+            $cm = $info->get_course_module();
+            $cmid = $cm->id;
+            $accesscode = $_SESSION['examus'];
+
+            $entry = $DB->get_record(
+                'availability_examus',
+                array('userid' => $userid, 'courseid' => $course->id, 'cmid' => $cm->id, 'accesscode' => $accesscode));
+
+            if ($entry) {
+                $allow = True;
+            }
         }
 
         if ($not) {
@@ -83,7 +97,7 @@ class condition extends \core_availability\condition
         $DB->delete_records('availability_examus', array('cmid' => $cmid));
     }
 
-    private static function create_entry_if_not_exist($userid, $courseid, $cmid)
+    private static function create_entry_if_not_exist($userid, $courseid, $cmid, $duration)
     {
         global $DB;
         $entries = $DB->get_records(
@@ -102,6 +116,7 @@ class condition extends \core_availability\condition
             $entry->status = 'Not inited';
             $entry->timecreated = $timenow;
             $entry->timemodified = $timenow;
+            $entry->duration = $duration;
             $DB->insert_record('availability_examus', $entry);
         }
     }
@@ -113,12 +128,11 @@ class condition extends \core_availability\condition
         $modinfo = get_fast_modinfo($course);
         $cm = $modinfo->get_cm($cmid);
 
-        // XXX this may fall
-
-        if (self::examus_enabled_for($cm)) {
+        if (self::has_examus_condition($cm)) {
+            $duration = self::get_examus_duration($cm);
             $users = get_enrolled_users($event->get_context());
             foreach ($users as $user) {
-                self::create_entry_if_not_exist($user->id, $event->courseid, $cmid);
+                self::create_entry_if_not_exist($user->id, $event->courseid, $cmid, $duration);
             }
         } else {
             $users = get_enrolled_users($event->get_context());
@@ -137,8 +151,9 @@ class condition extends \core_availability\condition
         $cm = $modinfo->get_cm($cmid);
         $userid = $event->relateduserid;
 
-        if (self::examus_enabled_for($cm)) {
-            self::create_entry_if_not_exist($userid, $event->courseid, $cmid);
+        if (self::has_examus_condition($cm)) {
+            $duration = self::get_examus_duration($cm);
+            self::create_entry_if_not_exist($userid, $event->courseid, $cmid, $duration);
         }
     }
 
@@ -151,7 +166,7 @@ class condition extends \core_availability\condition
         $cm = $modinfo->get_cm($cmid);
         $userid = $event->relateduserid;
 
-        if (self::examus_enabled_for($cm)) {
+        if (self::has_examus_condition($cm)) {
             self::delete_empty_entry($userid, $event->courseid, $cmid);
         }
     }

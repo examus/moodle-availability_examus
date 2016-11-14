@@ -15,7 +15,7 @@
         <FIELD NAME="review_link" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Review link"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The time this record was created"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The time this record was modified."/>
-        <!--<FIELD NAME="duration" SEQUENCE="false" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Duration of proctoring session in minutes"/>-->
+        <FIELD NAME="duration" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Duration of proctoring session in minutes"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

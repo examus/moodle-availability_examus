@@ -14,7 +14,7 @@ if ($entry) {
     $DB->update_record('availability_examus', $entry);
     $cmid = $entry->cmid;
 
-    $_SESSION['examus'] = True;
+    $_SESSION['examus'] = $accesscode;
 
     list($course, $cm) = get_course_and_cm_from_cmid($cmid);
 
