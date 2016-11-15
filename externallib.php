@@ -1,6 +1,7 @@
 <?php
 
 require_once($CFG->libdir . "/externallib.php");
+use core_availability\info_module;
 
 class availability_examus_external extends external_api
 {
@@ -38,6 +39,25 @@ class availability_examus_external extends external_api
         }
 
         $user = $DB->get_record('user', array('email' => $useremail));
+        $courses = enrol_get_users_courses($user->id, true);
+        foreach ($courses as $course) {
+            $course = get_course($course->id);
+            $modinfo = get_fast_modinfo($course);
+            $instances_by_types = $modinfo->get_instances();
+            foreach ($instances_by_types as $instances) {
+                foreach ($instances as $cm) {
+                    if (\availability_examus\condition::has_examus_condition($cm)) {
+                        // TODO check other availabilities here
+                        \availability_examus\condition::create_entry_for_cm($user->id, $cm);
+//                        TODO build answer array here
+                    } else {
+                        \availability_examus\condition::delete_empty_entry_for_cm($user->id, $cm);
+                    }
+
+                }
+            }
+
+        }
 
         $entries = $DB->get_records('availability_examus', array('userid' => $user->id, 'status' => 'Not inited'));
 

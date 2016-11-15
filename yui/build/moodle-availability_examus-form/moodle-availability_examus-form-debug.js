@@ -51,8 +51,8 @@ M.availability_examus.form.fillErrors = function(errors, node) {
     var value = {};
     this.fillValue(value, node);
 
-    if (value.duration === undefined || !/^\d+$/.test(value.duration)) {
-        errors.push('availability_examus:error_setduration');
+    if (value.duration === undefined || !/^\d+$/.test(value.duration) || value.duration % 30 != 0) {
+            errors.push('availability_examus:error_setduration');
     }
 };
 

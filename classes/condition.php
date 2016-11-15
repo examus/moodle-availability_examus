@@ -3,7 +3,7 @@
 namespace availability_examus;
 
 defined('MOODLE_INTERNAL') || die();
-use core_availability\info;
+
 use core_availability\info_module;
 use moodle_exception;
 use stdClass;
@@ -33,6 +33,7 @@ class condition extends \core_availability\condition
 
     public static function get_examus_duration($cm) {
         $econds = self::get_examus_conditions($cm);
+        // TODO: restrict examus condition to be only one
         return (int) $econds[0]->duration;
     }
 
@@ -97,8 +98,22 @@ class condition extends \core_availability\condition
         $DB->delete_records('availability_examus', array('cmid' => $cmid));
     }
 
+    public static function create_entry_for_cm($userid, $cm){
+        $course = $cm->get_course();
+        $courseid = $course->id;
+        $duration = self::get_examus_duration($cm);
+        return self::create_entry_if_not_exist($userid, $courseid, $cm->id, $duration);
+    }
+
+    public static function delete_empty_entry_for_cm($userid, $cm){
+        $course = $cm->get_course();
+        $courseid = $course->id;
+        self::delete_empty_entry($userid, $courseid, $cm->id);
+    }
+
     private static function create_entry_if_not_exist($userid, $courseid, $cmid, $duration)
     {
+        // TODO: refactor this to get courseid and duration from cm
         global $DB;
         $entries = $DB->get_records(
             'availability_examus',
@@ -118,44 +133,21 @@ class condition extends \core_availability\condition
             $entry->timemodified = $timenow;
             $entry->duration = $duration;
             $DB->insert_record('availability_examus', $entry);
-        }
-    }
-    public static function course_module_updated(\core\event\course_module_updated $event)
-    {
-        global $DB;
-        $cmid = $event->contextinstanceid;
-        $course = get_course($event->courseid);
-        $modinfo = get_fast_modinfo($course);
-        $cm = $modinfo->get_cm($cmid);
-
-        if (self::has_examus_condition($cm)) {
-            $duration = self::get_examus_duration($cm);
-            $users = get_enrolled_users($event->get_context());
-            foreach ($users as $user) {
-                self::create_entry_if_not_exist($user->id, $event->courseid, $cmid, $duration);
-            }
+            return $entry;
         } else {
-            $users = get_enrolled_users($event->get_context());
-            foreach ($users as $user) {
-                self::delete_empty_entry($user->id, $event->courseid, $cmid);
+            foreach ($entries as $entry) {
+                if ($entry->status == 'Not inited') {
+                    if ($entry->duration != $duration) {
+                        $entry->duration = $duration;
+                        $DB->update_record('availability_examus', $entry);
+                    }
+                    return $entry;
+                }
             }
         }
+        return null;
     }
 
-    public static function user_enrolment_created_updated(\core\event\user_enrolment_created $event)
-    {
-        global $DB;
-        $cmid = $event->contextinstanceid;
-        $course = get_course($event->courseid);
-        $modinfo = get_fast_modinfo($course);
-        $cm = $modinfo->get_cm($cmid);
-        $userid = $event->relateduserid;
-
-        if (self::has_examus_condition($cm)) {
-            $duration = self::get_examus_duration($cm);
-            self::create_entry_if_not_exist($userid, $event->courseid, $cmid, $duration);
-        }
-    }
 
     public static function user_enrolment_deleted(\core\event\user_enrolment_deleted $event)
     {
