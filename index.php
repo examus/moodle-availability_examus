@@ -23,6 +23,7 @@ switch ($action) {
             $entry->status = 'Not inited';
             $entry->timecreated = $timenow;
             $entry->timemodified = $timenow;
+            $entry->duration = $old_entry->duration;
             $DB->insert_record('availability_examus', $entry);
         }
         redirect('index.php');
