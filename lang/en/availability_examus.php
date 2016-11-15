@@ -15,4 +15,5 @@ $string['error_setduration'] = 'Duration must be a multiple of 30';
 $string['duration'] = 'Duration in minutes (a multiple of 30)';
 $string['link'] = 'Logs and video';
 
-$string[''] = '';
+$string['new_entry_created'] = 'New entry created';
+$string['entry_exist'] = 'New entry already exist';

@@ -13,29 +13,41 @@ switch ($action) {
     case 'renew':
         $id = required_param('id', PARAM_TEXT);
         $old_entry = $DB->get_record('availability_examus', array('id' => $id));
+
         if ($old_entry and $old_entry->status != 'Not inited') {
-            $timenow = time();
-            $entry = new stdClass();
-            $entry->userid = $old_entry->userid;
-            $entry->courseid = $old_entry->courseid;
-            $entry->cmid = $old_entry->cmid;
-            $entry->accesscode = md5(uniqid(rand(), 1));
-            $entry->status = 'Not inited';
-            $entry->timecreated = $timenow;
-            $entry->timemodified = $timenow;
-            $entry->duration = $old_entry->duration;
-            $DB->insert_record('availability_examus', $entry);
+            $entries = $DB->get_records('availability_examus', array(
+                'userid' => $old_entry->userid,
+                'courseid' => $old_entry->courseid,
+                'cmid' => $old_entry->cmid,
+                'status' => 'Not inited'));
+            if (count($entries) == 0) {
+                $timenow = time();
+                $entry = new stdClass();
+                $entry->userid = $old_entry->userid;
+                $entry->courseid = $old_entry->courseid;
+                $entry->cmid = $old_entry->cmid;
+                $entry->accesscode = md5(uniqid(rand(), 1));
+                $entry->status = 'Not inited';
+                $entry->timecreated = $timenow;
+                $entry->timemodified = $timenow;
+                $entry->duration = $old_entry->duration;
+                $DB->insert_record('availability_examus', $entry);
+                redirect('index.php', get_string('new_entry_created', 'availability_examus'),
+                    null, \core\output\notification::NOTIFY_SUCCESS);
+            } else {
+                redirect('index.php', get_string('entry_exist', 'availability_examus'),
+                    null, \core\output\notification::NOTIFY_ERROR);
+            }
         }
-        redirect('index.php');
         break;
     default:
         break;
 }
 
+
 echo $OUTPUT->header();
 
 echo $OUTPUT->heading(get_string('pluginname', 'availability_examus'));
-
 
 $entries = $DB->get_records('availability_examus', array(), '-id');
 
@@ -58,7 +70,7 @@ if (!empty($entries)) {
 
     foreach ($entries as $entry) {
         $row = array();
-        $user = $DB->get_record('user', array('id'=> $entry->userid));
+        $user = $DB->get_record('user', array('id' => $entry->userid));
         $row[] = $user->firstname . " " . $user->lastname . "<br>" . $user->email;
 
         $course = get_course($entry->courseid);
