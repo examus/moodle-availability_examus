@@ -48,7 +48,7 @@ if (!empty($entries)) {
         get_string('module', 'availability_examus'),
         get_string('status', 'availability_examus'),
         get_string('review', 'availability_examus'),
-        get_string('review', 'availability_examus')));
+        ''));
 
     $table->define_baseurl($PAGE->url);
     $table->set_attribute('id', 'entries');
