@@ -17,3 +17,4 @@ $string['link'] = 'Logs and video';
 
 $string['new_entry_created'] = 'New entry created';
 $string['entry_exist'] = 'New entry already exist';
+$string['date_modified'] = 'Date of last change';

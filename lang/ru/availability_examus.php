@@ -17,3 +17,4 @@ $string['link'] = 'Архив';
 
 $string['new_entry_created'] = 'Новая запись успешно создана';
 $string['entry_exist'] = 'Новая запись уже существует';
+$string['date_modified'] = 'Дата последнего изменения';

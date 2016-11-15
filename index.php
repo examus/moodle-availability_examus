@@ -54,8 +54,9 @@ $entries = $DB->get_records('availability_examus', array(), '-id');
 if (!empty($entries)) {
     $table = new flexible_table('availability_examus_table');
 
-    $table->define_columns(array('user', 'course', 'module', 'status', 'review_link', 'create_entry'));
+    $table->define_columns(array('date', 'user', 'course', 'module', 'status', 'review_link', 'create_entry'));
     $table->define_headers(array(
+        get_string('date_modified', 'availability_examus'),
         get_string('user'),
         get_string('course'),
         get_string('module', 'availability_examus'),
@@ -70,6 +71,11 @@ if (!empty($entries)) {
 
     foreach ($entries as $entry) {
         $row = array();
+
+        $date = usergetdate($entry->timemodified);
+        $row[] = '<b>' . $date['year'] . '.' . $date['mon'] . '.' . $date['mday'] . '</b> ' .
+            $date['hours'] . ':' . $date['minutes'];
+
         $user = $DB->get_record('user', array('id' => $entry->userid));
         $row[] = $user->firstname . " " . $user->lastname . "<br>" . $user->email;
 
