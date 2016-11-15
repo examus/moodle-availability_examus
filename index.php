@@ -87,7 +87,10 @@ if (!empty($entries)) {
         }
 
         if ($entry->status != 'Not inited') {
-            $row[] = "<a href='index.php?action=renew&id=" . $entry->id . "'>" . get_string('new_entry', 'availability_examus') . "</a>";
+            $row[] = "<form action='index.php' method='post'>" .
+                "<input type='hidden' name='id' value='" . $entry->id . "'>" .
+                "<input type='hidden' name='action' value='renew'>" .
+                "<input type='submit' value='" . get_string('new_entry', 'availability_examus') . "'></form>";
         } else {
             $row[] = "-";
         }
