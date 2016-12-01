@@ -1,7 +1,6 @@
 <?php
-
+global $CFG;
 require_once($CFG->libdir . "/externallib.php");
-use core_availability\info_module;
 
 class availability_examus_external extends external_api
 {
@@ -23,33 +22,26 @@ class availability_examus_external extends external_api
      */
     public static function user_proctored_modules($useremail)
     {
-        global $USER;
         global $DB;
 
-        $params = self::validate_parameters(self::user_proctored_modules_parameters(),
+        self::validate_parameters(self::user_proctored_modules_parameters(),
             array('useremail' => $useremail));
-
-        $context = get_context_instance(CONTEXT_USER, $USER->id);
-        self::validate_context($context);
-
-        //Capability checking
-        //OPTIONAL but in most web service it should present
-        if (!has_capability('moodle/user:viewdetails', $context)) {
-            throw new moodle_exception('cannotviewprofile');
-        }
+        $_SESSION['examus_api'] = True;
 
         $user = $DB->get_record('user', array('email' => $useremail));
         $courses = enrol_get_users_courses($user->id, true);
         foreach ($courses as $course) {
             $course = get_course($course->id);
-            $modinfo = get_fast_modinfo($course);
+
+            // Clearing cache
+            get_fast_modinfo($course->id, $user->id, true);
+            $modinfo = get_fast_modinfo($course->id, $user->id);
             $instances_by_types = $modinfo->get_instances();
             foreach ($instances_by_types as $instances) {
                 foreach ($instances as $cm) {
-                    if (\availability_examus\condition::has_examus_condition($cm)) {
-                        // TODO check other availabilities here
+                    if (\availability_examus\condition::has_examus_condition($cm) and $cm->uservisible) {
                         \availability_examus\condition::create_entry_for_cm($user->id, $cm);
-//                        TODO build answer array here
+                        // TODO build answer array here
                     } else {
                         \availability_examus\condition::delete_empty_entry_for_cm($user->id, $cm);
                     }
@@ -76,6 +68,7 @@ class availability_examus_external extends external_api
                     'url' => $url->out(),
                     'course_name' => $course->fullname,
                     'course_id' => $course->id,
+                    'cm_id' => $entry->cmid,
                     'is_proctored' => True,
                     'time_limit_mins' => $entry->duration,
                     'accesscode' => $entry->accesscode,
@@ -98,9 +91,11 @@ class availability_examus_external extends external_api
             array('modules' => new external_multiple_structure(
                 new external_single_structure(
                     array(
-                        'id' => new external_value(PARAM_INT, 'exam id'),
-                        'name' => new external_value(PARAM_TEXT, 'exam name'),
-                        'url' => new external_value(PARAM_TEXT, 'exam url'),
+                        'id' => new external_value(PARAM_INT, 'entry id'),
+                        'name' => new external_value(PARAM_TEXT, 'module name'),
+                        'url' => new external_value(PARAM_TEXT, 'module url'),
+//                        'course_id' => new external_value(PARAM_TEXT, 'course id'),
+//                        'cm_id' => new external_value(PARAM_TEXT, 'module id'),
                         'course_name' => new external_value(PARAM_TEXT, 'exam course name', VALUE_OPTIONAL),
                         'time_limit_mins' => new external_value(PARAM_INT, 'exxam duration', VALUE_OPTIONAL),
                         'is_proctored' => new external_value(PARAM_BOOL, 'exam proctored'),
@@ -134,7 +129,7 @@ class availability_examus_external extends external_api
     {
         global $DB;
 
-        $params = self::validate_parameters(self::submit_proctoring_review_parameters(),
+        self::validate_parameters(self::submit_proctoring_review_parameters(),
             array('accesscode' => $accesscode, 'review_link' => $review_link, 'status' => $status));
 
         $timenow = time();

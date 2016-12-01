@@ -63,7 +63,6 @@ class condition extends \core_availability\condition
         if (isset($_SESSION['examus'])) {
             $course = $info->get_course();
             $cm = $info->get_course_module();
-            $cmid = $cm->id;
             $accesscode = $_SESSION['examus'];
 
             $entry = $DB->get_record(
@@ -73,6 +72,11 @@ class condition extends \core_availability\condition
             if ($entry) {
                 $allow = True;
             }
+        }
+
+        if (isset($_SESSION['examus_api'])) {
+            // Call from api function
+            $allow = True;
         }
 
         if ($not) {
@@ -151,7 +155,6 @@ class condition extends \core_availability\condition
 
     public static function user_enrolment_deleted(\core\event\user_enrolment_deleted $event)
     {
-        global $DB;
         $cmid = $event->contextinstanceid;
         $course = get_course($event->courseid);
         $modinfo = get_fast_modinfo($course);
