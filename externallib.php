@@ -61,21 +61,25 @@ class availability_examus_external extends external_api
             $url = new moodle_url(
                 '/availability/condition/examus/entry.php',
                 array('accesscode' => $entry->accesscode));
-            array_push($answer,
-                array(
-                    'id' => $entry->id,
-                    'name' => $cm->get_formatted_name(),
-                    'url' => $url->out(),
-                    'course_name' => $course->fullname,
-                    'course_id' => $course->id,
-                    'cm_id' => $entry->cmid,
-                    'is_proctored' => True,
-                    'time_limit_mins' => $entry->duration,
-                    'accesscode' => $entry->accesscode,
-//                    'start' => new external_value(PARAM_TEXT, 'exam start', VALUE_OPTIONAL),
-//                    'end' => new external_value(PARAM_TEXT, 'exam end', VALUE_OPTIONAL),
-                )
+            $module_answer = array(
+                'id' => $entry->id,
+                'name' => $cm->get_formatted_name(),
+                'url' => $url->out(),
+                'course_name' => $course->fullname,
+                'course_id' => $course->id,
+                'cm_id' => $entry->cmid,
+                'is_proctored' => True,
+                'time_limit_mins' => $entry->duration,
+                'accesscode' => $entry->accesscode,
             );
+
+            if ($cm->get_module_type_name() == 'Quiz') {
+                $quiz = $DB->get_record('quiz', array('id' => $cm->instance));
+                $module_answer['start'] = $quiz->timeopen;
+                $module_answer['end'] = $quiz->timeclose;
+            }
+
+            array_push($answer, $module_answer);
         }
 
         return array('modules' => $answer);
@@ -96,12 +100,12 @@ class availability_examus_external extends external_api
                         'url' => new external_value(PARAM_TEXT, 'module url'),
 //                        'course_id' => new external_value(PARAM_TEXT, 'course id'),
 //                        'cm_id' => new external_value(PARAM_TEXT, 'module id'),
-                        'course_name' => new external_value(PARAM_TEXT, 'exam course name', VALUE_OPTIONAL),
-                        'time_limit_mins' => new external_value(PARAM_INT, 'exxam duration', VALUE_OPTIONAL),
-                        'is_proctored' => new external_value(PARAM_BOOL, 'exam proctored'),
-                        'accesscode' => new external_value(PARAM_TEXT, 'exam code'),
-                        'start' => new external_value(PARAM_TEXT, 'exam start', VALUE_OPTIONAL),
-                        'end' => new external_value(PARAM_TEXT, 'exam end', VALUE_OPTIONAL),
+                        'course_name' => new external_value(PARAM_TEXT, 'module course name', VALUE_OPTIONAL),
+                        'time_limit_mins' => new external_value(PARAM_INT, 'module duration', VALUE_OPTIONAL),
+                        'is_proctored' => new external_value(PARAM_BOOL, 'module proctored'),
+                        'accesscode' => new external_value(PARAM_TEXT, 'module code'),
+                        'start' => new external_value(PARAM_INT, 'module start', VALUE_OPTIONAL),
+                        'end' => new external_value(PARAM_INT, 'module end', VALUE_OPTIONAL),
                     ), 'module')
             ),)
         );
