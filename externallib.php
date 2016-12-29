@@ -73,7 +73,7 @@ class availability_examus_external extends external_api
                 'accesscode' => $entry->accesscode,
             );
 
-            if ($cm->get_module_type_name() == get_string('modulename', 'mod_quiz')) {
+            if ($cm->modname == "quiz") {
                 $quiz = $DB->get_record('quiz', array('id' => $cm->instance));
                 $module_answer['start'] = $quiz->timeopen;
                 $module_answer['end'] = $quiz->timeclose;
