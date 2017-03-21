@@ -33,10 +33,9 @@ M.availability_examus.form.getNode = function(json) {
 
     if (!M.availability_examus.form.addedEvents) {
         M.availability_examus.form.addedEvents = true;
-        root = Y.one('#id_availabilityconditionsheader');
+
+        root = Y.one(".availability-field");
         root.delegate('valuechange', function () {
-            console.log('event');
-            // Trigger the updating of the hidden availability data whenever the password field changes.
             M.core_availability.form.update();
         }, '.availability_examus input[name=duration]');
     }
@@ -51,7 +50,6 @@ M.availability_examus.form.fillValue = function(value, node) {
 M.availability_examus.form.fillErrors = function(errors, node) {
     var value = {};
     this.fillValue(value, node);
-    console.log(value.duration);
 
     if (value.duration === undefined || !/^\d+$/.test(value.duration) || value.duration % 30 !== 0) {
             errors.push('availability_examus:error_setduration');
