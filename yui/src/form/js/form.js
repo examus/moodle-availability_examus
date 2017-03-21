@@ -31,9 +31,8 @@ M.availability_examus.form.getNode = function(json) {
 
     if (!M.availability_examus.form.addedEvents) {
         M.availability_examus.form.addedEvents = true;
-        root = Y.one('#fitem_id_availabilityconditionsjson');
+        root = Y.one(".availability-field");
         root.delegate('valuechange', function () {
-            // Trigger the updating of the hidden availability data whenever the password field changes.
             M.core_availability.form.update();
         }, '.availability_examus input[name=duration]');
     }
@@ -42,14 +41,14 @@ M.availability_examus.form.getNode = function(json) {
 };
 
 M.availability_examus.form.fillValue = function(value, node) {
-    value.duration = node.one('input[name=duration').get('value').trim();
+    value.duration = node.one('input[name=duration]').get('value').trim();
 };
 
 M.availability_examus.form.fillErrors = function(errors, node) {
     var value = {};
     this.fillValue(value, node);
 
-    if (value.duration === undefined || !/^\d+$/.test(value.duration) || value.duration % 30 != 0) {
+    if (value.duration === undefined || !/^\d+$/.test(value.duration) || value.duration % 30 !== 0) {
             errors.push('availability_examus:error_setduration');
     }
 };
