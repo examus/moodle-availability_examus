@@ -1,4 +1,4 @@
-#EXAMUS MOODLE PLUGIN
+# EXAMUS MOODLE PLUGIN
 
 ## Requirements
 1. Examus plugin was tested with Moodle 3.1 version
