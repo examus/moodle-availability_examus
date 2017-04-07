@@ -12,10 +12,14 @@ class condition extends \core_availability\condition
 {
 
     protected $duration = 60;
+    protected $mode = 'normal';
     public function __construct($structure)
     {
         if (!empty($structure->duration)) {
             $this->duration = $structure->duration;
+        }
+        if (!empty($structure->mode)) {
+            $this->mode = $structure->mode;
         }
     }
 
@@ -37,6 +41,12 @@ class condition extends \core_availability\condition
         return (int) $econds[0]->duration;
     }
 
+    public static function get_examus_mode($cm) {
+        $econds = self::get_examus_conditions($cm);
+        // TODO: restrict examus condition to be only one
+        return (string) $econds[0]->mode;
+    }
+
     private static function get_examus_conditions($cm) {
         $info = new info_module($cm);
         try {
@@ -49,7 +59,7 @@ class condition extends \core_availability\condition
 
     public function save()
     {
-        return (object) ['duration' => (int) $this->duration];
+        return (object) ['duration' => (int) $this->duration, 'mode' => (string) $this->mode];
     }
 
     public function is_available($not,

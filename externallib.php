@@ -30,6 +30,8 @@ class availability_examus_external extends external_api
 
         $user = $DB->get_record('user', array('email' => $useremail));
         $courses = enrol_get_users_courses($user->id, true);
+
+        $answer = array();
         foreach ($courses as $course) {
             $course = get_course($course->id);
 
@@ -40,8 +42,33 @@ class availability_examus_external extends external_api
             foreach ($instances_by_types as $instances) {
                 foreach ($instances as $cm) {
                     if (\availability_examus\condition::has_examus_condition($cm) and $cm->uservisible) {
-                        \availability_examus\condition::create_entry_for_cm($user->id, $cm);
+                        $entry = \availability_examus\condition::create_entry_for_cm($user->id, $cm);
                         // TODO build answer array here
+                        $url = new moodle_url(
+                            '/availability/condition/examus/entry.php',
+                            array('accesscode' => $entry->accesscode));
+                        $module_answer = array(
+                            'id' => $entry->id,
+                            'name' => $cm->get_formatted_name(),
+                            'url' => $url->out(),
+                            'course_name' => $course->fullname,
+                            'course_id' => $course->id,
+                            'cm_id' => $entry->cmid,
+                            'is_proctored' => True,
+                            'time_limit_mins' => $entry->duration,
+                            'mode' => \availability_examus\condition::get_examus_mode($cm),
+                            'accesscode' => $entry->accesscode,
+                        );
+
+                        if ($cm->modname == "quiz") {
+                            $quiz = $DB->get_record('quiz', array('id' => $cm->instance));
+                            $module_answer['start'] = $quiz->timeopen;
+                            $module_answer['end'] = $quiz->timeclose;
+                        }
+
+                        array_push($answer, $module_answer);
+
+
                     } else {
                         \availability_examus\condition::delete_empty_entry_for_cm($user->id, $cm);
                     }
@@ -49,37 +76,6 @@ class availability_examus_external extends external_api
                 }
             }
 
-        }
-
-        $entries = $DB->get_records('availability_examus', array('userid' => $user->id, 'status' => 'Not inited'));
-
-        $answer = array();
-        foreach ($entries as $entry) {
-            $course = get_course($entry->courseid);
-            $modinfo = get_fast_modinfo($course);
-            $cm = $modinfo->get_cm($entry->cmid);
-            $url = new moodle_url(
-                '/availability/condition/examus/entry.php',
-                array('accesscode' => $entry->accesscode));
-            $module_answer = array(
-                'id' => $entry->id,
-                'name' => $cm->get_formatted_name(),
-                'url' => $url->out(),
-                'course_name' => $course->fullname,
-                'course_id' => $course->id,
-                'cm_id' => $entry->cmid,
-                'is_proctored' => True,
-                'time_limit_mins' => $entry->duration,
-                'accesscode' => $entry->accesscode,
-            );
-
-            if ($cm->modname == "quiz") {
-                $quiz = $DB->get_record('quiz', array('id' => $cm->instance));
-                $module_answer['start'] = $quiz->timeopen;
-                $module_answer['end'] = $quiz->timeclose;
-            }
-
-            array_push($answer, $module_answer);
         }
 
         return array('modules' => $answer);
@@ -102,6 +98,7 @@ class availability_examus_external extends external_api
 //                        'cm_id' => new external_value(PARAM_TEXT, 'module id'),
                         'course_name' => new external_value(PARAM_TEXT, 'module course name', VALUE_OPTIONAL),
                         'time_limit_mins' => new external_value(PARAM_INT, 'module duration', VALUE_OPTIONAL),
+                        'mode' => new external_value(PARAM_TEXT, 'module proctoring mode', VALUE_OPTIONAL),
                         'is_proctored' => new external_value(PARAM_BOOL, 'module proctored'),
                         'accesscode' => new external_value(PARAM_TEXT, 'module code'),
                         'start' => new external_value(PARAM_INT, 'module start', VALUE_OPTIONAL),
