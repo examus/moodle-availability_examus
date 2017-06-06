@@ -11,4 +11,8 @@ $observers = [
         'eventname' => '\core\event\user_enrolment_deleted',
         'callback' => '\availability_examus\condition::user_enrolment_deleted'
     ],
+    [
+        'eventname' => '\mod_quiz\event\attempt_submitted',
+        'callback' => '\availability_examus\condition::attempt_submitted'
+    ]
 ];

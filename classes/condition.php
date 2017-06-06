@@ -176,4 +176,22 @@ class condition extends \core_availability\condition
         }
     }
 
+    public static function attempt_submitted(\mod_quiz\event\attempt_submitted $event)
+    {
+        global $DB;
+        $cmid = $event->contextinstanceid;
+        $course = get_course($event->courseid);
+        $modinfo = get_fast_modinfo($course);
+        $cm = $modinfo->get_cm($cmid);
+        $userid = $event->relateduserid;
+
+
+        $entry = $DB->get_record(
+            'availability_examus',
+            array('userid' => $userid, 'courseid' => $event->courseid, 'cmid' => $cmid));
+        $entry->status = "Finished";
+        $DB->update_record('availability_examus', $entry);
+
+    }
+
 }
