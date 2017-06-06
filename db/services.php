@@ -13,14 +13,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Web service local plugin template external functions and service definitions.
- *
- * @package    localwstemplate
- * @copyright  2011 Jerome Mouneyrac
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 // We defined the web service functions to install.
 $functions = array(
         'availability_examus_user_proctored_modules' => array(
@@ -38,13 +30,23 @@ $functions = array(
                 'description' => 'Accepts review for proctoring session',
                 'type'        => 'write',
                 'services'    => 'Examus',
+        ),
+        'availability_examus_user_proctored_module_status' => array(
+                'classname'   => 'availability_examus_external',
+                'methodname'  => 'user_proctored_module_status',
+                'classpath'   => 'availability/condition/examus/externallib.php',
+                'description' => 'Returns entry status',
+                'type'        => 'write',
+                'services'    => 'Examus',
         )
 );
 
 // We define the services to install as pre-build services. A pre-build service is not editable by administrator.
 $services = array(
         'Examus' => array(
-                'functions' => array ('availability_examus_user_proctored_modules', 'availability_examus_submit_proctoring_review'),
+                'functions' => array ('availability_examus_user_proctored_modules',
+                    'availability_examus_submit_proctoring_review',
+                    'availability_examus_user_proctored_module_status'),
                 'restrictedusers' => 0,
                 'enabled'=>1,
         )

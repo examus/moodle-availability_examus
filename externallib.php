@@ -18,7 +18,7 @@ class availability_examus_external extends external_api
 
     /**
      * Returns welcome message
-     * @return string welcome message
+     * @return array
      */
     public static function user_proctored_modules($useremail)
     {
@@ -124,7 +124,7 @@ class availability_examus_external extends external_api
 
     /**
      * Returns welcome message
-     * @return string welcome message
+     * @return array
      */
     public static function submit_proctoring_review($accesscode, $review_link, $status)
     {
@@ -160,5 +160,43 @@ class availability_examus_external extends external_api
                 'error' => new external_value(PARAM_TEXT, 'error message')
             )
         );
+    }
+
+    public static function user_proctored_module_status_parameters()
+    {
+        return new external_function_parameters(
+            array('accesscode' => new external_value(PARAM_TEXT, 'Accesscode'))
+        );
+    }
+
+    /**
+     * Returns welcome message
+     * @return array
+     */
+    public static function user_proctored_module_status($accesscode)
+    {
+        global $DB;
+
+        self::validate_parameters(self::user_proctored_module_status_parameters(),
+            array('accesscode' => $accesscode));
+        $_SESSION['examus_api'] = True;
+
+        $entry = $DB->get_record('availability_examus', array('accesscode' => $accesscode));
+        if ($entry) {
+            return array('status' => $entry->status);
+        }
+        return array('status' => "Not found");
+    }
+
+    /**
+     * Returns description of method result value
+     * @return external_description
+     */
+    public static function user_proctored_module_status_returns()
+    {
+        return new external_single_structure(
+                    array(
+                        'status' => new external_value(PARAM_TEXT, 'Status'),
+                    ), 'module');
     }
 }
