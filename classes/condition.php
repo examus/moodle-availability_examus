@@ -115,8 +115,7 @@ class condition extends \core_availability\condition
     public static function create_entry_for_cm($userid, $cm){
         $course = $cm->get_course();
         $courseid = $course->id;
-        $duration = self::get_examus_duration($cm);
-        return self::create_entry_if_not_exist($userid, $courseid, $cm->id, $duration);
+        return self::create_entry_if_not_exist($userid, $courseid, $cm->id);
     }
 
     public static function delete_empty_entry_for_cm($userid, $cm){
@@ -125,7 +124,7 @@ class condition extends \core_availability\condition
         self::delete_empty_entry($userid, $courseid, $cm->id);
     }
 
-    private static function create_entry_if_not_exist($userid, $courseid, $cmid, $duration)
+    private static function create_entry_if_not_exist($userid, $courseid, $cmid)
     {
         // TODO: refactor this to get courseid and duration from cm
         global $DB;
@@ -145,16 +144,11 @@ class condition extends \core_availability\condition
             $entry->status = 'Not inited';
             $entry->timecreated = $timenow;
             $entry->timemodified = $timenow;
-            $entry->duration = $duration;
             $DB->insert_record('availability_examus', $entry);
             return $entry;
         } else {
             foreach ($entries as $entry) {
                 if ($entry->status == 'Not inited') {
-                    if ($entry->duration != $duration) {
-                        $entry->duration = $duration;
-                        $DB->update_record('availability_examus', $entry);
-                    }
                     return $entry;
                 }
             }

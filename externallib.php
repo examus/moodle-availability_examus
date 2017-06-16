@@ -55,7 +55,7 @@ class availability_examus_external extends external_api
                             'course_id' => $course->id,
                             'cm_id' => $entry->cmid,
                             'is_proctored' => True,
-                            'time_limit_mins' => $entry->duration,
+                            'time_limit_mins' => \availability_examus\condition::get_examus_duration($cm),
                             'mode' => \availability_examus\condition::get_examus_mode($cm),
                             'accesscode' => $entry->accesscode,
                         );
@@ -124,7 +124,7 @@ class availability_examus_external extends external_api
 
     /**
      * Returns welcome message
-     * @return string welcome message
+     * @return array
      */
     public static function submit_proctoring_review($accesscode, $review_link, $status)
     {
