@@ -23,3 +23,5 @@ $string['mode'] = 'Proctoring mode';
 $string['normal_mode'] = 'Normal (Full human proctoring)';
 $string['olympics_mode'] = 'Olympics (Automatic)';
 $string['identification_mode'] = 'Identification (Human identification, automatic proctoring)';
+
+$string['time_scheduled'] = 'Scheduled';
