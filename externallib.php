@@ -12,7 +12,10 @@ class availability_examus_external extends external_api
     public static function user_proctored_modules_parameters()
     {
         return new external_function_parameters(
-            array('useremail' => new external_value(PARAM_TEXT, 'User Email'))
+            array(
+                'useremail' => new external_value(PARAM_TEXT, 'User Email'),
+                'accesscode' => new external_value(PARAM_TEXT, 'Access Code',VALUE_OPTIONAL),
+                )
         );
     }
 
@@ -20,12 +23,46 @@ class availability_examus_external extends external_api
      * Returns welcome message
      * @return array
      */
-    public static function user_proctored_modules($useremail)
+    public static function user_proctored_modules($useremail, $accesscode)
     {
         global $DB;
 
         self::validate_parameters(self::user_proctored_modules_parameters(),
-            array('useremail' => $useremail));
+            array('useremail' => $useremail, 'accesscode' => $accesscode));
+
+        if ($accesscode) {
+            $entries = $DB->get_records(
+                'availability_examus',
+                array('accesscode' => $accesscode));
+
+            if (count($entries) == 0) {
+                return array('modules' => array());
+            }
+            foreach ($entries as $entry) {
+
+                $course = get_course($entry->courseid);
+                $modinfo = get_fast_modinfo($course);
+                $cm = $modinfo->get_cm($entry->cmid);
+
+                return array('modules' => array(
+                    array(
+                        'id' => $entry->id,
+                        'name' => $cm->get_formatted_name(),
+                        'url' => $entry->url,
+                        'course_name' => $course->fullname,
+                        'course_id' => $course->id,
+                        'cm_id' => $entry->cmid,
+                        'status' => $entry->status,
+                        'is_proctored' => True,
+                        'time_limit_mins' => \availability_examus\condition::get_examus_duration($cm),
+                        'mode' => \availability_examus\condition::get_examus_mode($cm),
+                        'accesscode' => $entry->accesscode,
+                    )
+                ));
+            }
+
+        }
+
         $_SESSION['examus_api'] = True;
 
         $user = $DB->get_record('user', array('email' => $useremail));
@@ -54,6 +91,7 @@ class availability_examus_external extends external_api
                             'course_name' => $course->fullname,
                             'course_id' => $course->id,
                             'cm_id' => $entry->cmid,
+                            'status' => $entry->status,
                             'is_proctored' => True,
                             'time_limit_mins' => \availability_examus\condition::get_examus_duration($cm),
                             'mode' => \availability_examus\condition::get_examus_mode($cm),
@@ -96,6 +134,7 @@ class availability_examus_external extends external_api
                         'url' => new external_value(PARAM_TEXT, 'module url'),
 //                        'course_id' => new external_value(PARAM_TEXT, 'course id'),
 //                        'cm_id' => new external_value(PARAM_TEXT, 'module id'),
+                        'status' => new external_value(PARAM_TEXT, 'status'),
                         'course_name' => new external_value(PARAM_TEXT, 'module course name', VALUE_OPTIONAL),
                         'time_limit_mins' => new external_value(PARAM_INT, 'module duration', VALUE_OPTIONAL),
                         'mode' => new external_value(PARAM_TEXT, 'module proctoring mode', VALUE_OPTIONAL),
