@@ -13,7 +13,7 @@ $observers = [
     ],
     [
         'eventname' => '\mod_quiz\event\attempt_submitted',
-        'callback' => 'quiz_attempt_submitted_handler',
+        'callback' => 'examus_attempt_submitted_handler',
         'includefile' => '/availability/condition/examus/locallib.php',
         'internal' => false
     ]

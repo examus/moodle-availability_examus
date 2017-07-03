@@ -14,10 +14,6 @@ function examus_attempt_submitted_handler($event) {
     $quiz    = $event->get_record_snapshot('quiz', $attempt->quiz);
     $cm      = get_coursemodule_from_id('quiz', $event->get_context()->instanceid, $event->courseid);
 
-//    $cmid = $event->contextinstanceid;
-//    $course = get_course($event->courseid);
-//    $modinfo = get_fast_modinfo($course);
-//    $cm = $modinfo->get_cm($cmid);
     $userid = $event->userid;
     $entries = $DB->get_records(
         'availability_examus',
