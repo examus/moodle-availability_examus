@@ -81,6 +81,7 @@ class availability_examus_external extends external_api
                     if (\availability_examus\condition::has_examus_condition($cm) and $cm->uservisible) {
                         $entry = \availability_examus\condition::create_entry_for_cm($user->id, $cm);
                         // TODO build answer array here
+                        if ($entry == null) continue;
                         $url = new moodle_url(
                             '/availability/condition/examus/entry.php',
                             array('accesscode' => $entry->accesscode));
