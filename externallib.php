@@ -21,6 +21,44 @@ class availability_examus_external extends external_api
 
     /**
      * Returns welcome message
+     * @param $accesscode
+     * @param $status
+     * @param $review_link
+     * @param $timescheduled
+     * @return array
+     */
+    public static function submit_proctoring_review($accesscode, $status, $review_link, $timescheduled) {
+        global $DB;
+
+        self::validate_parameters(self::submit_proctoring_review_parameters(), array(
+            'accesscode' => $accesscode,
+            'review_link' => $review_link,
+            'status' => $status,
+            'timescheduled' => $timescheduled));
+
+        $timenow = time();
+        $entry = $DB->get_record('availability_examus', array('accesscode' => $accesscode));
+
+        if ($entry) {
+            if ($review_link) $entry->review_link = $review_link;
+
+            if ($timescheduled === -1)
+                $entry->timescheduled = null;
+            elseif ($timescheduled !== null)
+                $entry->timescheduled = $timescheduled;
+
+            $entry->status = $status;
+            $entry->timemodified = $timenow;
+
+            $DB->update_record('availability_examus', $entry);
+            return array('success' => True, 'error'=>null);
+        }
+        return array('success' => False, 'error'=>'Entry was not found');
+
+    }
+
+    /**
+     * Returns welcome message
      * @return array
      */
     public static function user_proctored_modules($useremail, $accesscode)
@@ -157,46 +195,11 @@ class availability_examus_external extends external_api
     {
         return new external_function_parameters(
             array('accesscode' => new external_value(PARAM_TEXT, 'Access Code'),
-                'review_link' => new external_value(PARAM_TEXT, 'Link to review page', VALUE_OPTIONAL),
                 'status' => new external_value(PARAM_TEXT, 'Status of review'),
+                'review_link' => new external_value(PARAM_TEXT, 'Link to review page', VALUE_OPTIONAL),
                 'timescheduled' => new external_value(PARAM_INT, 'Time scheduled', VALUE_OPTIONAL)
             )
         );
-    }
-
-    /**
-     * Returns welcome message
-     * @param $accesscode
-     * @param $review_link
-     * @param $status
-     * @param $timescheduled
-     * @return array
-     */
-    public static function submit_proctoring_review($accesscode, $review_link, $status, $timescheduled)
-    {
-        global $DB;
-
-        self::validate_parameters(self::submit_proctoring_review_parameters(), array(
-            'accesscode' => $accesscode,
-            'review_link' => $review_link,
-            'status' => $status,
-            'timescheduled' => $timescheduled));
-
-        $timenow = time();
-        $entry = $DB->get_record('availability_examus', array('accesscode' => $accesscode));
-
-        if ($entry) {
-            if ($review_link) $entry->review_link = $review_link;
-            if ($timescheduled) $entry->review_link = $timescheduled;
-
-            $entry->status = $status;
-            $entry->timemodified = $timenow;
-
-            $DB->update_record('availability_examus', $entry);
-            return array('success' => True, 'error'=>null);
-        }
-        return array('success' => False, 'error'=>'Entry was not found');
-
     }
 
     /**
