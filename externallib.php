@@ -14,7 +14,7 @@ class availability_examus_external extends external_api
         return new external_function_parameters(
             array(
                 'useremail' => new external_value(PARAM_TEXT, 'User Email'),
-                'accesscode' => new external_value(PARAM_TEXT, 'Access Code',VALUE_OPTIONAL),
+                'accesscode' => new external_value(PARAM_TEXT, 'Access Code',VALUE_DEFAULT, ""),
                 )
         );
     }
@@ -40,9 +40,10 @@ class availability_examus_external extends external_api
         $entry = $DB->get_record('availability_examus', array('accesscode' => $accesscode));
 
         if ($entry) {
-            if ($review_link === null) $entry->review_link = $review_link;
+            if ($review_link) $entry->review_link = $review_link;
 
-            if ($timescheduled === null) $entry->timescheduled = $timescheduled;
+            if ($timescheduled === -1) $entry->timescheduled = null;
+            elseif ($timescheduled) $entry->timescheduled = $timescheduled;
 
             $entry->status = $status;
             $entry->timemodified = $timenow;
@@ -193,8 +194,8 @@ class availability_examus_external extends external_api
         return new external_function_parameters(
             array('accesscode' => new external_value(PARAM_TEXT, 'Access Code'),
                 'status' => new external_value(PARAM_TEXT, 'Status of review'),
-                'review_link' => new external_value(PARAM_TEXT, 'Link to review page', VALUE_DEFAULT, false),
-                'timescheduled' => new external_value(PARAM_INT, 'Time scheduled', VALUE_DEFAULT, false)
+                'review_link' => new external_value(PARAM_TEXT, 'Link to review page', VALUE_DEFAULT, ""),
+                'timescheduled' => new external_value(PARAM_INT, 'Time scheduled', VALUE_DEFAULT, 0)
             )
         );
     }
