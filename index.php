@@ -101,7 +101,7 @@ if (!empty($entries)) {
             $row[] = "-";
         }
 
-        if ($entry->status != 'Not inited') {
+        if ($entry->status != 'Not inited' and $entry->status != 'Scheduled') {
             $row[] = "<form action='index.php' method='post'>" .
                 "<input type='hidden' name='id' value='" . $entry->id . "'>" .
                 "<input type='hidden' name='action' value='renew'>" .
