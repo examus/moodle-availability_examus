@@ -31,7 +31,6 @@ switch ($action) {
                 $entry->status = 'Not inited';
                 $entry->timecreated = $timenow;
                 $entry->timemodified = $timenow;
-                $entry->duration = $old_entry->duration;
                 $DB->insert_record('availability_examus', $entry);
                 redirect('index.php', get_string('new_entry_created', 'availability_examus'),
                     null, \core\output\notification::NOTIFY_SUCCESS);
@@ -55,9 +54,10 @@ $entries = $DB->get_records('availability_examus', array(), '-id');
 if (!empty($entries)) {
     $table = new flexible_table('availability_examus_table');
 
-    $table->define_columns(array('date', 'user', 'course', 'module', 'status', 'review_link', 'create_entry'));
+    $table->define_columns(array('date', 'time_scheduled', 'user', 'course', 'module', 'status', 'review_link', 'create_entry'));
     $table->define_headers(array(
         get_string('date_modified', 'availability_examus'),
+        get_string('time_scheduled', 'availability_examus'),
         get_string('user'),
         get_string('course'),
         get_string('module', 'availability_examus'),
@@ -77,6 +77,14 @@ if (!empty($entries)) {
         $row[] = '<b>' . $date['year'] . '.' . $date['mon'] . '.' . $date['mday'] . '</b> ' .
             $date['hours'] . ':' . $date['minutes'];
 
+        if ($entry->timescheduled) {
+            $time_scheduled = usergetdate($entry->timescheduled);
+            $row[] = '<b>' . $time_scheduled['year'] . '.' . $time_scheduled['mon'] . '.' . $time_scheduled['mday'] . '</b> ' .
+                $time_scheduled['hours'] . ':' . $time_scheduled['minutes'];
+        } else {
+            $row[] = '';
+        }
+
         $user = $DB->get_record('user', array('id' => $entry->userid));
         $row[] = $user->firstname . " " . $user->lastname . "<br>" . $user->email;
 
@@ -93,7 +101,7 @@ if (!empty($entries)) {
             $row[] = "-";
         }
 
-        if ($entry->status != 'Not inited') {
+        if ($entry->status != 'Not inited' and $entry->status != 'Scheduled') {
             $row[] = "<form action='index.php' method='post'>" .
                 "<input type='hidden' name='id' value='" . $entry->id . "'>" .
                 "<input type='hidden' name='action' value='renew'>" .
