@@ -65,7 +65,6 @@ M.availability_examus.form.fillValue = function (value, node) {
 M.availability_examus.form.fillErrors = function (errors, node) {
     var value = {};
     this.fillValue(value, node);
-    console.log(value.duration); debugger;
     if (value.duration === undefined || !(new RegExp('^\\d+$')).test(value.duration) || value.duration % 30 !== 0) {
         errors.push('availability_examus:error_setduration');
     }
