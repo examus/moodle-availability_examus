@@ -9,13 +9,13 @@ M.availability_examus = M.availability_examus || {};
 M.availability_examus.form = Y.Object(M.core_availability.plugin);
 
 M.availability_examus.form.initInner = function () {
-    // Nothing
+    // Nothing.
 };
 
 M.availability_examus.form.instId = 1;
 
 M.availability_examus.form.getNode = function (json) {
-    var html, node, root, id, strings, mode_id;
+    var html, node, root, id, strings, modeId;
     strings = M.str.availability_examus;
 
     id = 'examus' + M.availability_examus.form.instId;
@@ -26,11 +26,13 @@ M.availability_examus.form.getNode = function (json) {
     html += '<label for"' + id + '">' + strings.duration + '</label> ';
     html += '<input type="text" name="duration" id="' + id + '">';
 
-    mode_id = 'examus' + M.availability_examus.form.instId;
-    html += '<br><label for"' + mode_id + '">' + strings.mode + '</label> ';
-    html += '<select name="mode" id="' + mode_id + '"><option value="normal">' + strings.normal_mode +
-        '</option><option value="identification">' + strings.identification_mode +
-        '</option><option value="olympics">' + strings.olympics_mode + '</option></select>';
+    modeId = 'examus' + M.availability_examus.form.instId;
+    html += '<br><label for"' + modeId + '">' + strings.mode + '</label> ';
+    html += '<select name="mode" id="' + modeId + '">';
+    html += '  <option value="normal">' + strings.normal_mode + '</option>';
+    html += '  <option value="identification">' + strings.identification_mode + '</option>';
+    html += '  <option value="olympics">' + strings.olympics_mode + '</option>';
+    html += '</select>';
 
     node = Y.Node.create('<span> ' + html + ' </span>');
     if (json.duration !== undefined) {
@@ -38,7 +40,7 @@ M.availability_examus.form.getNode = function (json) {
     }
 
     if (json.mode !== undefined) {
-        node.one('select[name=mode] option[value='+json.mode+']').set('selected', 'selected');
+        node.one('select[name=mode] option[value=' + json.mode + ']').set('selected', 'selected');
     }
 
     if (!M.availability_examus.form.addedEvents) {
@@ -63,8 +65,8 @@ M.availability_examus.form.fillValue = function (value, node) {
 M.availability_examus.form.fillErrors = function (errors, node) {
     var value = {};
     this.fillValue(value, node);
-
-    if (value.duration === undefined || !/^\d+$/.test(value.duration) || value.duration % 30 !== 0) {
+    console.log(value.duration); debugger;
+    if (value.duration === undefined || !(new RegExp('^\\d+$')).test(value.duration) || value.duration % 30 !== 0) {
         errors.push('availability_examus:error_setduration');
     }
 };

@@ -1,4 +1,19 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 require_once('../../../config.php');
 require_once("{$CFG->libdir}/formslib.php");
 require_once($CFG->libdir . '/adminlib.php');
@@ -13,20 +28,20 @@ $action = optional_param('action', '', PARAM_ALPHA);
 switch ($action) {
     case 'renew':
         $id = required_param('id', PARAM_TEXT);
-        $old_entry = $DB->get_record('availability_examus', array('id' => $id));
+        $oldentry = $DB->get_record('availability_examus', array('id' => $id));
 
-        if ($old_entry and $old_entry->status != 'Not inited') {
+        if ($oldentry and $oldentry->status != 'Not inited') {
             $entries = $DB->get_records('availability_examus', array(
-                'userid' => $old_entry->userid,
-                'courseid' => $old_entry->courseid,
-                'cmid' => $old_entry->cmid,
+                'userid' => $oldentry->userid,
+                'courseid' => $oldentry->courseid,
+                'cmid' => $oldentry->cmid,
                 'status' => 'Not inited'));
             if (count($entries) == 0) {
                 $timenow = time();
                 $entry = new stdClass();
-                $entry->userid = $old_entry->userid;
-                $entry->courseid = $old_entry->courseid;
-                $entry->cmid = $old_entry->cmid;
+                $entry->userid = $oldentry->userid;
+                $entry->courseid = $oldentry->courseid;
+                $entry->cmid = $oldentry->cmid;
                 $entry->accesscode = md5(uniqid(rand(), 1));
                 $entry->status = 'Not inited';
                 $entry->timecreated = $timenow;
@@ -78,9 +93,9 @@ if (!empty($entries)) {
             $date['hours'] . ':' . $date['minutes'];
 
         if ($entry->timescheduled) {
-            $time_scheduled = usergetdate($entry->timescheduled);
-            $row[] = '<b>' . $time_scheduled['year'] . '.' . $time_scheduled['mon'] . '.' . $time_scheduled['mday'] . '</b> ' .
-                $time_scheduled['hours'] . ':' . $time_scheduled['minutes'];
+            $timescheduled = usergetdate($entry->timescheduled);
+            $row[] = '<b>' . $timescheduled['year'] . '.' . $timescheduled['mon'] . '.' . $timescheduled['mday'] . '</b> ' .
+                $timescheduled['hours'] . ':' . $timescheduled['minutes'];
         } else {
             $row[] = '';
         }
