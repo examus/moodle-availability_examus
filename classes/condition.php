@@ -1,5 +1,4 @@
 <?php
-
 namespace availability_examus;
 
 defined('MOODLE_INTERNAL') || die();
@@ -13,8 +12,8 @@ class condition extends \core_availability\condition
 
     protected $duration = 60;
     protected $mode = 'normal';
-    public function __construct($structure)
-    {
+
+    public function __construct($structure) {
         if (!empty($structure->duration)) {
             $this->duration = $structure->duration;
         }
@@ -23,35 +22,38 @@ class condition extends \core_availability\condition
         }
     }
 
-    private static function delete_empty_entry($userid, $courseid, $cmid)
-    {
+    private static function delete_empty_entry($userid, $courseid, $cmid) {
         global $DB;
         $DB->delete_records('availability_examus', array(
             'userid' => $userid, 'courseid' => $courseid, 'cmid' => $cmid, 'status' => 'Not inited'));
     }
 
-    public static function has_examus_condition($cm) {
+    public static function has_examus_condition($cm)
+    {
         $econds = self::get_examus_conditions($cm);
         return (bool)$econds;
     }
 
-    public static function get_examus_duration($cm) {
+    public static function get_examus_duration($cm)
+    {
         $econds = self::get_examus_conditions($cm);
-        // TODO: restrict examus condition to be only one
-        return (int) $econds[0]->duration;
+        // TODO: restrict examus condition to be only one.
+        return (int)$econds[0]->duration;
     }
 
-    public static function get_examus_mode($cm) {
+    public static function get_examus_mode($cm)
+    {
         $econds = self::get_examus_conditions($cm);
-        // TODO: restrict examus condition to be only one
-        return (string) $econds[0]->mode;
+        // TODO: restrict examus condition to be only one.
+        return (string)$econds[0]->mode;
     }
 
-    private static function get_examus_conditions($cm) {
+    private static function get_examus_conditions($cm)
+    {
         $info = new info_module($cm);
         try {
             $tree = $info->get_availability_tree();
-        } catch(moodle_exception $e) {
+        } catch (moodle_exception $e) {
             return null;
         }
         return $tree->get_all_children('\\availability_examus\\condition');
@@ -59,7 +61,7 @@ class condition extends \core_availability\condition
 
     public function save()
     {
-        return (object) ['duration' => (int) $this->duration, 'mode' => (string) $this->mode];
+        return (object)['duration' => (int)$this->duration, 'mode' => (string)$this->mode];
     }
 
     public function is_available($not,
@@ -112,13 +114,15 @@ class condition extends \core_availability\condition
         $DB->delete_records('availability_examus', array('cmid' => $cmid));
     }
 
-    public static function create_entry_for_cm($userid, $cm){
+    public static function create_entry_for_cm($userid, $cm)
+    {
         $course = $cm->get_course();
         $courseid = $course->id;
         return self::create_entry_if_not_exist($userid, $courseid, $cm->id);
     }
 
-    public static function delete_empty_entry_for_cm($userid, $cm){
+    public static function delete_empty_entry_for_cm($userid, $cm)
+    {
         $course = $cm->get_course();
         $courseid = $course->id;
         self::delete_empty_entry($userid, $courseid, $cm->id);
@@ -131,7 +135,7 @@ class condition extends \core_availability\condition
         $entries = $DB->get_records(
             'availability_examus',
             array('userid' => $userid, 'courseid' => $courseid, 'cmid' => $cmid),
-            $sort='id');
+            $sort = 'id');
 
 
         if (count($entries) == 0) {
