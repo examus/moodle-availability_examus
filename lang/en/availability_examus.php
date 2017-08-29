@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Availability plugin for integration with Examus proctoring system.
+ *
+ * @package    availability_examus
+ * @copyright  2017 Max Pomazuev
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 
 $string['description'] = 'Allows students to use Examus proctoring service';

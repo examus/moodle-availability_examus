@@ -13,8 +13,22 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Availability plugin for integration with Examus proctoring system.
+ *
+ * @package    availability_examus
+ * @copyright  2017 Max Pomazuev
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * availability examus upgrade
+ * @param string $oldversion Oldversion
+ * @return bool
+ */
 function xmldb_availability_examus_upgrade($oldversion) {
     global $DB;
     $dbman = $DB->get_manager();

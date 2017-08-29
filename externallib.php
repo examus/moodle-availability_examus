@@ -13,10 +13,24 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Availability plugin for integration with Examus proctoring system.
+ *
+ * @package    availability_examus
+ * @copyright  2017 Max Pomazuev
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->libdir . "/externallib.php");
 
+/**
+ * Availability examus class
+ * @copyright  2017 Max Pomazuev
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class availability_examus_external extends external_api {
 
     /**
@@ -36,6 +50,8 @@ class availability_examus_external extends external_api {
     /**
      * Returns welcome message
      *
+     * @param string $useremail Useremail
+     * @param string $accesscode Accesscode
      * @return array
      */
     public static function user_proctored_modules($useremail, $accesscode) {
@@ -178,10 +194,10 @@ class availability_examus_external extends external_api {
     /**
      * Returns welcome message
      *
-     * @param $accesscode
-     * @param $status
-     * @param $reviewlink
-     * @param $timescheduled
+     * @param string $accesscode accesscode
+     * @param string $status status
+     * @param string $reviewlink reviewlink
+     * @param string $timescheduled timescheduled
      * @return array
      */
     public static function submit_proctoring_review($accesscode, $status, $reviewlink, $timescheduled) {
