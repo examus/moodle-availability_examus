@@ -94,7 +94,6 @@ class availability_examus_external extends external_api {
                 foreach ($instances as $cm) {
                     if (\availability_examus\condition::has_examus_condition($cm) and $cm->uservisible) {
                         $entry = \availability_examus\condition::create_entry_for_cm($user->id, $cm);
-                        // TODO build answer array here.
                         if ($entry == null) {
                             continue;
                         }
@@ -148,8 +147,6 @@ class availability_examus_external extends external_api {
                                         'id' => new external_value(PARAM_INT, 'entry id'),
                                         'name' => new external_value(PARAM_TEXT, 'module name'),
                                         'url' => new external_value(PARAM_TEXT, 'module url'),
-                                        // 'course_id' => new external_value(PARAM_TEXT, 'course id'),
-                                        // 'cm_id' => new external_value(PARAM_TEXT, 'module id'),
                                         'status' => new external_value(PARAM_TEXT, 'status'),
                                         'course_name' => new external_value(PARAM_TEXT, 'module course name', VALUE_OPTIONAL),
                                         'time_limit_mins' => new external_value(PARAM_INT, 'module duration', VALUE_OPTIONAL),
