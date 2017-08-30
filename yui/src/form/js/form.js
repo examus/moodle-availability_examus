@@ -1,4 +1,4 @@
-/*global M*/
+/* global M */
 /**
  * JavaScript for form editing profile conditions.
  *
@@ -15,23 +15,26 @@ M.availability_examus.form.initInner = function() {
 M.availability_examus.form.instId = 1;
 
 M.availability_examus.form.getNode = function(json) {
-    var html, node, root, id, strings, modeId;
-    strings = M.str.availability_examus;
+    var html, node, root, id, modeId;
+
+    function get_string(identifier) {
+        return M.util.get_string(identifier, 'availability_examus');
+    }
 
     id = 'examus' + M.availability_examus.form.instId;
     M.availability_examus.form.instId += 1;
 
-    html = '<label> ' + strings.title + ' </label><br>';
+    html = '<label> ' + get_string('title') + ' </label><br>';
 
-    html += '<label for"' + id + '">' + strings.duration + '</label> ';
+    html += '<label for"' + id + '">' + get_string('duration') + '</label> ';
     html += '<input type="text" name="duration" id="' + id + '">';
 
     modeId = 'examus' + M.availability_examus.form.instId;
-    html += '<br><label for"' + modeId + '">' + strings.mode + '</label> ';
+    html += '<br><label for"' + modeId + '">' + get_string('mode') + '</label> ';
     html += '<select name="mode" id="' + modeId + '">';
-    html += '  <option value="normal">' + strings.normal_mode + '</option>';
-    html += '  <option value="identification">' + strings.identification_mode + '</option>';
-    html += '  <option value="olympics">' + strings.olympics_mode + '</option>';
+    html += '  <option value="normal">' + get_string('normal_mode') + '</option>';
+    html += '  <option value="identification">' + get_string('identification_mode') + '</option>';
+    html += '  <option value="olympics">' + get_string('olympics_mode') + '</option>';
     html += '</select>';
 
     node = Y.Node.create('<span> ' + html + ' </span>');
