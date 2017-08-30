@@ -10,13 +10,13 @@ M.availability_examus = M.availability_examus || {};
 
 M.availability_examus.form = Y.Object(M.core_availability.plugin);
 
-M.availability_examus.form.initInner = function () {
+M.availability_examus.form.initInner = function() {
     // Nothing.
 };
 
 M.availability_examus.form.instId = 1;
 
-M.availability_examus.form.getNode = function (json) {
+M.availability_examus.form.getNode = function(json) {
     var html, node, root, id, strings, modeId;
     strings = M.str.availability_examus;
 
@@ -48,10 +48,10 @@ M.availability_examus.form.getNode = function (json) {
     if (!M.availability_examus.form.addedEvents) {
         M.availability_examus.form.addedEvents = true;
         root = Y.one(".availability-field");
-        root.delegate('valuechange', function () {
+        root.delegate('valuechange', function() {
             M.core_availability.form.update();
         }, '.availability_examus input[name=duration]');
-        root.delegate('valuechange', function () {
+        root.delegate('valuechange', function() {
             M.core_availability.form.update();
         }, '.availability_examus select[name=mode]');
     }
@@ -59,12 +59,12 @@ M.availability_examus.form.getNode = function (json) {
     return node;
 };
 
-M.availability_examus.form.fillValue = function (value, node) {
+M.availability_examus.form.fillValue = function(value, node) {
     value.duration = node.one('input[name=duration]').get('value').trim();
     value.mode = node.one('select[name=mode]').get('value').trim();
 };
 
-M.availability_examus.form.fillErrors = function (errors, node) {
+M.availability_examus.form.fillErrors = function(errors, node) {
     var value = {};
     this.fillValue(value, node);
     if (value.duration === undefined || !(new RegExp('^\\d+$')).test(value.duration) || value.duration % 30 !== 0) {
