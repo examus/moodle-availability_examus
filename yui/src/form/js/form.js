@@ -4,6 +4,7 @@
  *
  * @module moodle-availability_examus-form
  */
+/** @suppress checkVars */
 M.availability_examus = M.availability_examus || {};
 
 M.availability_examus.form = Y.Object(M.core_availability.plugin);
@@ -17,24 +18,25 @@ M.availability_examus.form.instId = 1;
 M.availability_examus.form.getNode = function(json) {
     var html, node, root, id, modeId;
 
-    function get_string(identifier) {
+    /** Returns string from translations. */
+    function getString(identifier) {
         return M.util.get_string(identifier, 'availability_examus');
     }
 
     id = 'examus' + M.availability_examus.form.instId;
     M.availability_examus.form.instId += 1;
 
-    html = '<label> ' + get_string('title') + ' </label><br>';
+    html = '<label> ' + getString('title') + ' </label><br>';
 
-    html += '<label for"' + id + '">' + get_string('duration') + '</label> ';
+    html += '<label for"' + id + '">' + getString('duration') + '</label> ';
     html += '<input type="text" name="duration" id="' + id + '">';
 
     modeId = 'examus' + M.availability_examus.form.instId;
-    html += '<br><label for"' + modeId + '">' + get_string('mode') + '</label> ';
+    html += '<br><label for"' + modeId + '">' + getString('mode') + '</label> ';
     html += '<select name="mode" id="' + modeId + '">';
-    html += '  <option value="normal">' + get_string('normal_mode') + '</option>';
-    html += '  <option value="identification">' + get_string('identification_mode') + '</option>';
-    html += '  <option value="olympics">' + get_string('olympics_mode') + '</option>';
+    html += '  <option value="normal">' + getString('normal_mode') + '</option>';
+    html += '  <option value="identification">' + getString('identification_mode') + '</option>';
+    html += '  <option value="olympics">' + getString('olympics_mode') + '</option>';
     html += '</select>';
 
     node = Y.Node.create('<span> ' + html + ' </span>');
