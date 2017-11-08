@@ -9,8 +9,11 @@ M.availability_examus = M.availability_examus || {};
 
 M.availability_examus.form = Y.Object(M.core_availability.plugin);
 
-M.availability_examus.form.initInner = function() {
-    // Nothing.
+M.availability_examus.form.rules = null;
+
+M.availability_examus.form.initInner = function(rules)
+{
+    this.rules = rules;
 };
 
 M.availability_examus.form.instId = 1;
@@ -39,6 +42,15 @@ M.availability_examus.form.getNode = function(json) {
     html += '  <option value="olympics">' + getString('olympics_mode') + '</option>';
     html += '</select>';
 
+    html += '<div class="rules">';
+    html += '<br><label>' + getString('rules') + '</label> ';
+    for (var key in this.rules) {
+        html += '  <br><input type="checkbox" name="' + key + '" id="' + key + '" value="' + key + '" >';
+        html += '  <label for="' + key + '">' + getString(key) + '</label>';
+    }
+    html += '</div>';
+
+
     node = Y.Node.create('<span> ' + html + ' </span>');
     if (json.duration !== undefined) {
         node.one('input[name=duration]').set('value', json.duration);
@@ -46,6 +58,16 @@ M.availability_examus.form.getNode = function(json) {
 
     if (json.mode !== undefined) {
         node.one('select[name=mode] option[value=' + json.mode + ']').set('selected', 'selected');
+    }
+
+    if (json.rules === undefined) {
+        json.rules = this.rules
+    }
+
+    for (key in json.rules) {
+        if (json.rules[key]) {
+            node.one('.rules input[name=' + key + ']').set('checked', 'checked');
+        }
     }
 
     if (!M.availability_examus.form.addedEvents) {
@@ -57,14 +79,29 @@ M.availability_examus.form.getNode = function(json) {
         root.delegate('valuechange', function() {
             M.core_availability.form.update();
         }, '.availability_examus select[name=mode]');
+        root.delegate('click', function() {
+            M.core_availability.form.update();
+        }, '.availability_examus .rules input');
     }
 
     return node;
 };
 
 M.availability_examus.form.fillValue = function(value, node) {
+    var rulesInputs, key;
     value.duration = node.one('input[name=duration]').get('value').trim();
     value.mode = node.one('select[name=mode]').get('value').trim();
+    value.rules = {};
+    rulesInputs = node.all('.rules input');
+    Y.each(rulesInputs, function (ruleInput) {
+        key = ruleInput.get('value');
+        if (ruleInput.get('checked') === true) {
+            value.rules[key] = true;
+        } else {
+            value.rules[key] = false;
+        }
+
+    });
 };
 
 M.availability_examus.form.fillErrors = function(errors, node) {

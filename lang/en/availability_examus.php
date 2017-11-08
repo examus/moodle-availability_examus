@@ -47,4 +47,18 @@ $string['normal_mode'] = 'Normal (Full human proctoring)';
 $string['olympics_mode'] = 'Olympics (Automatic)';
 $string['identification_mode'] = 'Identification (Human identification, automatic proctoring)';
 
+$string['rules'] = "Rules";
+
 $string['time_scheduled'] = 'Scheduled';
+
+// TODO: Translate here
+$string['allow_to_use_websites'] =  'allow_to_use_websites';
+$string['allow_to_use_books'] =  'allow_to_use_books';
+$string['allow_to_use_paper'] =  'allow_to_use_paper';
+$string['allow_to_use_messengers'] =  'allow_to_use_messengers';
+$string['allow_to_use_calculator'] =  'allow_to_use_calculator';
+$string['allow_to_use_excel'] =  'allow_to_use_excel';
+$string['allow_to_use_human_assistant'] =  'allow_to_use_human_assistant';
+$string['allow_absence_in_frame'] = 'allow_absence_in_frame';
+$string['allow_voices'] =  'allow_voices';
+$string['allow_wrong_gaze_direction'] =  'allow_wrong_gaze_direction';

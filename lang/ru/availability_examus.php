@@ -47,4 +47,18 @@ $string['normal_mode'] = 'Нормальный (Ручной прокторин�
 $string['olympics_mode'] = 'Олимпиадный (Полностью автоматический)';
 $string['identification_mode'] = 'Идентификация (Ручная идентификация, автоматический прокторинг)';
 
+$string['rules'] = "Правила";
+
 $string['time_scheduled'] = 'Время записи в календаре';
+
+// TODO: Translate here
+$string['allow_to_use_websites'] =  'allow_to_use_websites';
+$string['allow_to_use_books'] =  'allow_to_use_books';
+$string['allow_to_use_paper'] =  'allow_to_use_paper';
+$string['allow_to_use_messengers'] =  'allow_to_use_messengers';
+$string['allow_to_use_calculator'] =  'allow_to_use_calculator';
+$string['allow_to_use_excel'] =  'allow_to_use_excel';
+$string['allow_to_use_human_assistant'] =  'allow_to_use_human_assistant';
+$string['allow_absence_in_frame'] = 'allow_absence_in_frame';
+$string['allow_voices'] =  'allow_voices';
+$string['allow_wrong_gaze_direction'] =  'allow_wrong_gaze_direction';
