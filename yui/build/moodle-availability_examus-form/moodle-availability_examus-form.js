@@ -45,7 +45,7 @@ M.availability_examus.form.getNode = function(json) {
     html += '</select>';
 
     html += '<div class="rules">';
-    html += '<br><label>' + getString('rules') + '</label> ';
+    html += '<label>' + getString('rules') + '</label> ';
     for (var key in this.rules) {
         html += '  <br><input type="checkbox" name="' + key + '" id="' + key + '" value="' + key + '" >';
         html += '  <label for="' + key + '">' + getString(key) + '</label>';
@@ -104,10 +104,6 @@ M.availability_examus.form.fillValue = function(value, node) {
         }
 
     });
-
-
-    // console.log(value)
-
 };
 
 M.availability_examus.form.fillErrors = function(errors, node) {

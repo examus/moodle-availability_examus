@@ -52,13 +52,13 @@ $string['rules'] = "Rules";
 $string['time_scheduled'] = 'Scheduled';
 
 // TODO: Translate here
-$string['allow_to_use_websites'] =  'allow_to_use_websites';
-$string['allow_to_use_books'] =  'allow_to_use_books';
-$string['allow_to_use_paper'] =  'allow_to_use_paper';
-$string['allow_to_use_messengers'] =  'allow_to_use_messengers';
-$string['allow_to_use_calculator'] =  'allow_to_use_calculator';
-$string['allow_to_use_excel'] =  'allow_to_use_excel';
-$string['allow_to_use_human_assistant'] =  'allow_to_use_human_assistant';
-$string['allow_absence_in_frame'] = 'allow_absence_in_frame';
-$string['allow_voices'] =  'allow_voices';
-$string['allow_wrong_gaze_direction'] =  'allow_wrong_gaze_direction';
+$string['allow_to_use_websites'] =  'Allow to use websites';
+$string['allow_to_use_books'] =  'Allow to use books';
+$string['allow_to_use_paper'] =  'Allow to use paper';
+$string['allow_to_use_messengers'] =  'Allow to use messengers';
+$string['allow_to_use_calculator'] =  'Allow to use calculator';
+$string['allow_to_use_excel'] =  'Allow to use excel';
+$string['allow_to_use_human_assistant'] =  'Allow to use human assistant';
+$string['allow_absence_in_frame'] = 'Allow absence in frame';
+$string['allow_voices'] =  'Allow voices';
+$string['allow_wrong_gaze_direction'] =  'Allow wrong gaze direction';

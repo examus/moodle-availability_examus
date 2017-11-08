@@ -226,7 +226,7 @@ class condition extends \core_availability\condition {
      *
      * @param int $userid User id
      * @param stdClass $cm Cm
-     * @return bool
+     * @return stdClass
      */
     public static function create_entry_for_cm($userid, $cm) {
         $course = $cm->get_course();

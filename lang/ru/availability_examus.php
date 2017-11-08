@@ -47,18 +47,18 @@ $string['normal_mode'] = 'Нормальный (Ручной прокторин�
 $string['olympics_mode'] = 'Олимпиадный (Полностью автоматический)';
 $string['identification_mode'] = 'Идентификация (Ручная идентификация, автоматический прокторинг)';
 
-$string['rules'] = "Правила";
+$string['rules'] = 'Правила';
 
 $string['time_scheduled'] = 'Время записи в календаре';
 
 // TODO: Translate here
-$string['allow_to_use_websites'] =  'allow_to_use_websites';
-$string['allow_to_use_books'] =  'allow_to_use_books';
-$string['allow_to_use_paper'] =  'allow_to_use_paper';
-$string['allow_to_use_messengers'] =  'allow_to_use_messengers';
-$string['allow_to_use_calculator'] =  'allow_to_use_calculator';
-$string['allow_to_use_excel'] =  'allow_to_use_excel';
-$string['allow_to_use_human_assistant'] =  'allow_to_use_human_assistant';
-$string['allow_absence_in_frame'] = 'allow_absence_in_frame';
-$string['allow_voices'] =  'allow_voices';
-$string['allow_wrong_gaze_direction'] =  'allow_wrong_gaze_direction';
+$string['allow_to_use_websites'] =  'Разрешить использование веб-сайтов';
+$string['allow_to_use_books'] =  'Разрешить использование книг';
+$string['allow_to_use_paper'] =  'Разрешить использование черновиков';
+$string['allow_to_use_messengers'] =  'Разрешить использование мессенджеров';
+$string['allow_to_use_calculator'] =  'Разрешить использование калькулятора';
+$string['allow_to_use_excel'] =  'Разрешить использование Excel';
+$string['allow_to_use_human_assistant'] =  'Разрешить использование помощи людей';
+$string['allow_absence_in_frame'] = 'Разрешить выход из комнаты';
+$string['allow_voices'] =  'Разрешить голоса';
+$string['allow_wrong_gaze_direction'] =  'Разрешить взгляд в сторону';

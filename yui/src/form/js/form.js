@@ -43,7 +43,7 @@ M.availability_examus.form.getNode = function(json) {
     html += '</select>';
 
     html += '<div class="rules">';
-    html += '<br><label>' + getString('rules') + '</label> ';
+    html += '<label>' + getString('rules') + '</label> ';
     for (var key in this.rules) {
         html += '  <br><input type="checkbox" name="' + key + '" id="' + key + '" value="' + key + '" >';
         html += '  <label for="' + key + '">' + getString(key) + '</label>';
