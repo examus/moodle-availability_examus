@@ -39,7 +39,11 @@ class frontend extends \core_availability\frontend {
      * @return array
      */
     protected function get_javascript_strings() {
-        return ['title', 'error_setduration', 'duration', 'link', 'mode', 'normal_mode', 'olympics_mode', 'identification_mode'];
+        return ['title', 'error_setduration', 'duration', 'link', 'mode', 'normal_mode',
+                'rules', 'olympics_mode', 'identification_mode', 'allow_to_use_websites',
+                'allow_to_use_books', 'allow_to_use_paper', 'allow_to_use_messengers',
+                'allow_to_use_calculator', 'allow_to_use_excel', 'allow_to_use_human_assistant',
+                'allow_absence_in_frame', 'allow_voices', 'allow_wrong_gaze_direction'];
     }
 
     /**
@@ -52,7 +56,17 @@ class frontend extends \core_availability\frontend {
      */
     protected function get_javascript_init_params($course, \cm_info $cm = null,
             \section_info $section = null) {
-        return array();
+        $rules['allow_to_use_websites'] = false;
+        $rules['allow_to_use_books'] = false;
+        $rules['allow_to_use_paper'] = true;
+        $rules['allow_to_use_messengers'] = false;
+        $rules['allow_to_use_calculator'] = true;
+        $rules['allow_to_use_excel'] = false;
+        $rules['allow_to_use_human_assistant'] = false;
+        $rules['allow_absence_in_frame'] = false;
+        $rules['allow_voices'] = false;
+        $rules['allow_wrong_gaze_direction'] = false;
+        return array($rules);
     }
 
     /**
@@ -61,7 +75,7 @@ class frontend extends \core_availability\frontend {
      * @param int $course Course id
      * @param \cm_info $cm Cm
      * @param \section_info $section Section
-     * @return array
+     * @return bool
      */
     protected function allow_add($course, \cm_info $cm = null,
             \section_info $section = null) {

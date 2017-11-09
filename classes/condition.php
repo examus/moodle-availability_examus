@@ -44,6 +44,9 @@ class condition extends \core_availability\condition {
     /** @var string Default exam mode */
     protected $mode = 'normal';
 
+    /** @var array Default exam rules */
+    protected $rules = Array();
+
     /**
      * Construct
      *
@@ -55,6 +58,9 @@ class condition extends \core_availability\condition {
         }
         if (!empty($structure->mode)) {
             $this->mode = $structure->mode;
+        }
+        if (!empty($structure->rules)) {
+            $this->rules = $structure->rules;
         }
     }
 
@@ -107,6 +113,17 @@ class condition extends \core_availability\condition {
     }
 
     /**
+     * get examus mode
+     *
+     * @param int $cm Cm
+     * @return array
+     */
+    public static function get_examus_rules($cm) {
+        $econds = self::get_examus_conditions($cm);
+        return (array) $econds[0]->rules;
+    }
+
+    /**
      * get examus conditions
      *
      * @param int $cm Cm
@@ -128,7 +145,7 @@ class condition extends \core_availability\condition {
      * @return object
      */
     public function save() {
-        return (object) ['duration' => (int) $this->duration, 'mode' => (string) $this->mode];
+        return (object) ['duration' => (int) $this->duration, 'mode' => (string) $this->mode, 'rules' => (array) $this->rules];
     }
 
     /**
@@ -208,7 +225,7 @@ class condition extends \core_availability\condition {
      *
      * @param int $userid User id
      * @param stdClass $cm Cm
-     * @return bool
+     * @return stdClass
      */
     public static function create_entry_for_cm($userid, $cm) {
         $course = $cm->get_course();
