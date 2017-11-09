@@ -74,21 +74,25 @@ class availability_examus_external extends external_api {
                 $modinfo = get_fast_modinfo($course);
                 $cm = $modinfo->get_cm($entry->cmid);
 
+                $moduleanswer = array(
+                        'id' => $entry->id,
+                        'name' => $cm->get_formatted_name(),
+                        'url' => $entry->url,
+                        'course_name' => $course->fullname,
+                        'course_id' => $course->id,
+                        'cm_id' => $entry->cmid,
+                        'status' => $entry->status,
+                        'is_proctored' => true,
+                        'time_limit_mins' => \availability_examus\condition::get_examus_duration($cm),
+                        'mode' => \availability_examus\condition::get_examus_mode($cm),
+                        'accesscode' => $entry->accesscode,
+                );
+                $rules = \availability_examus\condition::get_examus_rules($cm);
+                if ($rules) {
+                    $moduleanswer['rules'] = $rules;
+                }
                 return array('modules' => array(
-                        array(
-                                'id' => $entry->id,
-                                'name' => $cm->get_formatted_name(),
-                                'url' => $entry->url,
-                                'course_name' => $course->fullname,
-                                'course_id' => $course->id,
-                                'cm_id' => $entry->cmid,
-                                'status' => $entry->status,
-                                'is_proctored' => true,
-                                'rules' => \availability_examus\condition::get_examus_rules($cm),
-                                'time_limit_mins' => \availability_examus\condition::get_examus_duration($cm),
-                                'mode' => \availability_examus\condition::get_examus_mode($cm),
-                                'accesscode' => $entry->accesscode,
-                        )
+                    $moduleanswer
                 ));
             }
 
@@ -125,12 +129,15 @@ class availability_examus_external extends external_api {
                                 'course_id' => $course->id,
                                 'cm_id' => $entry->cmid,
                                 'status' => $entry->status,
-                                'rules' => \availability_examus\condition::get_examus_rules($cm),
                                 'is_proctored' => true,
                                 'time_limit_mins' => \availability_examus\condition::get_examus_duration($cm),
                                 'mode' => \availability_examus\condition::get_examus_mode($cm),
                                 'accesscode' => $entry->accesscode,
                         );
+                        $rules = \availability_examus\condition::get_examus_rules($cm);
+                        if ($rules) {
+                            $moduleanswer['rules'] = $rules;
+                        }
 
                         if ($cm->modname == "quiz") {
                             $quiz = $DB->get_record('quiz', array('id' => $cm->instance));
@@ -181,7 +188,7 @@ class availability_examus_external extends external_api {
                                                     'allow_absence_in_frame' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
                                                     'allow_voices' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
                                                     'allow_wrong_gaze_direction'=> new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
-                                        )),
+                                        ), 'rules set', VALUE_OPTIONAL),
                                         'is_proctored' => new external_value(PARAM_BOOL, 'module proctored'),
                                         'accesscode' => new external_value(PARAM_TEXT, 'module code'),
                                         'start' => new external_value(PARAM_INT, 'module start', VALUE_OPTIONAL),
