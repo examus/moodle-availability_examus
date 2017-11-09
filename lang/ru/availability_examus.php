@@ -51,7 +51,6 @@ $string['rules'] = 'Правила';
 
 $string['time_scheduled'] = 'Время записи в календаре';
 
-// TODO: Translate here
 $string['allow_to_use_websites'] =  'Разрешить использование веб-сайтов';
 $string['allow_to_use_books'] =  'Разрешить использование книг';
 $string['allow_to_use_paper'] =  'Разрешить использование черновиков';

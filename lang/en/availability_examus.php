@@ -51,7 +51,6 @@ $string['rules'] = "Rules";
 
 $string['time_scheduled'] = 'Scheduled';
 
-// TODO: Translate here
 $string['allow_to_use_websites'] =  'Allow to use websites';
 $string['allow_to_use_books'] =  'Allow to use books';
 $string['allow_to_use_paper'] =  'Allow to use paper';

@@ -120,7 +120,6 @@ class condition extends \core_availability\condition {
      */
     public static function get_examus_rules($cm) {
         $econds = self::get_examus_conditions($cm);
-        // TODO: restrict examus condition to be only one.
         return (array) $econds[0]->rules;
     }
 
