@@ -21,12 +21,11 @@ In the bottom part of the page, allow the following capabilities:
     - Use REST protocol
 Fill in all other required fields.
 Click the `Create this role` button.
-4. Go to `Site administration → Users → Permissions → Assign system roles`. Choose the role created in the previous step (`webservice`).
-5. Add the previously created `examus` user to the `Existing users` field.
+4. Go to `Site administration → Users → Permissions → Assign system roles`. Choose the role created in the previous step (`webservice`). Add the previously created `examus` user to the `Existing users` field.
 
 ### Enabling web services
 1. Go to `Site administration → Advanced features`. Enable web services. Save changes.
-2. `Site administration → Plugins → Web services → Manage protocols`. Enable the REST protocol. Save changes.
+2. Go to `Site administration → Plugins → Web services → Manage protocols`. Enable the REST protocol. Save changes.
 
 ### Creating a web service token
 1. Go to `Site administration → Plugins → Web services → Manage tokens`, click `Add`.
@@ -36,9 +35,8 @@ Click the `Create this role` button.
 ### Creating a new OAuth client
 The new client will be used by Examus proctoring service to authenticate your users.
 1. Please contact us to get your 'Redirect URL'.
-2. Go to `Site administration → Server → OAuth provider settings`, click `Add new client`.
-3. You can use any `Client identifier`, for example, `examus`. Paste the received 'Redirect URL'. Save changes.
-4. Sent the `Client identifier` and `Client secret` values to Examus. We will use them for integration.
+2. Go to `Site administration → Server → OAuth provider settings`, click `Add new client`. You can use any `Client identifier`, for example, `examus`. Paste the received 'Redirect URL'. Save changes.
+3. Sent the `Client identifier` and `Client secret` values to Examus. We will use them for integration.
 
 ## Usage
 
