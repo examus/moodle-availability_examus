@@ -80,7 +80,7 @@ class condition extends \core_availability\condition {
     /**
      * has examus condition
      *
-     * @param int $cm Cm
+     * @param \cm_info $cm Cm
      * @return bool
      */
     public static function has_examus_condition($cm) {
@@ -91,7 +91,7 @@ class condition extends \core_availability\condition {
     /**
      * get examus duration
      *
-     * @param int $cm Cm
+     * @param \cm_info $cm Cm
      * @return int
      */
     public static function get_examus_duration($cm) {
@@ -103,7 +103,7 @@ class condition extends \core_availability\condition {
     /**
      * get examus mode
      *
-     * @param int $cm Cm
+     * @param \cm_info $cm Cm
      * @return string
      */
     public static function get_examus_mode($cm) {
@@ -115,7 +115,7 @@ class condition extends \core_availability\condition {
     /**
      * get examus mode
      *
-     * @param int $cm Cm
+     * @param \cm_info $cm Cm
      * @return array
      */
     public static function get_examus_rules($cm) {
@@ -126,7 +126,7 @@ class condition extends \core_availability\condition {
     /**
      * get examus conditions
      *
-     * @param int $cm Cm
+     * @param \cm_info $cm Cm
      * @return array
      */
     private static function get_examus_conditions($cm) {
