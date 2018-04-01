@@ -61,3 +61,5 @@ $string['allow_to_use_human_assistant'] =  'Разрешить использо�
 $string['allow_absence_in_frame'] = 'Разрешить выход из комнаты';
 $string['allow_voices'] =  'Разрешить голоса';
 $string['allow_wrong_gaze_direction'] =  'Разрешить взгляд в сторону';
+
+$string['scheduling_required'] = 'Обязательна запись в календаре';

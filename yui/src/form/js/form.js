@@ -34,6 +34,9 @@ M.availability_examus.form.getNode = function(json) {
     html += '<label for"' + id + '">' + getString('duration') + '</label> ';
     html += '<input type="text" name="duration" id="' + id + '">';
 
+    html += '<br><input type="checkbox" name="scheduling_required" id="scheduling_required">';
+    html += '<label for"scheduling_required">' + getString('scheduling_required') + '</label> ';
+
     modeId = 'examus' + M.availability_examus.form.instId;
     html += '<br><label for"' + modeId + '">' + getString('mode') + '</label> ';
     html += '<select name="mode" id="' + modeId + '">';
@@ -41,8 +44,6 @@ M.availability_examus.form.getNode = function(json) {
     html += '  <option value="identification">' + getString('identification_mode') + '</option>';
     html += '  <option value="olympics">' + getString('olympics_mode') + '</option>';
     html += '</select>';
-
-    //TODO: add scheduling_required
 
     html += '<div class="rules">';
     html += '<label>' + getString('rules') + '</label> ';
@@ -80,7 +81,9 @@ M.availability_examus.form.getNode = function(json) {
         root.delegate('valuechange', function() {
             M.core_availability.form.update();
         }, '.availability_examus input[name=duration]');
-        //TODO: add scheduling_required
+        root.delegate('valuechange', function() {
+            M.core_availability.form.update();
+        }, '.availability_examus input[name=scheduling_required]');
         root.delegate('valuechange', function() {
             M.core_availability.form.update();
         }, '.availability_examus select[name=mode]');
@@ -95,8 +98,8 @@ M.availability_examus.form.getNode = function(json) {
 M.availability_examus.form.fillValue = function(value, node) {
     var rulesInputs, key;
     value.duration = node.one('input[name=duration]').get('value').trim();
+    value.scheduling_required = node.one('input[name=scheduling_required]').get('checked');
     value.mode = node.one('select[name=mode]').get('value').trim();
-    //TODO: add scheduling_required
 
     value.rules = {};
     rulesInputs = node.all('.rules input');

@@ -44,6 +44,9 @@ class condition extends \core_availability\condition {
     /** @var string Default exam mode */
     protected $mode = 'normal';
 
+    /** @var string Default calendar mode */
+    protected $scheduling_required = true;
+
     /** @var array Default exam rules */
     protected $rules = Array();
 
@@ -59,7 +62,9 @@ class condition extends \core_availability\condition {
         if (!empty($structure->mode)) {
             $this->mode = $structure->mode;
         }
-        // TODO: add scheduling_required
+        if (!empty($structure->scheduling_required)) {
+            $this->scheduling_required = $structure->scheduling_required;
+        }
         if (!empty($structure->rules)) {
             $this->rules = $structure->rules;
         }
@@ -114,7 +119,7 @@ class condition extends \core_availability\condition {
     }
 
     /**
-     * get examus mode
+     * get examus rules
      *
      * @param \cm_info $cm Cm
      * @return array
@@ -124,7 +129,17 @@ class condition extends \core_availability\condition {
         return (array) $econds[0]->rules;
     }
 
-    //TODO: add get_examus_scheduling_required
+    /**
+     * get examus scheduling mode
+     *
+     * @param \cm_info $cm Cm
+     * @return bool
+     */
+    public static function get_examus_scheduling($cm) {
+        $econds = self::get_examus_conditions($cm);
+        // TODO: restrict examus condition to be only one.
+        return (string) $econds[0]->scheduling_required;
+    }
 
     /**
      * get examus conditions
@@ -148,8 +163,12 @@ class condition extends \core_availability\condition {
      * @return object
      */
     public function save() {
-        //TODO: add scheduling_reuired
-        return (object) ['duration' => (int) $this->duration, 'mode' => (string) $this->mode, 'rules' => (array) $this->rules];
+        return (object) [
+            'duration' => (int) $this->duration,
+            'mode' => (string) $this->mode,
+            'scheduling_required' => (bool) $this->scheduling_required,
+            'rules' => (array) $this->rules
+        ];
     }
 
     /**

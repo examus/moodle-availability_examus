@@ -69,7 +69,7 @@ class availability_examus_external extends external_api {
                 'is_proctored' => true,
                 'time_limit_mins' => \availability_examus\condition::get_examus_duration($cm),
                 'mode' => \availability_examus\condition::get_examus_mode($cm),
-                // TODO: add scheduling_required
+                'scheduling_required' => \availability_examus\condition::get_examus_scheduling($cm),
                 'accesscode' => $entry->accesscode,
         );
         $rules = \availability_examus\condition::get_examus_rules($cm);
@@ -171,7 +171,7 @@ class availability_examus_external extends external_api {
                                         'course_name' => new external_value(PARAM_TEXT, 'module course name', VALUE_OPTIONAL),
                                         'time_limit_mins' => new external_value(PARAM_INT, 'module duration', VALUE_OPTIONAL),
                                         'mode' => new external_value(PARAM_TEXT, 'module proctoring mode', VALUE_OPTIONAL),
-                                        //TODO: add scheduling_required
+                                        'scheduling_required' => new external_value(PARAM_BOOL, 'module calendar mode', VALUE_OPTIONAL),
                                         'rules' => new external_single_structure(
                                                 array(
                                                     'allow_to_use_websites' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
