@@ -24,8 +24,24 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'availability_examus';
-$plugin->version = 2018040100;
-$plugin->release = 'v3.1-r1';
-$plugin->requires = 2016052300;
-$plugin->maturity = MATURITY_STABLE;
+/**
+ * Finish attempt on attempt finish event.
+ *
+ * @param stdClass $event Event
+ */
+function examus_attempt_submitted_handler($event) {
+    global $DB;
+
+    $course = $DB->get_record('course', array('id' => $event->courseid));
+    $attempt = $event->get_record_snapshot('quiz_attempts', $event->objectid);
+    $quiz = $event->get_record_snapshot('quiz', $attempt->quiz);
+    $cm = get_coursemodule_from_id('quiz', $event->get_context()->instanceid, $event->courseid);
+
+    $userid = $event->userid;
+    $entries = $DB->get_records('availability_examus',
+            array('userid' => $userid, 'courseid' => $event->courseid, 'cmid' => $cm->id, 'status' => "Started"), '-id');
+    foreach ($entries as $entry) {
+        $entry->status = "Finished";
+        $DB->update_record('availability_examus', $entry);
+    }
+}
