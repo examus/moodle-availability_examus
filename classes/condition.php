@@ -59,6 +59,7 @@ class condition extends \core_availability\condition {
         if (!empty($structure->mode)) {
             $this->mode = $structure->mode;
         }
+        // TODO: add scheduling_required
         if (!empty($structure->rules)) {
             $this->rules = $structure->rules;
         }
@@ -123,6 +124,8 @@ class condition extends \core_availability\condition {
         return (array) $econds[0]->rules;
     }
 
+    //TODO: add get_examus_scheduling_required
+
     /**
      * get examus conditions
      *
@@ -145,6 +148,7 @@ class condition extends \core_availability\condition {
      * @return object
      */
     public function save() {
+        //TODO: add scheduling_reuired
         return (object) ['duration' => (int) $this->duration, 'mode' => (string) $this->mode, 'rules' => (array) $this->rules];
     }
 

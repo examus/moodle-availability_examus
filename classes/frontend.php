@@ -39,6 +39,7 @@ class frontend extends \core_availability\frontend {
      * @return array
      */
     protected function get_javascript_strings() {
+        //TODO: add scheduling_required here
         return ['title', 'error_setduration', 'duration', 'link', 'mode', 'normal_mode',
                 'rules', 'olympics_mode', 'identification_mode', 'allow_to_use_websites',
                 'allow_to_use_books', 'allow_to_use_paper', 'allow_to_use_messengers',

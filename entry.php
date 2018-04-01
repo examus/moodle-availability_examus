@@ -44,4 +44,5 @@ if ($entry) {
     redirect($cm->url->out(false));
 }
 
+// TODO: Show message for user that smth went wrong
 die;

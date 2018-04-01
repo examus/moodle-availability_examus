@@ -42,6 +42,8 @@ M.availability_examus.form.getNode = function(json) {
     html += '  <option value="olympics">' + getString('olympics_mode') + '</option>';
     html += '</select>';
 
+    //TODO: add scheduling_required
+
     html += '<div class="rules">';
     html += '<label>' + getString('rules') + '</label> ';
     for (var key in this.rules) {
@@ -60,6 +62,8 @@ M.availability_examus.form.getNode = function(json) {
         node.one('select[name=mode] option[value=' + json.mode + ']').set('selected', 'selected');
     }
 
+    //TODO: add scheduling_required
+
     if (json.rules === undefined) {
         json.rules = this.rules
     }
@@ -76,6 +80,7 @@ M.availability_examus.form.getNode = function(json) {
         root.delegate('valuechange', function() {
             M.core_availability.form.update();
         }, '.availability_examus input[name=duration]');
+        //TODO: add scheduling_required
         root.delegate('valuechange', function() {
             M.core_availability.form.update();
         }, '.availability_examus select[name=mode]');
@@ -91,6 +96,8 @@ M.availability_examus.form.fillValue = function(value, node) {
     var rulesInputs, key;
     value.duration = node.one('input[name=duration]').get('value').trim();
     value.mode = node.one('select[name=mode]').get('value').trim();
+    //TODO: add scheduling_required
+
     value.rules = {};
     rulesInputs = node.all('.rules input');
     Y.each(rulesInputs, function (ruleInput) {
