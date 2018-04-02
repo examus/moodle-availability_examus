@@ -16,29 +16,32 @@ M.availability_examus.form.initInner = function(rules)
     this.rules = rules;
 };
 
-M.availability_examus.form.instId = 1;
+M.availability_examus.form.instId = 0;
 
 M.availability_examus.form.getNode = function(json) {
-    var html, node, root, id, modeId;
+    var html, node, root, id, modeId, durationId, schedulingId, keyId;
 
     /** Returns string from translations. */
     function getString(identifier) {
         return M.util.get_string(identifier, 'availability_examus');
     }
 
-    id = 'examus' + M.availability_examus.form.instId;
     M.availability_examus.form.instId += 1;
+
+    id = 'examus' + M.availability_examus.form.instId;
 
     html = '<label> ' + getString('title') + ' </label><br>';
 
-    html += '<label for"' + id + '">' + getString('duration') + '</label> ';
-    html += '<input type="text" name="duration" id="' + id + '">';
+    durationId = id + '_duration';
+    html += '<label for="' + durationId + '">' + getString('duration') + '</label> ';
+    html += '<input type="text" name="duration" id="' + durationId + '">';
 
-    html += '<br><input type="checkbox" name="scheduling_required" id="scheduling_required">';
-    html += '<label for"scheduling_required">' + getString('scheduling_required') + '</label> ';
+    schedulingId = id + '_scheduling';
+    html += '<br><input type="checkbox" name="scheduling_required" id="' + schedulingId + '">';
+    html += '<label for="' + schedulingId + '">' + getString('scheduling_required') + '</label> ';
 
-    modeId = 'examus' + M.availability_examus.form.instId;
-    html += '<br><label for"' + modeId + '">' + getString('mode') + '</label> ';
+    modeId = id + '_mode';
+    html += '<br><label for="' + modeId + '">' + getString('mode') + '</label> ';
     html += '<select name="mode" id="' + modeId + '">';
     html += '  <option value="normal">' + getString('normal_mode') + '</option>';
     html += '  <option value="identification">' + getString('identification_mode') + '</option>';
@@ -48,8 +51,9 @@ M.availability_examus.form.getNode = function(json) {
     html += '<div class="rules">';
     html += '<label>' + getString('rules') + '</label> ';
     for (var key in this.rules) {
-        html += '  <br><input type="checkbox" name="' + key + '" id="' + key + '" value="' + key + '" >';
-        html += '  <label for="' + key + '">' + getString(key) + '</label>';
+        keyId = id + '_' + key;
+        html += '  <br><input type="checkbox" name="' + key + '" id="' + keyId + '" value="' + key + '" >';
+        html += '  <label for="' + keyId + '">' + getString(key) + '</label>';
     }
     html += '</div>';
 
@@ -63,7 +67,9 @@ M.availability_examus.form.getNode = function(json) {
         node.one('select[name=mode] option[value=' + json.mode + ']').set('selected', 'selected');
     }
 
-    //TODO: add scheduling_required
+    if (json.scheduling_required !== undefined) {
+        node.one('input[name=scheduling_required]').set('checked', 'checked');
+    }
 
     if (json.rules === undefined) {
         json.rules = this.rules
