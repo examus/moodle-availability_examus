@@ -68,7 +68,9 @@ M.availability_examus.form.getNode = function(json) {
     }
 
     if (json.scheduling_required !== undefined) {
-        node.one('input[name=scheduling_required]').set('checked', 'checked');
+        if (json.scheduling_required) {
+            node.one('input[name=scheduling_required]').set('checked', 'checked');
+        }
     }
 
     if (json.rules === undefined) {
@@ -104,8 +106,13 @@ M.availability_examus.form.getNode = function(json) {
 M.availability_examus.form.fillValue = function(value, node) {
     var rulesInputs, key;
     value.duration = node.one('input[name=duration]').get('value').trim();
-    value.scheduling_required = node.one('input[name=scheduling_required]').get('checked');
     value.mode = node.one('select[name=mode]').get('value').trim();
+
+    if (node.one('input[name=scheduling_required]').get('checked') === true) {
+        value.scheduling_required = true;
+    } else {
+        value.scheduling_required = false;
+    }
 
     value.rules = {};
     rulesInputs = node.all('.rules input');
