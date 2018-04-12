@@ -71,6 +71,9 @@ M.availability_examus.form.getNode = function(json) {
         if (json.scheduling_required) {
             node.one('input[name=scheduling_required]').set('checked', 'checked');
         }
+    } else {
+        // By default
+        node.one('input[name=scheduling_required]').set('checked', 'checked');
     }
 
     if (json.rules === undefined) {
@@ -89,7 +92,7 @@ M.availability_examus.form.getNode = function(json) {
         root.delegate('valuechange', function() {
             M.core_availability.form.update();
         }, '.availability_examus input[name=duration]');
-        root.delegate('valuechange', function() {
+        root.delegate('click', function() {
             M.core_availability.form.update();
         }, '.availability_examus input[name=scheduling_required]');
         root.delegate('valuechange', function() {

@@ -62,7 +62,7 @@ class condition extends \core_availability\condition {
         if (!empty($structure->mode)) {
             $this->mode = $structure->mode;
         }
-        if (!empty($structure->scheduling_required)) {
+        if (array_key_exists("scheduling_required", $structure)) {
             $this->scheduling_required = $structure->scheduling_required;
         }
         if (!empty($structure->rules)) {
@@ -138,7 +138,12 @@ class condition extends \core_availability\condition {
     public static function get_examus_scheduling($cm) {
         $econds = self::get_examus_conditions($cm);
         // TODO: restrict examus condition to be only one.
-        return (bool) $econds[0]->scheduling_required;
+        if (array_key_exists("scheduling_required", $econds[0])) {
+            return (bool) $econds[0]->scheduling_required;
+        } else {
+            return true;
+        }
+
     }
 
     /**
