@@ -70,11 +70,8 @@ M.availability_examus.form.getNode = function(json) {
     if (json.scheduling_required !== undefined) {
         if (json.scheduling_required) {
             node.one('input[name=scheduling_required]').set('checked', 'checked');
-        }}
-    // } else {
-    //     // By default
-    //     node.one('input[name=scheduling_required]').set('checked', 'checked');
-    // }
+        }
+    }
 
     if (json.rules === undefined) {
         json.rules = this.rules
