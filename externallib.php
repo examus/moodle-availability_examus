@@ -201,7 +201,7 @@ class availability_examus_external extends external_api {
                                                             PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
                                                     'allow_voices' => new external_value(
                                                             PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
-                                                    'allow_wrong_gaze_direction'=> new external_value(
+                                                    'allow_wrong_gaze_direction' => new external_value(
                                                             PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
                                         ), 'rules set', VALUE_OPTIONAL),
                                         'is_proctored' => new external_value(PARAM_BOOL, 'module proctored'),
