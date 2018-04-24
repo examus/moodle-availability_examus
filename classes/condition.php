@@ -270,6 +270,20 @@ class condition extends \core_availability\condition {
         self::delete_empty_entry($userid, $courseid, $cm->id);
     }
 
+    public static function make_entry($courseid, $cmid, $userid=null) {
+        $timenow = time();
+        $entry = new stdClass();
+        $entry->courseid = $courseid;
+        $entry->cmid = $cmid;
+        $entry->accesscode = is_null($userid) ? '' : md5(uniqid(rand(), 1));
+        $entry->status = is_null($userid) ? null : 'Not inited';
+        $entry->timecreated = $timenow;
+        $entry->timemodified = $timenow;
+        $entry->userid = $userid;
+
+        return $entry;
+    }
+
     /**
      * create entry if not exist
      *
@@ -287,15 +301,7 @@ class condition extends \core_availability\condition {
                 $sort = 'id');
 
         if (count($entries) == 0) {
-            $timenow = time();
-            $entry = new stdClass();
-            $entry->userid = $userid;
-            $entry->courseid = $courseid;
-            $entry->cmid = $cmid;
-            $entry->accesscode = md5(uniqid(rand(), 1));
-            $entry->status = 'Not inited';
-            $entry->timecreated = $timenow;
-            $entry->timemodified = $timenow;
+            $entry = self::make_entry($courseid, $cmid, $userid);
             $DB->insert_record('availability_examus', $entry);
             return $entry;
         } else {

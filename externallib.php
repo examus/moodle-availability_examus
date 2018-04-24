@@ -41,7 +41,7 @@ class availability_examus_external extends external_api {
     public static function user_proctored_modules_parameters() {
         return new external_function_parameters(
                 array(
-                        'useremail' => new external_value(PARAM_TEXT, 'User Email'),
+                        'useremail' => new external_value(PARAM_TEXT, 'User Email', VALUE_DEFAULT, ""),
                         'accesscode' => new external_value(PARAM_TEXT, 'Access Code', VALUE_DEFAULT, ""),
                 )
         );
@@ -50,10 +50,10 @@ class availability_examus_external extends external_api {
 
     static function moduleanswer($entry) {
         global $DB;
+
         $course = get_course($entry->courseid);
         $modinfo = get_fast_modinfo($course);
         $cm = $modinfo->get_cm($entry->cmid);
-        $user = $DB->get_record('user', array('id' => $entry->userid));
 
         $url = new moodle_url(
                 '/availability/condition/examus/entry.php',
@@ -99,6 +99,8 @@ class availability_examus_external extends external_api {
     public static function user_proctored_modules($useremail, $accesscode) {
         global $DB;
 
+        $answer = array();
+
         self::validate_parameters(self::user_proctored_modules_parameters(),
                 array('useremail' => $useremail, 'accesscode' => $accesscode));
 
@@ -107,48 +109,58 @@ class availability_examus_external extends external_api {
                     'availability_examus',
                     array('accesscode' => $accesscode));
 
-            if (count($entries) == 0) {
-                return array('modules' => array());
-            }
             foreach ($entries as $entry) {
-
-                return array('modules' => array(
-                    self::moduleanswer($entry)
-                ));
+                array_push($answer, self::moduleanswer($entry));
             }
 
-        }
+        } elseif ($useremail) {
 
-        $_SESSION['examus_api'] = true;
+            $_SESSION['examus_api'] = true;
 
-        $user = $DB->get_record('user', array('email' => $useremail));
-        $courses = enrol_get_users_courses($user->id, true);
+            $user = $DB->get_record('user', array('email' => $useremail));
+            $courses = enrol_get_users_courses($user->id, true);
 
-        $answer = array();
-        foreach ($courses as $course) {
-            $course = get_course($course->id);
+            foreach ($courses as $course) {
+                $course = get_course($course->id);
 
-            // Clearing cache.
-            get_fast_modinfo($course->id, $user->id, true);
-            $modinfo = get_fast_modinfo($course->id, $user->id);
-            $instancesbytypes = $modinfo->get_instances();
-            foreach ($instancesbytypes as $instances) {
-                foreach ($instances as $cm) {
-                    if (\availability_examus\condition::has_examus_condition($cm) and $cm->uservisible) {
-                        $entry = \availability_examus\condition::create_entry_for_cm($user->id, $cm);
-                        if ($entry == null) {
-                            continue;
+                // Clearing cache.
+                get_fast_modinfo($course->id, $user->id, true);
+                $modinfo = get_fast_modinfo($course->id, $user->id);
+                $instancesbytypes = $modinfo->get_instances();
+                foreach ($instancesbytypes as $instances) {
+                    foreach ($instances as $cm) {
+                        if (\availability_examus\condition::has_examus_condition($cm) and $cm->uservisible) {
+                            $entry = \availability_examus\condition::create_entry_for_cm($user->id, $cm);
+                            if ($entry == null) {
+                                continue;
+                            }
+
+                            array_push($answer, self::moduleanswer($entry));
+
+                        } else {
+                            \availability_examus\condition::delete_empty_entry_for_cm($user->id, $cm);
                         }
 
-                        array_push($answer, self::moduleanswer($entry));
-
-                    } else {
-                        \availability_examus\condition::delete_empty_entry_for_cm($user->id, $cm);
                     }
-
                 }
             }
+        } else {
 
+            // Shows all modules
+
+            $courses = get_courses();
+            foreach ($courses as $course) {
+                $modinfo = get_fast_modinfo($course);
+                $instancesbytypes = $modinfo->get_instances();
+                foreach ($instancesbytypes as $instances) {
+                    foreach ($instances as $cm) {
+                        if (\availability_examus\condition::has_examus_condition($cm)) {
+                            $entry = \availability_examus\condition::make_entry($course->id, $cm->id);
+                            array_push($answer, self::moduleanswer($entry));
+                        }
+                    }
+                }
+            }
         }
 
         return array('modules' => $answer);
@@ -166,8 +178,8 @@ class availability_examus_external extends external_api {
                                 array(
                                         'id' => new external_value(PARAM_INT, 'entry id'),
                                         'name' => new external_value(PARAM_TEXT, 'module name'),
-                                        'url' => new external_value(PARAM_TEXT, 'module url'),
-                                        'status' => new external_value(PARAM_TEXT, 'status'),
+                                        'url' => new external_value(PARAM_TEXT, 'module url', VALUE_OPTIONAL),
+                                        'status' => new external_value(PARAM_TEXT, 'status', VALUE_OPTIONAL),
                                         'course_name' => new external_value(PARAM_TEXT, 'module course name', VALUE_OPTIONAL),
                                         'time_limit_mins' => new external_value(PARAM_INT, 'module duration', VALUE_OPTIONAL),
                                         'mode' => new external_value(PARAM_TEXT, 'module proctoring mode', VALUE_OPTIONAL),
@@ -186,7 +198,7 @@ class availability_examus_external extends external_api {
                                                     'allow_wrong_gaze_direction'=> new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
                                         ), 'rules set', VALUE_OPTIONAL),
                                         'is_proctored' => new external_value(PARAM_BOOL, 'module proctored'),
-                                        'accesscode' => new external_value(PARAM_TEXT, 'module code'),
+                                        'accesscode' => new external_value(PARAM_TEXT, 'module code', VALUE_OPTIONAL),
                                         'start' => new external_value(PARAM_INT, 'module start', VALUE_OPTIONAL),
                                         'end' => new external_value(PARAM_INT, 'module end', VALUE_OPTIONAL),
                                 ), 'module')
