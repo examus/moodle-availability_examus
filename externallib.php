@@ -48,7 +48,7 @@ class availability_examus_external extends external_api {
     }
 
 
-    static function moduleanswer($entry) {
+    private static function moduleanswer($entry) {
         global $DB;
 
         $course = get_course($entry->courseid);
@@ -85,8 +85,6 @@ class availability_examus_external extends external_api {
 
         $moduleanswer['status'] = $entry->status;
 
-
-
         return $moduleanswer;
     }
     /**
@@ -113,7 +111,7 @@ class availability_examus_external extends external_api {
                 array_push($answer, self::moduleanswer($entry));
             }
 
-        } elseif ($useremail) {
+        } else if ($useremail) {
 
             $_SESSION['examus_api'] = true;
 
@@ -146,8 +144,7 @@ class availability_examus_external extends external_api {
             }
         } else {
 
-            // Shows all modules
-
+            // Shows all modules.
             $courses = get_courses();
             foreach ($courses as $course) {
                 $modinfo = get_fast_modinfo($course);
@@ -186,16 +183,26 @@ class availability_examus_external extends external_api {
                                         'scheduling_required' => new external_value(PARAM_BOOL, 'module calendar mode'),
                                         'rules' => new external_single_structure(
                                                 array(
-                                                    'allow_to_use_websites' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
-                                                    'allow_to_use_books' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
-                                                    'allow_to_use_paper' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
-                                                    'allow_to_use_messengers' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
-                                                    'allow_to_use_calculator' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
-                                                    'allow_to_use_excel' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
-                                                    'allow_to_use_human_assistant' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
-                                                    'allow_absence_in_frame' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
-                                                    'allow_voices' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
-                                                    'allow_wrong_gaze_direction'=> new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
+                                                    'allow_to_use_websites' => new external_value(
+                                                            PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
+                                                    'allow_to_use_books' => new external_value(
+                                                            PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
+                                                    'allow_to_use_paper' => new external_value(
+                                                            PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
+                                                    'allow_to_use_messengers' => new external_value(
+                                                            PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
+                                                    'allow_to_use_calculator' => new external_value(
+                                                            PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
+                                                    'allow_to_use_excel' => new external_value(
+                                                            PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
+                                                    'allow_to_use_human_assistant' => new external_value(
+                                                            PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
+                                                    'allow_absence_in_frame' => new external_value(
+                                                            PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
+                                                    'allow_voices' => new external_value(
+                                                            PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
+                                                    'allow_wrong_gaze_direction'=> new external_value(
+                                                            PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
                                         ), 'rules set', VALUE_OPTIONAL),
                                         'is_proctored' => new external_value(PARAM_BOOL, 'module proctored'),
                                         'accesscode' => new external_value(PARAM_TEXT, 'module code'),

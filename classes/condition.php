@@ -222,7 +222,6 @@ class condition extends \core_availability\condition {
      * @param bool $not Not
      * @param \core_availability\info $info Info
      * @return string
-     * @throws \coding_exception
      */
     public function get_description($full, $not, \core_availability\info $info) {
         return get_string('use_examus', 'availability_examus');

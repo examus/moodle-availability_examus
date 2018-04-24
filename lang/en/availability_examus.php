@@ -51,15 +51,15 @@ $string['rules'] = "Rules";
 
 $string['time_scheduled'] = 'Scheduled';
 
-$string['allow_to_use_websites'] =  'Allow to use websites';
-$string['allow_to_use_books'] =  'Allow to use books';
-$string['allow_to_use_paper'] =  'Allow to use paper';
-$string['allow_to_use_messengers'] =  'Allow to use messengers';
-$string['allow_to_use_calculator'] =  'Allow to use calculator';
-$string['allow_to_use_excel'] =  'Allow to use excel';
-$string['allow_to_use_human_assistant'] =  'Allow to use human assistant';
+$string['allow_to_use_websites'] = 'Allow to use websites';
+$string['allow_to_use_books'] = 'Allow to use books';
+$string['allow_to_use_paper'] = 'Allow to use paper';
+$string['allow_to_use_messengers'] = 'Allow to use messengers';
+$string['allow_to_use_calculator'] = 'Allow to use calculator';
+$string['allow_to_use_excel'] = 'Allow to use excel';
+$string['allow_to_use_human_assistant'] = 'Allow to use human assistant';
 $string['allow_absence_in_frame'] = 'Allow absence in frame';
-$string['allow_voices'] =  'Allow voices';
-$string['allow_wrong_gaze_direction'] =  'Allow wrong gaze direction';
+$string['allow_voices'] = 'Allow voices';
+$string['allow_wrong_gaze_direction'] = 'Allow wrong gaze direction';
 
 $string['scheduling_required'] = 'A calendar entry is required';

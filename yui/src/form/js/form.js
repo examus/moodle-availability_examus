@@ -57,7 +57,6 @@ M.availability_examus.form.getNode = function(json) {
     }
     html += '</div>';
 
-
     node = Y.Node.create('<span> ' + html + ' </span>');
     if (json.duration !== undefined) {
         node.one('input[name=duration]').set('value', json.duration);
