@@ -45,15 +45,8 @@ switch ($action) {
                 'cmid' => $oldentry->cmid,
                 'status' => 'Not inited'));
             if (count($entries) == 0) {
-                $timenow = time();
-                $entry = new stdClass();
-                $entry->userid = $oldentry->userid;
-                $entry->courseid = $oldentry->courseid;
-                $entry->cmid = $oldentry->cmid;
-                $entry->accesscode = md5(uniqid(rand(), 1));
-                $entry->status = 'Not inited';
-                $entry->timecreated = $timenow;
-                $entry->timemodified = $timenow;
+                $entry = \availability_examus\condition::make_entry($oldentry->courseid, $oldentry->cmid, $oldentry->userid);
+
                 $DB->insert_record('availability_examus', $entry);
                 redirect('index.php', get_string('new_entry_created', 'availability_examus'),
                     null, \core\output\notification::NOTIFY_SUCCESS);
@@ -109,14 +102,29 @@ if (!empty($entries)) {
         }
 
         $user = $DB->get_record('user', array('id' => $entry->userid));
-        $row[] = $user->firstname . " " . $user->lastname . "<br>" . $user->email;
+        if ($user) {
+            $row[] = $user->firstname . " " . $user->lastname . "<br>" . $user->email;
+        } else {
+            $row[] = "NO_USER_ERROR";
+        }
 
-        $course = get_course($entry->courseid);
-        $modinfo = get_fast_modinfo($course);
-        $cm = $modinfo->get_cm($entry->cmid);
 
-        $row[] = $course->fullname;
-        $row[] = $cm->get_formatted_name();
+        try {
+            $course = get_course($entry->courseid);
+            $coursename = $course->fullname;
+        } catch (dml_exception $e) {
+            $coursename = "NO_COURSE_ERROR";
+        }
+        try {
+            $modinfo = get_fast_modinfo($course);
+            $cm = $modinfo->get_cm($entry->cmid);
+            $modulename = $cm->get_formatted_name();
+        } catch (moodle_exception $e) {
+            $modulename = "NO_MODULE_ERROR";
+        }
+
+        $row[] = $coursename;
+        $row[] = $modulename;
         $row[] = $entry->status;
         if ($entry->review_link !== null) {
             $row[] = "<a href='" . $entry->review_link . "'>" . get_string('link', 'availability_examus') . "</a>";
