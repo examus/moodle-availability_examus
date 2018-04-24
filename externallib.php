@@ -178,12 +178,12 @@ class availability_examus_external extends external_api {
                                 array(
                                         'id' => new external_value(PARAM_INT, 'entry id'),
                                         'name' => new external_value(PARAM_TEXT, 'module name'),
-                                        'url' => new external_value(PARAM_TEXT, 'module url', VALUE_OPTIONAL),
-                                        'status' => new external_value(PARAM_TEXT, 'status', VALUE_OPTIONAL),
-                                        'course_name' => new external_value(PARAM_TEXT, 'module course name', VALUE_OPTIONAL),
+                                        'url' => new external_value(PARAM_TEXT, 'module url'),
+                                        'status' => new external_value(PARAM_TEXT, 'status'),
+                                        'course_name' => new external_value(PARAM_TEXT, 'module course name'),
                                         'time_limit_mins' => new external_value(PARAM_INT, 'module duration', VALUE_OPTIONAL),
-                                        'mode' => new external_value(PARAM_TEXT, 'module proctoring mode', VALUE_OPTIONAL),
-                                        'scheduling_required' => new external_value(PARAM_BOOL, 'module calendar mode', VALUE_OPTIONAL),
+                                        'mode' => new external_value(PARAM_TEXT, 'module proctoring mode'),
+                                        'scheduling_required' => new external_value(PARAM_BOOL, 'module calendar mode'),
                                         'rules' => new external_single_structure(
                                                 array(
                                                     'allow_to_use_websites' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
@@ -198,7 +198,7 @@ class availability_examus_external extends external_api {
                                                     'allow_wrong_gaze_direction'=> new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
                                         ), 'rules set', VALUE_OPTIONAL),
                                         'is_proctored' => new external_value(PARAM_BOOL, 'module proctored'),
-                                        'accesscode' => new external_value(PARAM_TEXT, 'module code', VALUE_OPTIONAL),
+                                        'accesscode' => new external_value(PARAM_TEXT, 'module code'),
                                         'start' => new external_value(PARAM_INT, 'module start', VALUE_OPTIONAL),
                                         'end' => new external_value(PARAM_INT, 'module end', VALUE_OPTIONAL),
                                 ), 'module')
