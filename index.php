@@ -65,7 +65,7 @@ echo $OUTPUT->header();
 
 echo $OUTPUT->heading(get_string('pluginname', 'availability_examus'));
 
-$entries = $DB->get_records('availability_examus', array(), '-id');
+$entries = $DB->get_records('availability_examus', array(), 'id DESC');
 
 if (!empty($entries)) {
     $table = new flexible_table('availability_examus_table');
@@ -142,7 +142,7 @@ if (!empty($entries)) {
         }
         $table->add_data($row);
     }
-    $table->print_html();
+    $table->finish_html();
 }
 
 

@@ -88,6 +88,7 @@ class condition extends \core_availability\condition {
      *
      * @param \cm_info $cm Cm
      * @return bool
+     * @throws \coding_exception
      */
     public static function has_examus_condition($cm) {
         $econds = self::get_examus_conditions($cm);
@@ -99,6 +100,7 @@ class condition extends \core_availability\condition {
      *
      * @param \cm_info $cm Cm
      * @return int
+     * @throws \coding_exception
      */
     public static function get_examus_duration($cm) {
         $econds = self::get_examus_conditions($cm);
@@ -111,6 +113,7 @@ class condition extends \core_availability\condition {
      *
      * @param \cm_info $cm Cm
      * @return string
+     * @throws \coding_exception
      */
     public static function get_examus_mode($cm) {
         $econds = self::get_examus_conditions($cm);
@@ -123,6 +126,7 @@ class condition extends \core_availability\condition {
      *
      * @param \cm_info $cm Cm
      * @return array
+     * @throws \coding_exception
      */
     public static function get_examus_rules($cm) {
         $econds = self::get_examus_conditions($cm);
@@ -134,6 +138,7 @@ class condition extends \core_availability\condition {
      *
      * @param \cm_info $cm Cm
      * @return bool
+     * @throws \coding_exception
      */
     public static function get_examus_scheduling($cm) {
         $econds = self::get_examus_conditions($cm);
@@ -147,14 +152,12 @@ class condition extends \core_availability\condition {
      *
      * @param \cm_info $cm Cm
      * @return array
+     * @throws \coding_exception
      */
     private static function get_examus_conditions($cm) {
         $info = new info_module($cm);
-        try {
-            $tree = $info->get_availability_tree();
-        } catch (moodle_exception $e) {
-            return null;
-        }
+        $tree = $info->get_availability_tree();
+
         return $tree->get_all_children('\\availability_examus\\condition');
     }
 
@@ -219,6 +222,7 @@ class condition extends \core_availability\condition {
      * @param bool $not Not
      * @param \core_availability\info $info Info
      * @return string
+     * @throws \coding_exception
      */
     public function get_description($full, $not, \core_availability\info $info) {
         return get_string('use_examus', 'availability_examus');
