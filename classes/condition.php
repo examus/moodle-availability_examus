@@ -76,6 +76,7 @@ class condition extends \core_availability\condition {
      * @param int $userid User id
      * @param int $courseid Course id
      * @param int $cmid Cm id
+     * @throws \dml_exception
      */
     private static function delete_empty_entry($userid, $courseid, $cmid) {
         global $DB;
@@ -88,7 +89,6 @@ class condition extends \core_availability\condition {
      *
      * @param \cm_info $cm Cm
      * @return bool
-     * @throws \coding_exception
      */
     public static function has_examus_condition($cm) {
         $econds = self::get_examus_conditions($cm);
@@ -100,7 +100,6 @@ class condition extends \core_availability\condition {
      *
      * @param \cm_info $cm Cm
      * @return int
-     * @throws \coding_exception
      */
     public static function get_examus_duration($cm) {
         $econds = self::get_examus_conditions($cm);
@@ -113,7 +112,6 @@ class condition extends \core_availability\condition {
      *
      * @param \cm_info $cm Cm
      * @return string
-     * @throws \coding_exception
      */
     public static function get_examus_mode($cm) {
         $econds = self::get_examus_conditions($cm);
@@ -126,7 +124,6 @@ class condition extends \core_availability\condition {
      *
      * @param \cm_info $cm Cm
      * @return array
-     * @throws \coding_exception
      */
     public static function get_examus_rules($cm) {
         $econds = self::get_examus_conditions($cm);
@@ -138,7 +135,6 @@ class condition extends \core_availability\condition {
      *
      * @param \cm_info $cm Cm
      * @return bool
-     * @throws \coding_exception
      */
     public static function get_examus_scheduling($cm) {
         $econds = self::get_examus_conditions($cm);
@@ -152,12 +148,14 @@ class condition extends \core_availability\condition {
      *
      * @param \cm_info $cm Cm
      * @return array
-     * @throws \coding_exception
      */
     private static function get_examus_conditions($cm) {
         $info = new info_module($cm);
-        $tree = $info->get_availability_tree();
-
+        try {	        $tree = $info->get_availability_tree();
+            $tree = $info->get_availability_tree();
+        } catch (moodle_exception $e) {
+            return null;
+        }
         return $tree->get_all_children('\\availability_examus\\condition');
     }
 
