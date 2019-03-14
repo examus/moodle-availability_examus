@@ -25,30 +25,41 @@
 defined('MOODLE_INTERNAL') || die();
 
 // We defined the web service functions to install.
-$functions = array(
-        'availability_examus_user_proctored_modules' => array(
-                'classname' => 'availability_examus_external',
-                'methodname' => 'user_proctored_modules',
-                'classpath' => 'availability/condition/examus/externallib.php',
-                'description' => 'Returns modules exams for user',
-                'type' => 'write',
-                'services' => 'Examus',
-        ),
-        'availability_examus_submit_proctoring_review' => array(
-                'classname' => 'availability_examus_external',
-                'methodname' => 'submit_proctoring_review',
-                'classpath' => 'availability/condition/examus/externallib.php',
-                'description' => 'Accepts review for proctoring session',
-                'type' => 'write',
-                'services' => 'Examus',
-        )
-);
+$functions = [
+    'availability_examus_user_proctored_modules' => [
+        'classname' => 'availability_examus_external',
+        'methodname' => 'user_proctored_modules',
+        'classpath' => 'availability/condition/examus/externallib.php',
+        'description' => 'Returns modules exams for user',
+        'type' => 'write',
+        'services' => 'Examus',
+    ],
+
+    'availability_examus_submit_proctoring_review' => [
+        'classname' => 'availability_examus_external',
+        'methodname' => 'submit_proctoring_review',
+        'classpath' => 'availability/condition/examus/externallib.php',
+        'description' => 'Accepts review for proctoring session',
+        'type' => 'write',
+        'services' => 'Examus',
+    ],
+
+    'availability_examus_reset_entry' => [
+        'classname' => 'availability_examus_external',
+        'methodname' => 'reset_entry',
+        'classpath' => 'availability/condition/examus/externallib.php',
+        'description' => 'Resets entry for a user',
+        'type' => 'write',
+        'services' => 'Examus',
+    ],
+
+];
 
 // We define the services to install as pre-build services. A pre-build service is not editable by administrator.
-$services = array(
-        'Examus' => array(
-                'functions' => array('availability_examus_user_proctored_modules', 'availability_examus_submit_proctoring_review'),
-                'restrictedusers' => 0,
-                'enabled' => 1,
-        )
-);
+$services = [
+    'Examus' => [
+        'functions' => array_keys($functions),
+        'restrictedusers' => 0,
+        'enabled' => 1,
+    ]
+];

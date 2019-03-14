@@ -263,17 +263,64 @@ class availability_examus_external extends external_api {
 
     }
 
+
     /**
      * Returns description of method result value
      *
      * @return external_description
      */
     public static function submit_proctoring_review_returns() {
-        return new external_single_structure(
-                array(
-                        'success' => new external_value(PARAM_BOOL, 'request success status'),
-                        'error' => new external_value(PARAM_TEXT, 'error message')
-                )
-        );
+        return new external_single_structure([
+            'success' => new external_value(PARAM_BOOL, 'request success status'),
+            'error' => new external_value(PARAM_TEXT, 'error message')
+        ]);
+    }
+
+
+    /**
+     * Returns success flag and error message for reset operation
+     *
+     * @param string $accesscode accesscode
+     * @return array
+     */
+    public static function reset_entry($accesscode) {
+        global $DB;
+
+        self::validate_parameters(self::reset_entry_parameters(), [
+            'accesscode' => $accesscode,
+        ]);
+
+        $timenow = time();
+        $result = \availability_examus\common::reset_entry(['accesscode' => $accesscode]);
+
+        if ($result) {
+            return ['success' => true, 'error' => null];
+        }else{
+            return ['success' => false, 'error' => 'Entry was not found'];
+        }
+
+    }
+
+    /**
+     * Returns description of method parameters
+     *
+     * @return external_function_parameters
+     */
+    public static function reset_entry_parameters() {
+        return new external_function_parameters([
+            'accesscode' => new external_value(PARAM_TEXT, 'Access Code'),
+        ]);
+    }
+
+    /**
+     * Returns description of method result value
+     *
+     * @return external_description
+     */
+    public static function reset_entry_returns() {
+        return new external_single_structure([
+            'success' => new external_value(PARAM_BOOL, 'request success status'),
+            'error' => new external_value(PARAM_TEXT, 'error message')
+        ]);
     }
 }

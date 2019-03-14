@@ -23,9 +23,9 @@
  */
 
 require_once('../../../config.php');
-require_once("{$CFG->libdir}/formslib.php");
+require_once($CFG->libdir . "/formslib.php");
 require_once($CFG->libdir . '/adminlib.php');
-require_once($CFG->libdir.'/tablelib.php');
+require_once($CFG->libdir . '/tablelib.php');
 
 require_login();
 
@@ -36,32 +36,15 @@ $action = optional_param('action', '', PARAM_ALPHA);
 switch ($action) {
     case 'renew':
         $id = required_param('id', PARAM_TEXT);
-        $oldentry = $DB->get_record('availability_examus', array('id' => $id));
 
-        if ($oldentry and $oldentry->status != 'Not inited') {
-            $entries = $DB->get_records('availability_examus', array(
-                'userid' => $oldentry->userid,
-                'courseid' => $oldentry->courseid,
-                'cmid' => $oldentry->cmid,
-                'status' => 'Not inited'));
-            if (count($entries) == 0) {
-                $timenow = time();
-                $entry = new stdClass();
-                $entry->userid = $oldentry->userid;
-                $entry->courseid = $oldentry->courseid;
-                $entry->cmid = $oldentry->cmid;
-                $entry->accesscode = md5(uniqid(rand(), 1));
-                $entry->status = 'Not inited';
-                $entry->timecreated = $timenow;
-                $entry->timemodified = $timenow;
-                $DB->insert_record('availability_examus', $entry);
-                redirect('index.php', get_string('new_entry_created', 'availability_examus'),
-                    null, \core\output\notification::NOTIFY_SUCCESS);
-            } else {
-                redirect('index.php', get_string('entry_exist', 'availability_examus'),
+        if(\availability_examus\common::reset_entry(['id' => $id])){
+            redirect('index.php', get_string('new_entry_created', 'availability_examus'),
+                     null, \core\output\notification::NOTIFY_SUCCESS);
+        } else {
+            redirect('index.php', get_string('entry_exist', 'availability_examus'),
                     null, \core\output\notification::NOTIFY_ERROR);
-            }
         }
+
         break;
     default:
         break;
