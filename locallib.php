@@ -44,8 +44,6 @@ function examus_attempt_submitted_handler($event) {
         $entry->status = "Finished";
         $DB->update_record('availability_examus', $entry);
     }
-
-    unset($_SESSION['examus']);
 }
 
 /**
