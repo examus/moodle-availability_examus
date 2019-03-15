@@ -54,5 +54,17 @@ function xmldb_availability_examus_upgrade($oldversion) {
 
     }
 
+    if ($oldversion < 2019031502) {
+        $table = new xmldb_table('availability_examus');
+
+        $field = new xmldb_field('attemptid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+
+        // Conditionally launch add field timescheduled.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+    }
+
     return true;
 }

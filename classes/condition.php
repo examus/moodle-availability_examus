@@ -295,9 +295,10 @@ class condition extends \core_availability\condition {
     private static function create_entry_if_not_exist($userid, $courseid, $cmid) {
         // TODO: refactor this to get courseid and duration from cm.
         global $DB;
+
         $entries = $DB->get_records(
                 'availability_examus',
-                array('userid' => $userid, 'courseid' => $courseid, 'cmid' => $cmid),
+                ['userid' => $userid, 'courseid' => $courseid, 'cmid' => $cmid],
                 $sort = 'id');
 
         if (count($entries) == 0) {

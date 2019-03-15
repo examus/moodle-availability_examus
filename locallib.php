@@ -44,4 +44,41 @@ function examus_attempt_submitted_handler($event) {
         $entry->status = "Finished";
         $DB->update_record('availability_examus', $entry);
     }
+
+    unset($_SESSION['examus']);
 }
+
+/**
+ * When attempt is started, update entry accordingly
+ *
+ * @param stdClass $event Event
+ */
+function examus_attempt_started_handler($event) {
+    global $DB;
+
+    $attempt = $event->get_record_snapshot('quiz_attempts', $event->objectid);
+
+    $entry = $DB->get_record('availability_examus', ['status' => 'Started', 'accesscode' => $accesscode]);
+
+    $entry->attemptid = $attempt->id;
+    $DB->update_record('availability_examus', $entry);
+}
+
+
+/**
+ * Remove entries on attempt deletion
+ *
+ * @param stdClass $event Event
+ */
+function examus_attempt_deleted_handler($event) {
+    global $DB;
+
+    $course = $DB->get_record('course', array('id' => $event->courseid));
+    $attempt = $event->get_record_snapshot('quiz_attempts', $event->objectid);
+    $quiz = $event->get_record_snapshot('quiz', $attempt->quiz);
+    $cm = get_coursemodule_from_id('quiz', $event->get_context()->instanceid, $event->courseid);
+
+    $DB->delete_records('availability_examus', ['cmid' => $cm->id, 'attemptid' => $attempt->id]);
+}
+
+function examu
