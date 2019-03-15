@@ -81,4 +81,3 @@ function examus_attempt_deleted_handler($event) {
     $DB->delete_records('availability_examus', ['cmid' => $cm->id, 'attemptid' => $attempt->id]);
 }
 
-function examu
