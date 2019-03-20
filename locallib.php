@@ -78,7 +78,6 @@ function examus_attempt_deleted_handler($event) {
     $attempt = $event->get_record_snapshot('quiz_attempts', $event->objectid);
     $quiz = $event->get_record_snapshot('quiz', $attempt->quiz);
     $cm = get_coursemodule_from_id('quiz', $event->get_context()->instanceid, $event->courseid);
-
-    $DB->delete_records('availability_examus', ['cmid' => $cm->id, 'attemptid' => $attempt->id]);
+    $result = \availability_examus\common::reset_entry(['cmid' => $cm->id, 'attemptid' => $attempt->id]);
 }
 
