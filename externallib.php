@@ -233,14 +233,15 @@ class availability_examus_external extends external_api {
     public static function submit_proctoring_review($accesscode, $status, $reviewlink, $timescheduled) {
         global $DB;
 
-        self::validate_parameters(self::submit_proctoring_review_parameters(), array(
+        self::validate_parameters(self::submit_proctoring_review_parameters(), [
                 'accesscode' => $accesscode,
                 'review_link' => $reviewlink,
                 'status' => $status,
-                'timescheduled' => $timescheduled));
+                'timescheduled' => $timescheduled
+        ]);
 
         $timenow = time();
-        $entry = $DB->get_record('availability_examus', array('accesscode' => $accesscode));
+        $entry = $DB->get_record('availability_examus', ['accesscode' => $accesscode]);
 
         if ($entry) {
             if ($reviewlink) {
@@ -257,9 +258,14 @@ class availability_examus_external extends external_api {
             $entry->timemodified = $timenow;
 
             $DB->update_record('availability_examus', $entry);
-            return array('success' => true, 'error' => null);
+
+            if (!$entry->attemptid) {
+                \availability_examus\common::reset_entry(['accesscode' => $entry->accesscode]);
+            }
+
+            return ['success' => true, 'error' => null];
         }
-        return array('success' => false, 'error' => 'Entry was not found');
+        return ['success' => false, 'error' => 'Entry was not found'];
 
     }
 
@@ -290,7 +296,6 @@ class availability_examus_external extends external_api {
             'accesscode' => $accesscode,
         ]);
 
-        $timenow = time();
         $result = \availability_examus\common::reset_entry(['accesscode' => $accesscode]);
 
         if ($result) {
