@@ -55,27 +55,47 @@ echo $OUTPUT->header();
 
 echo $OUTPUT->heading(get_string('pluginname', 'availability_examus'));
 
-$entries = $DB->get_records('availability_examus', array(), '-id');
+$table = new flexible_table('availability_examus_table');
+
+$table->define_columns(['timemodified', 'timescheduled', 'u_email', 'courseid', 'cmid', 'status', 'review_link', 'create_entry']);
+$table->define_headers([
+    get_string('date_modified', 'availability_examus'),
+    get_string('time_scheduled', 'availability_examus'),
+    get_string('user'),
+    get_string('course'),
+    get_string('module', 'availability_examus'),
+    get_string('status', 'availability_examus'),
+    get_string('review', 'availability_examus'),
+    '']);
+
+$table->define_baseurl($PAGE->url);
+$table->sortable(true, 'date_modified');
+$table->no_sorting('courseid');
+$table->no_sorting('cmid');
+$table->set_attribute('id', 'entries');
+$table->set_attribute('class', 'generaltable generalbox');
+$table->setup();
+
+$select = [
+    'e.id id',
+    'e.timemodified timemodified',
+    'timescheduled',
+    'u.firstname u_firstname',
+    'u.lastname u_lastname',
+    'u.email u_email',
+    'e.status status',
+    'review_link',
+    'cmid',
+    'courseid'
+];
+$query = 'SELECT '.implode(', ', $select).' FROM {availability_examus} e LEFT JOIN {user} u ON u.id=e.userid';
+$orderBy = $table->get_sql_sort();
+if($orderBy){
+    $query .= ' ORDER BY '. $orderBy;
+}
+$entries = $DB->get_records_sql($query);
 
 if (!empty($entries)) {
-    $table = new flexible_table('availability_examus_table');
-
-    $table->define_columns(array('date', 'time_scheduled', 'user', 'course', 'module', 'status', 'review_link', 'create_entry'));
-    $table->define_headers(array(
-        get_string('date_modified', 'availability_examus'),
-        get_string('time_scheduled', 'availability_examus'),
-        get_string('user'),
-        get_string('course'),
-        get_string('module', 'availability_examus'),
-        get_string('status', 'availability_examus'),
-        get_string('review', 'availability_examus'),
-        ''));
-
-    $table->define_baseurl($PAGE->url);
-    $table->set_attribute('id', 'entries');
-    $table->set_attribute('class', 'generaltable generalbox');
-    $table->setup();
-
     foreach ($entries as $entry) {
         $row = array();
 
@@ -91,8 +111,7 @@ if (!empty($entries)) {
             $row[] = '';
         }
 
-        $user = $DB->get_record('user', array('id' => $entry->userid));
-        $row[] = $user->firstname . " " . $user->lastname . "<br>" . $user->email;
+        $row[] = $entry->u_firstname . " " . $entry->u_lastname . "<br>" . $entry->u_email;
 
         $course = get_course($entry->courseid);
         $modinfo = get_fast_modinfo($course);
