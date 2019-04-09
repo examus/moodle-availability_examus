@@ -30,6 +30,7 @@ $string['title'] = 'Экзамус';
 
 $string['use_examus'] = 'Используйте приложение "Экзамус", чтобы получить доступ к модулю';
 $string['settings'] = 'Настройки прокторинга "Экзамус"';
+$string['log_section'] = 'Журнал прокторинга "Экзамус"';
 $string['status'] = 'Статус';
 $string['review'] = 'Результат';
 $string['module'] = 'Модуль';
@@ -63,3 +64,6 @@ $string['allow_voices'] =  'Разрешить голоса';
 $string['allow_wrong_gaze_direction'] =  'Разрешить взгляд в сторону';
 
 $string['scheduling_required'] = 'Обязательна запись в календаре';
+$string['apply_filter'] = 'Применить фильтры';
+$string['allcourses'] = 'Все курсы';
+$string['allstatuses'] = 'Все статусы';
