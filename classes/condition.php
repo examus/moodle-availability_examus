@@ -56,15 +56,18 @@ class condition extends \core_availability\condition {
      * @param stdClass $structure Structure
      */
     public function __construct($structure) {
+        $manual_modes = ['normal', 'identification'];
+
         if (!empty($structure->duration)) {
             $this->duration = $structure->duration;
         }
         if (!empty($structure->mode)) {
             $this->mode = $structure->mode;
         }
-        if (array_key_exists("scheduling_required", $structure)) {
-            $this->scheduling_required = $structure->scheduling_required;
-        }
+
+        //var_dump('head');die();
+        $this->scheduling_required = in_array($this->mode, $manual_modes);
+
         if (!empty($structure->rules)) {
             $this->rules = $structure->rules;
         }

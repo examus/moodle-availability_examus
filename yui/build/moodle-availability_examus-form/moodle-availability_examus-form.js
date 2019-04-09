@@ -21,7 +21,7 @@ M.availability_examus.form.initInner = function(rules)
 M.availability_examus.form.instId = 0;
 
 M.availability_examus.form.getNode = function(json) {
-    var html, node, root, id, modeId, durationId, schedulingId, keyId;
+    var html, node, root, id, modeId, durationId, keyId;
 
     /** Returns string from translations. */
     function getString(identifier) {
@@ -37,10 +37,6 @@ M.availability_examus.form.getNode = function(json) {
     durationId = id + '_duration';
     html += '<label for="' + durationId + '">' + getString('duration') + '</label> ';
     html += '<input type="text" name="duration" id="' + durationId + '">';
-
-    schedulingId = id + '_scheduling';
-    html += '<br><input type="checkbox" name="scheduling_required" id="' + schedulingId + '">';
-    html += '<label for="' + schedulingId + '">' + getString('scheduling_required') + '</label> ';
 
     modeId = id + '_mode';
     html += '<br><label for="' + modeId + '">' + getString('mode') + '</label> ';
@@ -69,14 +65,8 @@ M.availability_examus.form.getNode = function(json) {
         node.one('select[name=mode] option[value=' + json.mode + ']').set('selected', 'selected');
     }
 
-    if (json.scheduling_required !== undefined) {
-        if (json.scheduling_required) {
-            node.one('input[name=scheduling_required]').set('checked', 'checked');
-        }
-    }
-
     if (json.rules === undefined) {
-        json.rules = this.rules
+        json.rules = this.rules;
     }
 
     for (key in json.rules) {
@@ -91,9 +81,6 @@ M.availability_examus.form.getNode = function(json) {
         root.delegate('valuechange', function() {
             M.core_availability.form.update();
         }, '.availability_examus input[name=duration]');
-        root.delegate('click', function() {
-            M.core_availability.form.update();
-        }, '.availability_examus input[name=scheduling_required]');
         root.delegate('valuechange', function() {
             M.core_availability.form.update();
         }, '.availability_examus select[name=mode]');
@@ -109,12 +96,6 @@ M.availability_examus.form.fillValue = function(value, node) {
     var rulesInputs, key;
     value.duration = node.one('input[name=duration]').get('value').trim();
     value.mode = node.one('select[name=mode]').get('value').trim();
-
-    if (node.one('input[name=scheduling_required]').get('checked') === true) {
-        value.scheduling_required = true;
-    } else {
-        value.scheduling_required = false;
-    }
 
     value.rules = {};
     rulesInputs = node.all('.rules input');
@@ -136,5 +117,6 @@ M.availability_examus.form.fillErrors = function(errors, node) {
         errors.push('availability_examus:error_setduration');
     }
 };
+
 
 }, '@VERSION@', {"requires": ["base", "node", "event", "moodle-core_availability-form"]});
