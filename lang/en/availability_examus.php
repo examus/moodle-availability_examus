@@ -67,3 +67,6 @@ $string['scheduling_required'] = 'A calendar entry is required';
 $string['apply_filter'] = 'Apply filter';
 $string['allcourses'] = 'All courses';
 $string['allstatuses'] = 'All statuses';
+$string['userquery'] = 'User Email starts with';
+$string['fromdate'] = 'From date:';
+$string['todate'] = 'To date:';

@@ -67,3 +67,6 @@ $string['scheduling_required'] = 'Обязательна запись в кал�
 $string['apply_filter'] = 'Применить фильтры';
 $string['allcourses'] = 'Все курсы';
 $string['allstatuses'] = 'Все статусы';
+$string['userquery'] = 'Email пользователя начинается с';
+$string['fromdate'] = 'С:';
+$string['todate'] = 'По:';

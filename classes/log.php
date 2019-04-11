@@ -48,16 +48,45 @@ class log {
         ];
 
         $where = ['1'];
-        foreach($this->filters as $key => $value){
+        $params = $this->filters;
+
+        if(isset($params['from[day]']) && isset($params['from[month]']) && isset($params['from[year]'])){
+            $month = $params['from[month]'];
+            $day = $params['from[day]'];
+            $year = $params['from[year]'];
+            unset($params['from[month]'], $params['from[day]'], $params['from[year]']);
+
+            $params['from'] = mktime(0,0,0, $month, $day, $year);
+        };
+
+        if(isset($params['to[day]']) && isset($params['to[month]']) && isset($params['to[year]'])){
+            $month = $params['to[month]'];
+            $day = $params['to[day]'];
+            $year = $params['to[year]'];
+            unset($params['to[month]'], $params['to[day]'], $params['to[year]']);
+
+            $params['to'] = mktime(23,59,59, $month, $day, $year);
+        };
+
+
+        foreach($params as $key => $value){
             if(empty($value)){
                 continue;
             }
             switch($key){
-                case 'timemodified':
-                    $where[]= 'e.'.$key.' > '.$value;
-                    $where[]= 'e.'.$key.' < '.($value + (60*60*24));
-
+                case 'from':
+                    $where[]= 'e.timemodified > :'.$key;
                     break;
+
+                case 'to':
+                    $where[]= 'e.timemodified <= :'.$key;
+                    break;
+
+                case 'userquery':
+                    $params[$key] = $value.'%';
+                    $where[]= 'u.email LIKE :'.$key;
+                    break;
+
                 default:
                     $where[]= $key.' = :'.$key;
             }
@@ -74,9 +103,9 @@ class log {
 
         $queryCount = 'SELECT count(e.id) as `count` FROM {availability_examus} e LEFT JOIN {user} u ON u.id=e.userid WHERE '.implode(' AND ', $where);
 
-        $this->entries = $DB->get_records_sql($query, $this->filters);
+        $this->entries = $DB->get_records_sql($query, $params);
 
-        $result = $DB->get_records_sql($queryCount, $this->filters);
+        $result = $DB->get_records_sql($queryCount, $params);
         $this->entries_count = reset($result)->count;
         $this->pages_count = ceil($this->entries_count / $this->per_page);
 
@@ -115,7 +144,7 @@ class log {
 
         if (!empty($entries)) {
             foreach ($entries as $entry) {
-                $row = array();
+                $row = [];
 
                 $date = usergetdate($entry->timemodified);
                 $row[] = '<b>' . $date['year'] . '.' . $date['mon'] . '.' . $date['mday'] . '</b> ' .
@@ -308,7 +337,7 @@ class log {
 
         $courseid = $this->filters['courseid'];
 
-        $userid = $this->filters['userid'];
+        $userquery = $this->filters['userquery'];
         $date = $this->filters['timemodified'];
         $status = $this->filters['status'];
 
@@ -328,25 +357,25 @@ class log {
 
         // Add user selector.
         echo html_writer::label(get_string('selctauser'), 'menuuser', false, ['class' => 'accesshide']);
-        echo html_writer::select($users, "userid", $userid, get_string("allparticipants"));
+        echo html_writer::empty_tag('input', [
+            'name' => 'userquery',
+            'value' => $userquery,
+            'placeholder' => get_string("userquery", 'availability_examus'),
+            'class' => 'form-control',
+            'style' => 'width: auto;clear: none;display: inline-block;'
+        ]);
 
         // Add status selector.
         //echo html_writer::label(get_string('selectstatus'), 'menuuser', false, array('class' => 'accesshide'));
         echo html_writer::select($statuses, "status", $status, get_string('allstatuses', 'availability_examus'));
 
+        /*
         // Add date selector.
         echo html_writer::label(get_string('date'), 'menudate', false, ['class' => 'accesshide']);
         echo html_writer::select($dates, "timemodified", $date, get_string('alldays'));
+        */
 
 
-        echo html_writer::empty_tag('input', [
-            'type' => 'submit',
-            'value' => get_string('apply_filter', 'availability_examus'),
-            'class' => 'btn btn-secondary'
-        ]);
-
-
-        /*
         // Get the calendar type used - see MDL-18375.
         $calendartype = \core_calendar\type_factory::get_calendar_instance();
         $dateformat = $calendartype->get_date_order(2000, date('Y'));
@@ -355,34 +384,58 @@ class log {
             $dateformat = array_reverse($dateformat);
         }
 
-        // from
-        echo html_writer::start_div();
+        // From date
+        echo html_writer::start_div(null, ['class' => 'fdate_selector']);
+
+        echo html_writer::label(get_string('fromdate',  'availability_examus'), '', false);
+
         foreach ($dateformat as $key => $value) {
-            // E_STRICT creating elements without forms is nasty because it internally uses $this
-            echo html_writer::select($value, 'from['.$key.']', null);
+            $name = 'from['.$key.']';
+            echo html_writer::select($value, $name, $this->filters[$name], null);
         }
         // The YUI2 calendar only supports the gregorian calendar type so only display the calendar image if this is being used.
         if ($calendartype->get_name() === 'gregorian') {
-            echo html_writer::start_tag('a', ['href' => '#', 'title' => get_string('calendar', 'calendar'), 'class' => 'visibleifjs']);
+            form_init_date_js();
+            echo html_writer::start_tag('a', [
+                'href' => '#',
+                'title' => get_string('calendar', 'calendar'),
+                'class' => 'visibleifjs',
+                'name' => 'from[calendar]'
+            ]);
             echo $OUTPUT->pix_icon('i/calendar', get_string('calendar', 'calendar') , 'moodle');
             echo html_writer::end_tag('a');
         }
         echo html_writer::end_div();
 
-        // From date
+        // To date
         echo html_writer::start_div();
+
+        echo html_writer::label(get_string('todate',  'availability_examus'), '', false);
+
         foreach ($dateformat as $key => $value) {
-            // E_STRICT creating elements without forms is nasty because it internally uses $this
-            echo html_writer::select($value, $key, null);
+            $name = 'to['.$key.']';
+            echo html_writer::select($value, $name, $this->filters[$name], null);
         }
         // The YUI2 calendar only supports the gregorian calendar type so only display the calendar image if this is being used.
         if ($calendartype->get_name() === 'gregorian') {
-            echo html_writer::start_tag('a', ['href' => '#', 'title' => get_string('calendar', 'calendar'), 'class' => 'visibleifjs']);
+            form_init_date_js();
+            echo html_writer::start_tag('a', [
+                'href' => '#',
+                'title' => get_string('calendar', 'calendar'),
+                'class' => 'visibleifjs',
+                'name' => 'to[calendar]'
+            ]);
             echo $OUTPUT->pix_icon('i/calendar', get_string('calendar', 'calendar') , 'moodle');
             echo html_writer::end_tag('a');
         }
         echo html_writer::end_div();
-        */
+
+
+        echo html_writer::empty_tag('input', [
+            'type' => 'submit',
+            'value' => get_string('apply_filter', 'availability_examus'),
+            'class' => 'btn btn-secondary'
+        ]);
 
         echo html_writer::end_div();
         echo html_writer::end_tag('form');
