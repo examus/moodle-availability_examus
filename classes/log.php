@@ -408,7 +408,7 @@ class log {
         echo html_writer::end_div();
 
         // To date
-        echo html_writer::start_div();
+        echo html_writer::start_div(null, ['class' => 'fdate_selector']);
 
         echo html_writer::label(get_string('todate',  'availability_examus'), '', false);
 

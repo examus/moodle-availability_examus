@@ -56,7 +56,7 @@ echo $OUTPUT->heading(get_string('pluginname', 'availability_examus'));
 global $PAGE;
 
 $from = isset($_GET['from']) ? $_GET['from'] : ['day' => null, 'month' => null, 'year' => null];
-$to = isset($_GET['to']) ? $_GET['to'] : ['day' => date('d'), 'month' => date('m'), 'year' => date('Y')];;
+$to = isset($_GET['to']) ? $_GET['to'] : ['day' => date('j'), 'month' => date('n'), 'year' => date('Y')];;
 
 $filters = [
     'courseid'     => optional_param('courseid', null, PARAM_INT),
