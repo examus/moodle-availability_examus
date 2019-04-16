@@ -351,9 +351,9 @@ class log {
         $dates = $this->get_date_options();
         $statuses = $this->get_status_list();
 
-        echo html_writer::start_div(null, ['class' => '', 'style' => 'padding: 0.5rem 0;']);
+        echo html_writer::start_div(null, ['class' => '', 'style' => 'padding: 0 0 0.8rem;']);
         echo html_writer::label(get_string('selectacourse'), 'menuid', false, ['class' => 'accesshide']);
-        echo html_writer::select($courses, "courseid", $courseid, get_string('allcourses', 'availability_examus'));
+        echo html_writer::select($courses, "courseid", $courseid, get_string('allcourses', 'availability_examus'), ['style'=>'height: 2.5rem;']);
 
 
         // Add user selector.
@@ -363,12 +363,12 @@ class log {
             'value' => $userquery,
             'placeholder' => get_string("userquery", 'availability_examus'),
             'class' => 'form-control',
-            'style' => 'width: auto;clear: none;display: inline-block;'
+            'style' => 'width: auto;clear: none;display: inline-block;vertical-align: middle;font-size:inherit;height: 2.5rem;'
         ]);
 
         // Add status selector.
         //echo html_writer::label(get_string('selectstatus'), 'menuuser', false, array('class' => 'accesshide'));
-        echo html_writer::select($statuses, "status", $status, get_string('allstatuses', 'availability_examus'));
+        echo html_writer::select($statuses, "status", $status, get_string('allstatuses', 'availability_examus'), ['style'=>'height: 2.5rem;']);
 
         /*
         // Add date selector.
@@ -390,11 +390,11 @@ class log {
         // From date
         echo html_writer::start_div(null, ['class' => 'fdate_selector', 'style' => 'padding: 0 0 0.8rem;']);
 
-        echo html_writer::label(get_string('fromdate',  'availability_examus'), '', false);
+        echo html_writer::label(get_string('fromdate',  'availability_examus'), '', false, ['style' => 'width: 12%;']);
 
         foreach ($dateformat as $key => $value) {
             $name = 'from['.$key.']';
-            echo html_writer::select($value, $name, $this->filters[$name], null);
+            echo html_writer::select($value, $name, $this->filters[$name], null, ['style'=>'height: 2.5rem;']);
         }
         // The YUI2 calendar only supports the gregorian calendar type so only display the calendar image if this is being used.
         if ($calendartype->get_name() === 'gregorian') {
@@ -411,13 +411,13 @@ class log {
         echo html_writer::end_div();
 
         // To date
-        echo html_writer::start_div(null, ['class' => 'fdate_selector', 'style' => 'padding: 0.5rem 0;']);
+        echo html_writer::start_div(null, ['class' => 'fdate_selector', 'style' => 'padding: 0 0 0.8rem;']);
 
-        echo html_writer::label(get_string('todate',  'availability_examus'), '', false);
+        echo html_writer::label(get_string('todate',  'availability_examus'), '', false, ['style' => 'width: 12%;']);
 
         foreach ($dateformat as $key => $value) {
             $name = 'to['.$key.']';
-            echo html_writer::select($value, $name, $this->filters[$name], null);
+            echo html_writer::select($value, $name, $this->filters[$name], null, ['style'=>'height: 2.5rem;']);
         }
         // The YUI2 calendar only supports the gregorian calendar type so only display the calendar image if this is being used.
         if ($calendartype->get_name() === 'gregorian') {
