@@ -351,6 +351,7 @@ class log {
         $dates = $this->get_date_options();
         $statuses = $this->get_status_list();
 
+        echo html_writer::start_div(null, ['class' => '', 'style' => 'padding: 0.5rem 0;']);
         echo html_writer::label(get_string('selectacourse'), 'menuid', false, ['class' => 'accesshide']);
         echo html_writer::select($courses, "courseid", $courseid, get_string('allcourses', 'availability_examus'));
 
@@ -384,8 +385,10 @@ class log {
             $dateformat = array_reverse($dateformat);
         }
 
+        echo html_writer::end_div();
+
         // From date
-        echo html_writer::start_div(null, ['class' => 'fdate_selector']);
+        echo html_writer::start_div(null, ['class' => 'fdate_selector', 'style' => 'padding: 0 0 0.8rem;']);
 
         echo html_writer::label(get_string('fromdate',  'availability_examus'), '', false);
 
@@ -408,7 +411,7 @@ class log {
         echo html_writer::end_div();
 
         // To date
-        echo html_writer::start_div(null, ['class' => 'fdate_selector']);
+        echo html_writer::start_div(null, ['class' => 'fdate_selector', 'style' => 'padding: 0.5rem 0;']);
 
         echo html_writer::label(get_string('todate',  'availability_examus'), '', false);
 
