@@ -353,7 +353,7 @@ class log {
 
         echo html_writer::start_div(null, ['class' => '', 'style' => 'padding: 0 0 0.8rem;']);
         echo html_writer::label(get_string('selectacourse'), 'menuid', false, ['class' => 'accesshide']);
-        echo html_writer::select($courses, "courseid", $courseid, get_string('allcourses', 'availability_examus'), ['style'=>'height: 2.5rem;']);
+        echo html_writer::select($courses, "courseid", $courseid, get_string('allcourses', 'availability_examus'), ['style'=>'height: 2.5rem;margin-right: 0.5rem']);
 
 
         // Add user selector.
@@ -363,12 +363,12 @@ class log {
             'value' => $userquery,
             'placeholder' => get_string("userquery", 'availability_examus'),
             'class' => 'form-control',
-            'style' => 'width: auto;clear: none;display: inline-block;vertical-align: middle;font-size:inherit;height: 2.5rem;'
+            'style' => 'width: auto;clear: none;display: inline-block;vertical-align: middle;font-size:inherit;height: 2.5rem;margin-right: 0.5rem'
         ]);
 
         // Add status selector.
         //echo html_writer::label(get_string('selectstatus'), 'menuuser', false, array('class' => 'accesshide'));
-        echo html_writer::select($statuses, "status", $status, get_string('allstatuses', 'availability_examus'), ['style'=>'height: 2.5rem;']);
+        echo html_writer::select($statuses, "status", $status, get_string('allstatuses', 'availability_examus'), ['style'=>'height: 2.5rem;margin-right: 0.5rem']);
 
         /*
         // Add date selector.
@@ -394,7 +394,7 @@ class log {
 
         foreach ($dateformat as $key => $value) {
             $name = 'from['.$key.']';
-            echo html_writer::select($value, $name, $this->filters[$name], null, ['style'=>'height: 2.5rem;']);
+            echo html_writer::select($value, $name, $this->filters[$name], null, ['style'=>'height: 2.5rem;margin-right: 0.5rem']);
         }
         // The YUI2 calendar only supports the gregorian calendar type so only display the calendar image if this is being used.
         if ($calendartype->get_name() === 'gregorian') {
@@ -417,7 +417,7 @@ class log {
 
         foreach ($dateformat as $key => $value) {
             $name = 'to['.$key.']';
-            echo html_writer::select($value, $name, $this->filters[$name], null, ['style'=>'height: 2.5rem;']);
+            echo html_writer::select($value, $name, $this->filters[$name], null, ['style'=>'height: 2.5rem;margin-right: 0.5rem']);
         }
         // The YUI2 calendar only supports the gregorian calendar type so only display the calendar image if this is being used.
         if ($calendartype->get_name() === 'gregorian') {
