@@ -24,6 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['examus:logaccess'] = 'Доступ к отчету Экзамус';
 $string['description'] = 'Позволяет студентам использовать сервис прокторинга "Экзамус"';
 $string['pluginname'] = 'Прокторинг "Экзамус"';
 $string['title'] = 'Экзамус';

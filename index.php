@@ -27,6 +27,7 @@ require_once($CFG->libdir . "/formslib.php");
 require_once($CFG->libdir . '/adminlib.php');
 
 require_login();
+require_capability('availability/examus:logaccess', context_system::instance());
 
 admin_externalpage_setup('availability_examus_settings');
 
