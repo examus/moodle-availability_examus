@@ -6,7 +6,7 @@ $capabilities = [
     'availability/examus:logaccess' => [
         'riskbitmask' => RISK_PERSONAL | RISK_CONFIG,
         'captype' => 'write',
-        'contextlevel' => CONTEXT_MODULE,
+        'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => []
     ],
 ];
