@@ -168,6 +168,7 @@ class condition extends \core_availability\condition {
      */
     public function save() {
         return (object) [
+            'type' => 'examus',
             'duration' => (int) $this->duration,
             'mode' => (string) $this->mode,
             'scheduling_required' => (bool) $this->scheduling_required,
