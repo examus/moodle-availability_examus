@@ -30,4 +30,22 @@ class common {
             }
         }
     }
+
+    public static function delete_empty_entries($userid, $courseid, $cmid = null){
+        global $DB;
+
+        $condition = [
+          'userid' => $userid,
+          'courseid' => $courseid,
+          'status' => 'Not inited'
+        ];
+
+        if(!empty($cmid)) {
+            $condition['cmid'] = $cmid;
+        }
+
+        $DB->delete_records('availability_examus', $condition);
+    }
+
+
 }

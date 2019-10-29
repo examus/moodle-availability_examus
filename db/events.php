@@ -27,28 +27,31 @@ defined('MOODLE_INTERNAL') || die();
 $observers = [
     [
         'eventname' => '\core\event\course_module_deleted',
-        'callback' => '\availability_examus\condition::course_module_deleted'
+        'includefile' => '/availability/condition/examus/locallib.php',
+        'callback' => 'examus_course_module_deleted',
     ],
     [
         'eventname' => '\core\event\user_enrolment_deleted',
-        'callback' => '\availability_examus\condition::user_enrolment_deleted'
+        'callback' => 'examus_user_enrolment_deleted',
+        'includefile' => '/availability/condition/examus/locallib.php',
+
     ],
     [
         'eventname' => '\mod_quiz\event\attempt_submitted',
         'callback' => 'examus_attempt_submitted_handler',
         'includefile' => '/availability/condition/examus/locallib.php',
-        'internal' => false
+        'internal' => false,
     ],
     [
         'eventname' => '\mod_quiz\event\attempt_started',
         'callback' => 'examus_attempt_started_handler',
         'includefile' => '/availability/condition/examus/locallib.php',
-        'internal' => false
+        'internal' => false,
     ],
     [
         'eventname' => '\mod_quiz\event\attempt_deleted',
         'callback' => 'examus_attempt_deleted_handler',
         'includefile' => '/availability/condition/examus/locallib.php',
-        'internal' => false
+        'internal' => false,
     ],
 ];

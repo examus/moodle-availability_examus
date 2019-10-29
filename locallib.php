@@ -81,3 +81,25 @@ function examus_attempt_deleted_handler($event) {
     $result = \availability_examus\common::reset_entry(['cmid' => $cm->id, 'attemptid' => $attempt->id]);
 }
 
+/**
+ * user enrolment deleted handles
+ *
+ * @param \core\event\user_enrolment_deleted $event Event
+ */
+function examus_user_enrolment_deleted(\core\event\user_enrolment_deleted $event) {
+    $course = get_course($event->courseid);
+    $userid = $event->relateduserid;
+
+    \availability_examus\common::delete_empty_entries($userid, $event->courseid);
+}
+
+/**
+ * course mudule deleted handler
+ *
+ * @param \core\event\course_module_deleted $event Event
+ */
+function examus_course_module_deleted(\core\event\course_module_deleted $event) {
+    global $DB;
+    $cmid = $event->contextinstanceid;
+    $DB->delete_records('availability_examus', ['cmid' => $cmid]);
+}
