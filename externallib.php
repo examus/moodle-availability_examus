@@ -26,6 +26,8 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->libdir . "/externallib.php");
 
+use core_availability\info_module;
+
 /**
  * Availability examus class
  * @copyright  2017 Max Pomazuev
@@ -129,6 +131,12 @@ class availability_examus_external extends external_api {
                 $instancesbytypes = $modinfo->get_instances();
                 foreach ($instancesbytypes as $instances) {
                     foreach ($instances as $cm) {
+                        $availibility_info = new info_module($cm);
+                        $reason = '';
+                        if($availibility_info && !$availibility_info->is_available($reason)){
+                            continue;
+                        }
+
                         if (\availability_examus\condition::has_examus_condition($cm) and $cm->uservisible) {
                             $entry = \availability_examus\condition::create_entry_for_cm($user->id, $cm);
                             if ($entry == null) {
