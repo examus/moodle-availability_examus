@@ -26,6 +26,8 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->libdir . "/externallib.php");
 
+use core_availability\info_module;
+
 /**
  * Availability examus class
  * @copyright  2017 Max Pomazuev
@@ -129,6 +131,12 @@ class availability_examus_external extends external_api {
                 $instancesbytypes = $modinfo->get_instances();
                 foreach ($instancesbytypes as $instances) {
                     foreach ($instances as $cm) {
+                        $availibility_info = new info_module($cm);
+                        $reason = '';
+                        if($availibility_info && !$availibility_info->is_available($reason)){
+                            continue;
+                        }
+
                         if (\availability_examus\condition::has_examus_condition($cm) and $cm->uservisible) {
                             $entry = \availability_examus\condition::create_entry_for_cm($user->id, $cm);
                             if ($entry == null) {
@@ -233,14 +241,15 @@ class availability_examus_external extends external_api {
     public static function submit_proctoring_review($accesscode, $status, $reviewlink, $timescheduled) {
         global $DB;
 
-        self::validate_parameters(self::submit_proctoring_review_parameters(), array(
+        self::validate_parameters(self::submit_proctoring_review_parameters(), [
                 'accesscode' => $accesscode,
                 'review_link' => $reviewlink,
                 'status' => $status,
-                'timescheduled' => $timescheduled));
+                'timescheduled' => $timescheduled
+        ]);
 
         $timenow = time();
-        $entry = $DB->get_record('availability_examus', array('accesscode' => $accesscode));
+        $entry = $DB->get_record('availability_examus', ['accesscode' => $accesscode]);
 
         if ($entry) {
             if ($reviewlink) {
@@ -257,11 +266,17 @@ class availability_examus_external extends external_api {
             $entry->timemodified = $timenow;
 
             $DB->update_record('availability_examus', $entry);
-            return array('success' => true, 'error' => null);
+
+            if (!$entry->attemptid) {
+                \availability_examus\common::reset_entry(['accesscode' => $entry->accesscode]);
+            }
+
+            return ['success' => true, 'error' => null];
         }
-        return array('success' => false, 'error' => 'Entry was not found');
+        return ['success' => false, 'error' => 'Entry was not found'];
 
     }
+
 
     /**
      * Returns description of method result value
@@ -269,11 +284,56 @@ class availability_examus_external extends external_api {
      * @return external_description
      */
     public static function submit_proctoring_review_returns() {
-        return new external_single_structure(
-                array(
-                        'success' => new external_value(PARAM_BOOL, 'request success status'),
-                        'error' => new external_value(PARAM_TEXT, 'error message')
-                )
-        );
+        return new external_single_structure([
+            'success' => new external_value(PARAM_BOOL, 'request success status'),
+            'error' => new external_value(PARAM_TEXT, 'error message')
+        ]);
+    }
+
+
+    /**
+     * Returns success flag and error message for reset operation
+     *
+     * @param string $accesscode accesscode
+     * @return array
+     */
+    public static function reset_entry($accesscode) {
+        global $DB;
+
+        self::validate_parameters(self::reset_entry_parameters(), [
+            'accesscode' => $accesscode,
+        ]);
+
+        $result = \availability_examus\common::reset_entry(['accesscode' => $accesscode]);
+
+        if ($result) {
+            return ['success' => true, 'error' => null];
+        }else{
+            return ['success' => false, 'error' => 'Entry was not found'];
+        }
+
+    }
+
+    /**
+     * Returns description of method parameters
+     *
+     * @return external_function_parameters
+     */
+    public static function reset_entry_parameters() {
+        return new external_function_parameters([
+            'accesscode' => new external_value(PARAM_TEXT, 'Access Code'),
+        ]);
+    }
+
+    /**
+     * Returns description of method result value
+     *
+     * @return external_description
+     */
+    public static function reset_entry_returns() {
+        return new external_single_structure([
+            'success' => new external_value(PARAM_BOOL, 'request success status'),
+            'error' => new external_value(PARAM_TEXT, 'error message')
+        ]);
     }
 }

@@ -39,12 +39,13 @@ class frontend extends \core_availability\frontend {
      * @return array
      */
     protected function get_javascript_strings() {
-        return ['title', 'error_setduration', 'duration', 'link', 'mode', 'normal_mode',
-                'rules', 'olympics_mode', 'identification_mode', 'allow_to_use_websites',
-                'allow_to_use_books', 'allow_to_use_paper', 'allow_to_use_messengers',
-                'allow_to_use_calculator', 'allow_to_use_excel', 'allow_to_use_human_assistant',
-                'allow_absence_in_frame', 'allow_voices', 'allow_wrong_gaze_direction',
-                'scheduling_required'];
+        return [
+            'title', 'error_setduration', 'duration', 'link', 'mode', 'normal_mode',
+            'rules', 'olympics_mode', 'identification_mode', 'allow_to_use_websites',
+            'allow_to_use_books', 'allow_to_use_paper', 'allow_to_use_messengers',
+            'allow_to_use_calculator', 'allow_to_use_excel', 'allow_to_use_human_assistant',
+            'allow_absence_in_frame', 'allow_voices', 'allow_wrong_gaze_direction'
+        ];
     }
 
     /**

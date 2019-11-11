@@ -24,12 +24,14 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['examus:logaccess'] = 'Examus log access';
 $string['description'] = 'Allows students to use Examus proctoring service';
 $string['pluginname'] = 'Proctoring by Examus';
 $string['title'] = 'Examus';
 
 $string['use_examus'] = 'Use examus app to view this module';
 $string['settings'] = 'Examus settings';
+$string['log_section'] = 'Examus log';
 $string['status'] = 'Status';
 $string['review'] = 'Review';
 $string['module'] = 'Module';
@@ -63,3 +65,9 @@ $string['allow_voices'] =  'Allow voices';
 $string['allow_wrong_gaze_direction'] =  'Allow wrong gaze direction';
 
 $string['scheduling_required'] = 'A calendar entry is required';
+$string['apply_filter'] = 'Apply filter';
+$string['allcourses'] = 'All courses';
+$string['allstatuses'] = 'All statuses';
+$string['userquery'] = 'User Email starts with';
+$string['fromdate'] = 'From date:';
+$string['todate'] = 'To date:';

@@ -56,15 +56,17 @@ class condition extends \core_availability\condition {
      * @param stdClass $structure Structure
      */
     public function __construct($structure) {
+        $manual_modes = ['normal', 'identification'];
+
         if (!empty($structure->duration)) {
             $this->duration = $structure->duration;
         }
         if (!empty($structure->mode)) {
             $this->mode = $structure->mode;
         }
-        if (array_key_exists("scheduling_required", $structure)) {
-            $this->scheduling_required = $structure->scheduling_required;
-        }
+
+        $this->scheduling_required = in_array($this->mode, $manual_modes);
+
         if (!empty($structure->rules)) {
             $this->rules = $structure->rules;
         }
@@ -78,10 +80,22 @@ class condition extends \core_availability\condition {
      * @param int $cmid Cm id
      */
     private static function delete_empty_entry($userid, $courseid, $cmid) {
-        global $DB;
-        $DB->delete_records('availability_examus', array(
-                'userid' => $userid, 'courseid' => $courseid, 'cmid' => $cmid, 'status' => 'Not inited'));
+        common::delete_empty_entries($userid, $courseid, $cmid);
     }
+
+    /**
+     * delete empty entry for cm
+     *
+     * @param int $userid User id
+     * @param stdClass $cm Cm
+     * @return bool
+     */
+    public static function delete_empty_entry_for_cm($userid, $cm) {
+        $course = $cm->get_course();
+        $courseid = $course->id;
+        self::delete_empty_entry($userid, $courseid, $cm->id);
+    }
+
 
     /**
      * has examus condition
@@ -165,6 +179,7 @@ class condition extends \core_availability\condition {
      */
     public function save() {
         return (object) [
+            'type' => 'examus',
             'duration' => (int) $this->duration,
             'mode' => (string) $this->mode,
             'scheduling_required' => (bool) $this->scheduling_required,
@@ -234,17 +249,6 @@ class condition extends \core_availability\condition {
     }
 
     /**
-     * course mudule deleted handler
-     *
-     * @param \core\event\course_module_deleted $event Event
-     */
-    public static function course_module_deleted(\core\event\course_module_deleted $event) {
-        global $DB;
-        $cmid = $event->contextinstanceid;
-        $DB->delete_records('availability_examus', array('cmid' => $cmid));
-    }
-
-    /**
      * create entry for cm
      *
      * @param int $userid User id
@@ -257,18 +261,6 @@ class condition extends \core_availability\condition {
         return self::create_entry_if_not_exist($userid, $courseid, $cm->id);
     }
 
-    /**
-     * delete empty entry for cm
-     *
-     * @param int $userid User id
-     * @param stdClass $cm Cm
-     * @return bool
-     */
-    public static function delete_empty_entry_for_cm($userid, $cm) {
-        $course = $cm->get_course();
-        $courseid = $course->id;
-        self::delete_empty_entry($userid, $courseid, $cm->id);
-    }
 
     public static function make_entry($courseid, $cmid, $userid=null) {
         $timenow = time();
@@ -295,9 +287,10 @@ class condition extends \core_availability\condition {
     private static function create_entry_if_not_exist($userid, $courseid, $cmid) {
         // TODO: refactor this to get courseid and duration from cm.
         global $DB;
+
         $entries = $DB->get_records(
                 'availability_examus',
-                array('userid' => $userid, 'courseid' => $courseid, 'cmid' => $cmid),
+                ['userid' => $userid, 'courseid' => $courseid, 'cmid' => $cmid],
                 $sort = 'id');
 
         if (count($entries) == 0) {
@@ -312,23 +305,6 @@ class condition extends \core_availability\condition {
             }
         }
         return null;
-    }
-
-    /**
-     * user enrolment deleted handles
-     *
-     * @param \core\event\user_enrolment_deleted $event Event
-     */
-    public static function user_enrolment_deleted(\core\event\user_enrolment_deleted $event) {
-        $cmid = $event->contextinstanceid;
-        $course = get_course($event->courseid);
-        $modinfo = get_fast_modinfo($course);
-        $cm = $modinfo->get_cm($cmid);
-        $userid = $event->relateduserid;
-
-        if (self::has_examus_condition($cm)) {
-            self::delete_empty_entry($userid, $event->courseid, $cmid);
-        }
     }
 
 }
