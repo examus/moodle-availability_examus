@@ -92,6 +92,11 @@ class log {
             }
         }
 
+        $course_ids = array_keys($this->get_course_list());
+        if(!empty($course_ids)){
+            $where[]= 'courseid IN('.implode(',', $course_ids).')';
+        }
+
         $orderBy = $this->table->get_sql_sort();
 
         $query = 'SELECT '.implode(', ', $select).' FROM {availability_examus} e '
@@ -115,7 +120,10 @@ class log {
     protected function setup_table(){
         $table = new \flexible_table('availability_examus_table');
 
-        $table->define_columns(['timemodified', 'timescheduled', 'u_email', 'courseid', 'cmid', 'status', 'review_link', 'create_entry']);
+        $table->define_columns([
+            'timemodified', 'timescheduled',  'u_email', 'courseid', 
+            'cmid', 'status', 'review_link', 'create_entry'
+        ]);
 
         $table->define_headers([
             get_string('date_modified', 'availability_examus'),
@@ -232,6 +240,10 @@ class log {
 
         if ($courserecords = $DB->get_records("course", null, "fullname", "id,shortname,fullname,category")) {
             foreach ($courserecords as $course) {
+                $course_context = \context_course::instance($course->id);
+                if(!has_capability('availability/examus:logaccess_course', $course_context)){
+                    continue;
+                }
                 if ($course->id == SITEID) {
                     $courses[$course->id] = format_string($course->fullname) . ' (' . get_string('site') . ')';
                 } else {
