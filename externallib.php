@@ -27,6 +27,7 @@ global $CFG;
 require_once($CFG->libdir . "/externallib.php");
 
 use core_availability\info_module;
+use availability_examus\condition;
 
 /**
  * Availability examus class
@@ -69,12 +70,12 @@ class availability_examus_external extends external_api {
                 'course_id' => $course->id,
                 'cm_id' => $entry->cmid,
                 'is_proctored' => true,
-                'time_limit_mins' => \availability_examus\condition::get_examus_duration($cm),
-                'mode' => \availability_examus\condition::get_examus_mode($cm),
-                'scheduling_required' => \availability_examus\condition::get_examus_scheduling($cm),
+                'time_limit_mins' => condition::get_examus_duration($cm),
+                'mode' => condition::get_examus_mode($cm),
+                'scheduling_required' => condition::get_examus_scheduling($cm),
                 'accesscode' => $entry->accesscode,
         );
-        $rules = \availability_examus\condition::get_examus_rules($cm);
+        $rules = condition::get_examus_rules($cm);
         if ($rules) {
             $moduleanswer['rules'] = $rules;
         }
@@ -137,8 +138,8 @@ class availability_examus_external extends external_api {
                             continue;
                         }
 
-                        if (\availability_examus\condition::has_examus_condition($cm) and $cm->uservisible) {
-                            $entry = \availability_examus\condition::create_entry_for_cm($user->id, $cm);
+                        if (condition::has_examus_condition($cm) and $cm->uservisible) {
+                            $entry = condition::create_entry_for_cm($user->id, $cm);
                             if ($entry == null) {
                                 continue;
                             }
@@ -146,7 +147,7 @@ class availability_examus_external extends external_api {
                             array_push($answer, self::moduleanswer($entry));
 
                         } else {
-                            \availability_examus\condition::delete_empty_entry_for_cm($user->id, $cm);
+                            condition::delete_empty_entry_for_cm($user->id, $cm);
                         }
 
                     }
@@ -162,8 +163,8 @@ class availability_examus_external extends external_api {
                 $instancesbytypes = $modinfo->get_instances();
                 foreach ($instancesbytypes as $instances) {
                     foreach ($instances as $cm) {
-                        if (\availability_examus\condition::has_examus_condition($cm)) {
-                            $entry = \availability_examus\condition::make_entry($course->id, $cm->id);
+                        if (condition::has_examus_condition($cm)) {
+                            $entry = condition::make_entry($course->id, $cm->id);
                             array_push($answer, self::moduleanswer($entry));
                         }
                     }
