@@ -288,10 +288,11 @@ class condition extends \core_availability\condition {
         // TODO: refactor this to get courseid and duration from cm.
         global $DB;
 
-        $entries = $DB->get_records(
-                'availability_examus',
-                ['userid' => $userid, 'courseid' => $courseid, 'cmid' => $cmid],
-                $sort = 'id');
+        $entries = $DB->get_records( 'availability_examus', [
+            'userid' => $userid,
+            'courseid' => $courseid,
+            'cmid' => $cmid,
+        ], $sort = 'id');
 
         if (count($entries) == 0) {
             $entry = self::make_entry($courseid, $cmid, $userid);
