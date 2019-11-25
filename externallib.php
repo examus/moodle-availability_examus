@@ -132,12 +132,14 @@ class availability_examus_external extends external_api {
                 foreach ($instancesbytypes as $instances) {
                     foreach ($instances as $cm) {
                         $availibility_info = new info_module($cm);
-                        $reason = '';
-                        if($availibility_info && !$availibility_info->is_available($reason)){
-                            continue;
-                        }
 
-                        if (condition::has_examus_condition($cm) and $cm->uservisible) {
+                        if (condition::has_examus_condition($cm)) {
+                            $reason = '';
+                            if(!$cm->uservisible || !$availibility_info->is_available($reason, false, $user->id)){
+                                continue;
+                            }
+
+
                             $entry = condition::create_entry_for_cm($user->id, $cm);
                             if ($entry == null) {
                                 continue;
@@ -146,7 +148,7 @@ class availability_examus_external extends external_api {
                             array_push($answer, self::moduleanswer($entry));
 
                         } else {
-                            condition::delete_empty_entry_for_cm($user->id, $cm);
+                            common::delete_empty_entries($user->id, $course->id, $cm->id);
                         }
 
                     }
