@@ -26,30 +26,37 @@ defined('MOODLE_INTERNAL') || die();
 
 $observers = [
     [
-        'eventname' => '\core\event\course_module_deleted',
+        'eventname' => 'core\event\course_module_deleted',
         'includefile' => '/availability/condition/examus/locallib.php',
         'callback' => 'examus_course_module_deleted',
+        'internal' => false,
     ],
     [
-        'eventname' => '\core\event\user_enrolment_deleted',
+        'eventname' => 'core\event\user_enrolment_deleted',
         'callback' => 'examus_user_enrolment_deleted',
         'includefile' => '/availability/condition/examus/locallib.php',
-
+        'internal' => false,
     ],
     [
-        'eventname' => '\mod_quiz\event\attempt_submitted',
+        'eventname' => 'mod_quiz\event\attempt_submitted',
         'callback' => 'examus_attempt_submitted_handler',
         'includefile' => '/availability/condition/examus/locallib.php',
         'internal' => false,
     ],
     [
-        'eventname' => '\mod_quiz\event\attempt_started',
+        'eventname' => 'mod_quiz\event\attempt_started',
         'callback' => 'examus_attempt_started_handler',
         'includefile' => '/availability/condition/examus/locallib.php',
         'internal' => false,
     ],
     [
-        'eventname' => '\mod_quiz\event\attempt_deleted',
+        'eventname' => 'mod_quiz\event\attempt_preview_started',
+        'callback' => 'examus_attempt_started_handler',
+        'includefile' => '/availability/condition/examus/locallib.php',
+        'internal' => false,
+    ],
+    [
+        'eventname' => 'mod_quiz\event\attempt_deleted',
         'callback' => 'examus_attempt_deleted_handler',
         'includefile' => '/availability/condition/examus/locallib.php',
         'internal' => false,
