@@ -264,7 +264,7 @@ class availability_examus_external extends external_api {
 
             $DB->update_record('availability_examus', $entry);
 
-            if (!$entry->attemptid) {
+            if (!$entry->attemptid && $status != 'Scheduled') {
                 common::reset_entry(['accesscode' => $entry->accesscode]);
             }
 
