@@ -26,8 +26,11 @@ namespace availability_examus;
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->dirroot . '/mod/quiz/locallib.php');
+
 use core_availability\info_module;
 use moodle_exception;
+use quiz;
 use stdClass;
 
 class condition extends \core_availability\condition {
@@ -255,7 +258,13 @@ class condition extends \core_availability\condition {
     public static function create_entry_for_cm($userid, $cm) {
         $course = $cm->get_course();
         $courseid = $course->id;
-        return self::create_entry_if_not_exist($userid, $courseid, $cm->id);
+
+        $quizobj = quiz::create($cm->instance, $userid);
+
+        $allowed_attempts = $quizobj->get_num_attempts_allowed();
+        $allowed_attempts = $allowed_attempts > 0 ? $allowed_attempts : NULL;
+
+        return self::create_entry_if_not_exist($userid, $courseid, $cm->id, $allowed_attempts);
     }
 
 
@@ -281,7 +290,7 @@ class condition extends \core_availability\condition {
      * @param int $cmid Cm id
      * @return stdClass
      */
-    private static function create_entry_if_not_exist($userid, $courseid, $cmid) {
+    private static function create_entry_if_not_exist($userid, $courseid, $cmid, $allowed_attempts = NULL) {
         // TODO: refactor this to get courseid and duration from cm.
         global $DB;
 
@@ -291,17 +300,18 @@ class condition extends \core_availability\condition {
             'cmid' => $cmid,
         ], $sort = 'id');
 
-        if (count($entries) == 0) {
+        foreach ($entries as $entry) {
+            if ($entry->status == 'Not inited') {
+                return $entry;
+            }
+        }
+
+        if ($allowed_attempts == NULL || count($entries) < $allowed_attempts) {
             $entry = self::make_entry($courseid, $cmid, $userid);
             $DB->insert_record('availability_examus', $entry);
             return $entry;
-        } else {
-            foreach ($entries as $entry) {
-                if ($entry->status == 'Not inited') {
-                    return $entry;
-                }
-            }
         }
+
         return null;
     }
 
