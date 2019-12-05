@@ -57,11 +57,11 @@ class availability_examus_external extends external_api {
         $modinfo = get_fast_modinfo($course);
         $cm = $modinfo->get_cm($entry->cmid);
 
-        $url = new moodle_url(
-                '/availability/condition/examus/entry.php',
-                array('accesscode' => $entry->accesscode));
+        $url = new moodle_url('/availability/condition/examus/entry.php', [
+            'accesscode' => $entry->accesscode
+        ]);
 
-        $moduleanswer = array(
+        $moduleanswer = [
                 'id' => $entry->id,
                 'name' => $cm->get_formatted_name(),
                 'url' => $url->out(),
@@ -73,14 +73,15 @@ class availability_examus_external extends external_api {
                 'mode' => condition::get_examus_mode($cm),
                 'scheduling_required' => condition::get_examus_scheduling($cm),
                 'accesscode' => $entry->accesscode,
-        );
+        ];
+
         $rules = condition::get_examus_rules($cm);
         if ($rules) {
             $moduleanswer['rules'] = $rules;
         }
 
         if ($cm->modname == "quiz") {
-            $quiz = $DB->get_record('quiz', array('id' => $cm->instance));
+            $quiz = $DB->get_record('quiz', ['id' => $cm->instance]);
             $moduleanswer['start'] = $quiz->timeopen;
             $moduleanswer['end'] = $quiz->timeclose;
         }
@@ -101,15 +102,17 @@ class availability_examus_external extends external_api {
     public static function user_proctored_modules($useremail, $accesscode) {
         global $DB;
 
-        $answer = array();
+        $answer = [];
 
-        self::validate_parameters(self::user_proctored_modules_parameters(),
-                array('useremail' => $useremail, 'accesscode' => $accesscode));
+        self::validate_parameters(self::user_proctored_modules_parameters(), [
+            'useremail' => $useremail,
+            'accesscode' => $accesscode
+        ]);
 
         if ($accesscode) {
-            $entries = $DB->get_records(
-                    'availability_examus',
-                    array('accesscode' => $accesscode));
+            $entries = $DB->get_records('availability_examus', [
+                'accesscode' => $accesscode
+            ]);
 
             foreach ($entries as $entry) {
                 array_push($answer, self::moduleanswer($entry));
@@ -173,7 +176,7 @@ class availability_examus_external extends external_api {
             }
         }
 
-        return array('modules' => $answer);
+        return ['modules' => $answer];
     }
 
     /**
