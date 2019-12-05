@@ -48,7 +48,7 @@ class condition extends \core_availability\condition {
     protected $scheduling_required = true;
 
     /** @var array Default exam rules */
-    protected $rules = Array();
+    protected $rules = [];
 
     /**
      * Construct
@@ -207,9 +207,12 @@ class condition extends \core_availability\condition {
             $cm = $info->get_course_module();
             $accesscode = $_SESSION['examus'];
 
-            $entry = $DB->get_record(
-                    'availability_examus',
-                    array('userid' => $userid, 'courseid' => $course->id, 'cmid' => $cm->id, 'accesscode' => $accesscode));
+            $entry = $DB->get_record('availability_examus', [
+                'userid' => $userid,
+                'courseid' => $course->id,
+                'cmid' => $cm->id,
+                'accesscode' => $accesscode
+            ]);
 
             if ($entry) {
                 $allow = true;
@@ -288,7 +291,7 @@ class condition extends \core_availability\condition {
         // TODO: refactor this to get courseid and duration from cm.
         global $DB;
 
-        $entries = $DB->get_records( 'availability_examus', [
+        $entries = $DB->get_records('availability_examus', [
             'userid' => $userid,
             'courseid' => $courseid,
             'cmid' => $cmid,
