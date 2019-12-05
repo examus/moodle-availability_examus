@@ -30,12 +30,6 @@ use core_availability\info_module;
 use moodle_exception;
 use stdClass;
 
-/**
- * Condition class
- *
- * @copyright  2017 Max Pomazuev
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 class condition extends \core_availability\condition {
 
     /** @var int Default exam duration */
