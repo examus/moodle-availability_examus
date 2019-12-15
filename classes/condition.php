@@ -34,6 +34,7 @@ use quiz;
 use stdClass;
 
 class condition extends \core_availability\condition {
+    const EXPIRATION_SLACK = 15*60;
 
     /** @var int Default exam duration */
     protected $duration = 60;
@@ -43,6 +44,9 @@ class condition extends \core_availability\condition {
 
     /** @var string Default calendar mode */
     protected $scheduling_required = true;
+
+    /** @var bool Reschedule when exam was missed */
+    protected $auto_rescheduling = false;
 
     /** @var array Default exam rules */
     protected $rules = [];
@@ -55,14 +59,18 @@ class condition extends \core_availability\condition {
     public function __construct($structure) {
         $manual_modes = ['normal', 'identification'];
 
-        if (!empty($structure->duration)) {
+        if(!empty($structure->duration)) {
             $this->duration = $structure->duration;
         }
-        if (!empty($structure->mode)) {
+        if(!empty($structure->mode)) {
             $this->mode = $structure->mode;
         }
 
         $this->scheduling_required = in_array($this->mode, $manual_modes);
+
+        if(!empty($structure->auto_rescheduling)){
+            $this->auto_rescheduling = $structure->auto_rescheduling;
+        }
 
         if (!empty($structure->rules)) {
             $this->rules = $structure->rules;
@@ -113,7 +121,6 @@ class condition extends \core_availability\condition {
      */
     public static function get_examus_duration($cm) {
         $econds = self::get_examus_conditions($cm);
-        // TODO: restrict examus condition to be only one.
         return (int) $econds[0]->duration;
     }
 
@@ -125,7 +132,6 @@ class condition extends \core_availability\condition {
      */
     public static function get_examus_mode($cm) {
         $econds = self::get_examus_conditions($cm);
-        // TODO: restrict examus condition to be only one.
         return (string) $econds[0]->mode;
     }
 
@@ -148,8 +154,19 @@ class condition extends \core_availability\condition {
      */
     public static function get_examus_scheduling($cm) {
         $econds = self::get_examus_conditions($cm);
-        // TODO: restrict examus condition to be only one.
         return (bool) $econds[0]->scheduling_required;
+
+    }
+
+    /**
+     * get examus scheduling mode
+     *
+     * @param \cm_info $cm Cm
+     * @return bool
+     */
+    public static function get_auto_rescheduling($cm) {
+        $econds = self::get_examus_conditions($cm);
+        return (bool) $econds[0]->auto_rescheduling;
 
     }
 
@@ -180,6 +197,7 @@ class condition extends \core_availability\condition {
             'duration' => (int) $this->duration,
             'mode' => (string) $this->mode,
             'scheduling_required' => (bool) $this->scheduling_required,
+            'auto_rescheduling' => (bool) $this->auto_rescheduling,
             'rules' => (array) $this->rules
         ];
     }
@@ -256,15 +274,7 @@ class condition extends \core_availability\condition {
      * @return stdClass
      */
     public static function create_entry_for_cm($userid, $cm) {
-        $course = $cm->get_course();
-        $courseid = $course->id;
-
-        $quizobj = quiz::create($cm->instance, $userid);
-
-        $allowed_attempts = $quizobj->get_num_attempts_allowed();
-        $allowed_attempts = $allowed_attempts > 0 ? $allowed_attempts : NULL;
-
-        return self::create_entry_if_not_exist($userid, $courseid, $cm->id, $allowed_attempts);
+        return self::create_entry_if_not_exist($userid, $cm);
     }
 
 
@@ -290,14 +300,22 @@ class condition extends \core_availability\condition {
      * @param int $cmid Cm id
      * @return stdClass
      */
-    private static function create_entry_if_not_exist($userid, $courseid, $cmid, $allowed_attempts = NULL) {
-        // TODO: refactor this to get courseid and duration from cm.
+    private static function create_entry_if_not_exist($userid, $cm) {
         global $DB;
+
+        $quizobj = quiz::create($cm->instance, $userid);
+        $allowed_attempts = $quizobj->get_num_attempts_allowed();
+        $allowed_attempts = $allowed_attempts > 0 ? $allowed_attempts : NULL;
+
+        $course = $cm->get_course();
+        $courseid = $course->id;
+
+        $auto_rescheduling = condition::get_auto_rescheduling($cm);
 
         $entries = $DB->get_records('availability_examus', [
             'userid' => $userid,
             'courseid' => $courseid,
-            'cmid' => $cmid,
+            'cmid' => $cm->id,
         ], $sort = 'id');
 
         foreach ($entries as $entry) {
@@ -306,9 +324,28 @@ class condition extends \core_availability\condition {
             }
         }
 
+        foreach ($entries as $entry) {
+            if($auto_rescheduling){
+                // Was schduled and not completed
+                $scheduled = !$entry->attemptid && $entry->status == 'Scheduled';
+                // Consider expired, giving 15 minutes slack
+                $expired = time() > $entry->timescheduled + self::EXPIRATION_SLACK;
+
+                if($scheduled && $expired) {
+                    $entry->timemodified = time();
+                    $entry->status = 'Rescheduled';
+
+                    $DB->update_record('availability_examus', $entry);
+                    $entry = common::reset_entry(['id' => $entry->id]);
+                    return $entry;
+                }
+
+            }
+        }
+
         if ($allowed_attempts == NULL || count($entries) < $allowed_attempts) {
             $entry = self::make_entry($courseid, $cmid, $userid);
-            $DB->insert_record('availability_examus', $entry);
+            $entry->id = $DB->insert_record('availability_examus', $entry);
             return $entry;
         }
 

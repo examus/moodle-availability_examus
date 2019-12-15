@@ -62,18 +62,20 @@ class availability_examus_external extends external_api {
         ]);
 
         $moduleanswer = [
-                'id' => $entry->id,
-                'name' => $cm->get_formatted_name(),
-                'url' => $url->out(),
-                'course_name' => $course->fullname,
-                'course_id' => $course->id,
-                'cm_id' => $entry->cmid,
-                'is_proctored' => true,
-                'time_limit_mins' => condition::get_examus_duration($cm),
-                'mode' => condition::get_examus_mode($cm),
-                'scheduling_required' => condition::get_examus_scheduling($cm),
-                'accesscode' => $entry->accesscode,
+            'id' => $entry->id,
+            'name' => $cm->get_formatted_name(),
+            'url' => $url->out(),
+            'course_name' => $course->fullname,
+            'course_id' => $course->id,
+            'cm_id' => $entry->cmid,
+            'is_proctored' => true,
+            'time_limit_mins' => condition::get_examus_duration($cm),
+            'mode' => condition::get_examus_mode($cm),
+            'scheduling_required' => condition::get_examus_scheduling($cm),
+            'auto_rescheduling' => condition::get_auto_rescheduling($cm),
+            'accesscode' => $entry->accesscode,
         ];
+
 
         $rules = condition::get_examus_rules($cm);
         if ($rules) {
@@ -196,6 +198,7 @@ class availability_examus_external extends external_api {
                     'time_limit_mins' => new external_value(PARAM_INT, 'module duration', VALUE_OPTIONAL),
                     'mode' => new external_value(PARAM_TEXT, 'module proctoring mode'),
                     'scheduling_required' => new external_value(PARAM_BOOL, 'module calendar mode'),
+                    'auto_rescheduling' =>  new external_value(PARAM_BOOL, 'allow rescheduling'),
                     'rules' => new external_single_structure([
                         'allow_to_use_websites' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
                         'allow_to_use_books' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),

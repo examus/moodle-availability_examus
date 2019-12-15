@@ -181,7 +181,13 @@ class log {
                     $row[] = "-";
                 }
 
-                if ($entry->status != 'Not inited' and $entry->status != 'Scheduled') {
+                $scheduled =  $entry->status == 'Scheduled' && $entry->timescheduled;
+
+                $not_started = $entry->status == 'Not inited' || $scheduled;
+
+                $expired = time() > $entry->timescheduled + condition::EXPIRATION_SLACK;
+
+                if (!$not_started || ($scheduled && $expired) ) {
                     $row[] = "<form action='index.php' method='post'>" .
                            "<input type='hidden' name='id' value='" . $entry->id . "'>" .
                            "<input type='hidden' name='action' value='renew'>" .

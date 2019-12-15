@@ -44,6 +44,11 @@ M.availability_examus.form.getNode = function(json) {
     html += '  <option value="olympics">' + getString('olympics_mode') + '</option>';
     html += '</select>';
 
+    var autoReschedulingId = id + '_autoRescheduling';
+    html += '<br><label for="' + autoReschedulingId + '">' + getString('auto_rescheduling') + '</label> ';
+    html += '<input type="checkbox" name="auto_rescheduling" id="' + autoReschedulingId + '" value="1">';
+    html += '<label for="' + autoReschedulingId + '">' + getString('enable') + '</label> ';
+
     html += '<div class="rules">';
     html += '<label>' + getString('rules') + '</label> ';
     for (var key in this.rules) {
@@ -61,6 +66,12 @@ M.availability_examus.form.getNode = function(json) {
 
     if (json.mode !== undefined) {
         node.one('select[name=mode] option[value=' + json.mode + ']').set('selected', 'selected');
+    }
+
+    if (json.auto_rescheduling !== undefined) {
+        var value = json.auto_rescheduling ? 'checked' : null;
+        node.one('#'+autoReschedulingId).set('checked', value);
+
     }
 
     if (json.rules === undefined) {
@@ -85,6 +96,11 @@ M.availability_examus.form.getNode = function(json) {
         root.delegate('click', function() {
             M.core_availability.form.update();
         }, '.availability_examus .rules input');
+
+        root.delegate('click', function() {
+            M.core_availability.form.update();
+        }, '.availability_examus input[type=checkbox]');
+
     }
 
     return node;
@@ -94,6 +110,7 @@ M.availability_examus.form.fillValue = function(value, node) {
     var rulesInputs, key;
     value.duration = node.one('input[name=duration]').get('value').trim();
     value.mode = node.one('select[name=mode]').get('value').trim();
+    value.auto_rescheduling = node.one('input[name=auto_rescheduling]').get('checked');
 
     value.rules = {};
     rulesInputs = node.all('.rules input');
