@@ -10,8 +10,7 @@ require_once($CFG->libdir . '/tablelib.php');
 class log {
     protected $entries = [];
     protected $entries_count = null;
-    protected $pages_count = null;
-    protected $per_page = 30;
+    protected $per_page = 10;
     protected $page = 0;
 
     protected $table = null;
@@ -106,15 +105,16 @@ class log {
                . ' LIMIT '.($this->page * $this->per_page).','.$this->per_page
                ;
 
-        $queryCount = 'SELECT count(e.id) as `count` FROM {availability_examus} e LEFT JOIN {user} u ON u.id=e.userid WHERE '.implode(' AND ', $where);
+        $queryCount = 'SELECT count(e.id) as `count` FROM {availability_examus} e '
+                    . ' LEFT JOIN {user} u ON u.id=e.userid '
+                    . ' WHERE '.implode(' AND ', $where);
 
         $this->entries = $DB->get_records_sql($query, $params);
 
         $result = $DB->get_records_sql($queryCount, $params);
         $this->entries_count = reset($result)->count;
-        $this->pages_count = ceil($this->entries_count / $this->per_page);
 
-        $this->table->pagesize($this->per_page, $this->pages_count);
+        $this->table->pagesize($this->per_page, $this->entries_count);
     }
 
     protected function setup_table(){
