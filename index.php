@@ -26,8 +26,14 @@ require_once('../../../config.php');
 require_once($CFG->libdir . "/formslib.php");
 require_once($CFG->libdir . '/adminlib.php');
 
+$context = context_system::instance();
+
 require_login();
-require_capability('availability/examus:logaccess', context_system::instance());
+require_capability('availability/examus:logaccess', $context);
+
+global $PAGE;
+$PAGE->set_url(new \moodle_url('/course/report/completion/index.php'));
+$PAGE->set_context($context);
 
 $action = optional_param('action', '', PARAM_ALPHA);
 
@@ -49,10 +55,8 @@ switch ($action) {
 }
 
 
-echo $OUTPUT->header();
-
 echo $OUTPUT->heading(get_string('pluginname', 'availability_examus'));
-global $PAGE;
+echo $OUTPUT->header();
 
 $from = isset($_GET['from']) ? $_GET['from'] : ['day' => null, 'month' => null, 'year' => null];
 $to = isset($_GET['to']) ? $_GET['to'] : ['day' => date('j'), 'month' => date('n'), 'year' => date('Y')];;
