@@ -1,7 +1,4 @@
 <?php
-function availability_examus_extend_navigation_user(){
-}
-
 function availability_examus_render_navbar_output(){
     global $PAGE;
 
