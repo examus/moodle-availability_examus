@@ -42,6 +42,8 @@ if ($entry) {
     list($course, $cm) = get_course_and_cm_from_cmid($cmid);
 
     redirect($cm->url->out(false));
+}else{
+    echo "Unknown access code";
 }
 
 // TODO: Show message for user that smth went wrong
