@@ -38,8 +38,13 @@ function examus_attempt_submitted_handler($event) {
     $cm = get_coursemodule_from_id('quiz', $event->get_context()->instanceid, $event->courseid);
 
     $userid = $event->userid;
-    $entries = $DB->get_records('availability_examus',
-            array('userid' => $userid, 'courseid' => $event->courseid, 'cmid' => $cm->id, 'status' => "Started"), '-id');
+    $entries = $DB->get_records('availability_examus', [
+        'userid' => $userid,
+        'courseid' => $event->courseid,
+        'cmid' => $cm->id,
+        'status' => "Started"
+    ], '-id');
+
     foreach ($entries as $entry) {
         $entry->status = "Finished";
         $DB->update_record('availability_examus', $entry);
@@ -53,14 +58,30 @@ function examus_attempt_submitted_handler($event) {
  */
 function examus_attempt_started_handler($event) {
     global $DB;
+
+    $attempt = $event->get_record_snapshot('quiz_attempts', $event->objectid);
+
     if(isset($_SESSION['examus'])){
         $accesscode = $_SESSION['examus'];
 
-        $attempt = $event->get_record_snapshot('quiz_attempts', $event->objectid);
+        $condition = [
+            'accesscode' => $accesscode
+        ];
+    }else{
+        $condition = [
+            'attemptid' => NULL,
+            'status' => 'Not inited',
+            'userid' => $event->userid,
+            'courseid' => $event->courseid,
+            'cmid' => $event->get_context()->instanceid,
+        ];
+    }
 
-        $entry = $DB->get_record('availability_examus', ['status' => 'Started', 'accesscode' => $accesscode]);
+    $entry = $DB->get_record('availability_examus', $condition);
 
+    if($entry && $attempt){
         $entry->attemptid = $attempt->id;
+        $entry->status = "Started";
         $DB->update_record('availability_examus', $entry);
     }
 }
@@ -74,11 +95,15 @@ function examus_attempt_started_handler($event) {
 function examus_attempt_deleted_handler($event) {
     global $DB;
 
-    $course = $DB->get_record('course', array('id' => $event->courseid));
+    $course = $DB->get_record('course', ['id' => $event->courseid]);
     $attempt = $event->get_record_snapshot('quiz_attempts', $event->objectid);
     $quiz = $event->get_record_snapshot('quiz', $attempt->quiz);
     $cm = get_coursemodule_from_id('quiz', $event->get_context()->instanceid, $event->courseid);
-    $result = \availability_examus\common::reset_entry(['cmid' => $cm->id, 'attemptid' => $attempt->id]);
+
+    $result = \availability_examus\common::reset_entry([
+        'cmid' => $cm->id,
+        'attemptid' => $attempt->id
+    ]);
 }
 
 /**

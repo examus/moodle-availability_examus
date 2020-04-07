@@ -10,7 +10,6 @@ require_once($CFG->libdir . '/tablelib.php');
 class log {
     protected $entries = [];
     protected $entries_count = null;
-    protected $pages_count = null;
     protected $per_page = 30;
     protected $page = 0;
 
@@ -92,6 +91,11 @@ class log {
             }
         }
 
+        $course_ids = array_keys($this->get_course_list());
+        if(!empty($course_ids)){
+            $where[]= 'courseid IN('.implode(',', $course_ids).')';
+        }
+
         $orderBy = $this->table->get_sql_sort();
 
         $query = 'SELECT '.implode(', ', $select).' FROM {availability_examus} e '
@@ -101,21 +105,25 @@ class log {
                . ' LIMIT '.($this->page * $this->per_page).','.$this->per_page
                ;
 
-        $queryCount = 'SELECT count(e.id) as `count` FROM {availability_examus} e LEFT JOIN {user} u ON u.id=e.userid WHERE '.implode(' AND ', $where);
+        $queryCount = 'SELECT count(e.id) as `count` FROM {availability_examus} e '
+                    . ' LEFT JOIN {user} u ON u.id=e.userid '
+                    . ' WHERE '.implode(' AND ', $where);
 
         $this->entries = $DB->get_records_sql($query, $params);
 
         $result = $DB->get_records_sql($queryCount, $params);
         $this->entries_count = reset($result)->count;
-        $this->pages_count = ceil($this->entries_count / $this->per_page);
 
-        $this->table->pagesize($this->per_page, $this->pages_count);
+        $this->table->pagesize($this->per_page, $this->entries_count);
     }
 
     protected function setup_table(){
         $table = new \flexible_table('availability_examus_table');
 
-        $table->define_columns(['timemodified', 'timescheduled', 'u_email', 'courseid', 'cmid', 'status', 'review_link', 'create_entry']);
+        $table->define_columns([
+            'timemodified', 'timescheduled',  'u_email', 'courseid', 
+            'cmid', 'status', 'review_link', 'create_entry'
+        ]);
 
         $table->define_headers([
             get_string('date_modified', 'availability_examus'),
@@ -173,7 +181,13 @@ class log {
                     $row[] = "-";
                 }
 
-                if ($entry->status != 'Not inited' and $entry->status != 'Scheduled') {
+                $scheduled =  $entry->status == 'Scheduled' && $entry->timescheduled;
+
+                $not_started = $entry->status == 'Not inited' || $scheduled;
+
+                $expired = time() > $entry->timescheduled + condition::EXPIRATION_SLACK;
+
+                if (!$not_started || ($scheduled && $expired) ) {
                     $row[] = "<form action='index.php' method='post'>" .
                            "<input type='hidden' name='id' value='" . $entry->id . "'>" .
                            "<input type='hidden' name='action' value='renew'>" .
@@ -232,6 +246,10 @@ class log {
 
         if ($courserecords = $DB->get_records("course", null, "fullname", "id,shortname,fullname,category")) {
             foreach ($courserecords as $course) {
+                $course_context = \context_course::instance($course->id);
+                if(!has_capability('availability/examus:logaccess_course', $course_context)){
+                    continue;
+                }
                 if ($course->id == SITEID) {
                     $courses[$course->id] = format_string($course->fullname) . ' (' . get_string('site') . ')';
                 } else {

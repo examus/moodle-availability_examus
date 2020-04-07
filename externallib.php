@@ -27,6 +27,8 @@ global $CFG;
 require_once($CFG->libdir . "/externallib.php");
 
 use core_availability\info_module;
+use availability_examus\condition;
+use availability_examus\common;
 
 /**
  * Availability examus class
@@ -41,12 +43,10 @@ class availability_examus_external extends external_api {
      * @return external_function_parameters
      */
     public static function user_proctored_modules_parameters() {
-        return new external_function_parameters(
-                array(
-                        'useremail' => new external_value(PARAM_TEXT, 'User Email', VALUE_DEFAULT, ""),
-                        'accesscode' => new external_value(PARAM_TEXT, 'Access Code', VALUE_DEFAULT, ""),
-                )
-        );
+        return new external_function_parameters([
+            'useremail' => new external_value(PARAM_TEXT, 'User Email', VALUE_DEFAULT, ""),
+            'accesscode' => new external_value(PARAM_TEXT, 'Access Code', VALUE_DEFAULT, ""),
+        ]);
     }
 
 
@@ -57,30 +57,33 @@ class availability_examus_external extends external_api {
         $modinfo = get_fast_modinfo($course);
         $cm = $modinfo->get_cm($entry->cmid);
 
-        $url = new moodle_url(
-                '/availability/condition/examus/entry.php',
-                array('accesscode' => $entry->accesscode));
+        $url = new moodle_url('/availability/condition/examus/entry.php', [
+            'accesscode' => $entry->accesscode
+        ]);
 
-        $moduleanswer = array(
-                'id' => $entry->id,
-                'name' => $cm->get_formatted_name(),
-                'url' => $url->out(),
-                'course_name' => $course->fullname,
-                'course_id' => $course->id,
-                'cm_id' => $entry->cmid,
-                'is_proctored' => true,
-                'time_limit_mins' => \availability_examus\condition::get_examus_duration($cm),
-                'mode' => \availability_examus\condition::get_examus_mode($cm),
-                'scheduling_required' => \availability_examus\condition::get_examus_scheduling($cm),
-                'accesscode' => $entry->accesscode,
-        );
-        $rules = \availability_examus\condition::get_examus_rules($cm);
+        $moduleanswer = [
+            'id' => $entry->id,
+            'name' => $cm->get_formatted_name(),
+            'url' => $url->out(),
+            'course_name' => $course->fullname,
+            'course_id' => $course->id,
+            'cm_id' => $entry->cmid,
+            'is_proctored' => true,
+            'time_limit_mins' => condition::get_examus_duration($cm),
+            'mode' => condition::get_examus_mode($cm),
+            'scheduling_required' => condition::get_examus_scheduling($cm),
+            'auto_rescheduling' => condition::get_auto_rescheduling($cm),
+            'accesscode' => $entry->accesscode,
+        ];
+
+
+        $rules = condition::get_examus_rules($cm);
         if ($rules) {
             $moduleanswer['rules'] = $rules;
         }
 
         if ($cm->modname == "quiz") {
-            $quiz = $DB->get_record('quiz', array('id' => $cm->instance));
+            $quiz = $DB->get_record('quiz', ['id' => $cm->instance]);
             $moduleanswer['start'] = $quiz->timeopen;
             $moduleanswer['end'] = $quiz->timeclose;
         }
@@ -101,15 +104,17 @@ class availability_examus_external extends external_api {
     public static function user_proctored_modules($useremail, $accesscode) {
         global $DB;
 
-        $answer = array();
+        $answer = [];
 
-        self::validate_parameters(self::user_proctored_modules_parameters(),
-                array('useremail' => $useremail, 'accesscode' => $accesscode));
+        self::validate_parameters(self::user_proctored_modules_parameters(), [
+            'useremail' => $useremail,
+            'accesscode' => $accesscode
+        ]);
 
         if ($accesscode) {
-            $entries = $DB->get_records(
-                    'availability_examus',
-                    array('accesscode' => $accesscode));
+            $entries = $DB->get_records('availability_examus', [
+                'accesscode' => $accesscode
+            ]);
 
             foreach ($entries as $entry) {
                 array_push($answer, self::moduleanswer($entry));
@@ -132,13 +137,15 @@ class availability_examus_external extends external_api {
                 foreach ($instancesbytypes as $instances) {
                     foreach ($instances as $cm) {
                         $availibility_info = new info_module($cm);
-                        $reason = '';
-                        if($availibility_info && !$availibility_info->is_available($reason)){
-                            continue;
-                        }
 
-                        if (\availability_examus\condition::has_examus_condition($cm) and $cm->uservisible) {
-                            $entry = \availability_examus\condition::create_entry_for_cm($user->id, $cm);
+                        if (condition::has_examus_condition($cm)) {
+                            $reason = '';
+                            if(!$cm->uservisible || !$availibility_info->is_available($reason, false, $user->id)){
+                                continue;
+                            }
+
+
+                            $entry = condition::create_entry_for_cm($user->id, $cm);
                             if ($entry == null) {
                                 continue;
                             }
@@ -146,7 +153,7 @@ class availability_examus_external extends external_api {
                             array_push($answer, self::moduleanswer($entry));
 
                         } else {
-                            \availability_examus\condition::delete_empty_entry_for_cm($user->id, $cm);
+                            common::delete_empty_entries($user->id, $course->id, $cm->id);
                         }
 
                     }
@@ -162,8 +169,8 @@ class availability_examus_external extends external_api {
                 $instancesbytypes = $modinfo->get_instances();
                 foreach ($instancesbytypes as $instances) {
                     foreach ($instances as $cm) {
-                        if (\availability_examus\condition::has_examus_condition($cm)) {
-                            $entry = \availability_examus\condition::make_entry($course->id, $cm->id);
+                        if (condition::has_examus_condition($cm)) {
+                            $entry = condition::make_entry($course->id, $cm->id);
                             array_push($answer, self::moduleanswer($entry));
                         }
                     }
@@ -171,7 +178,7 @@ class availability_examus_external extends external_api {
             }
         }
 
-        return array('modules' => $answer);
+        return ['modules' => $answer];
     }
 
     /**
@@ -180,38 +187,37 @@ class availability_examus_external extends external_api {
      * @return external_description
      */
     public static function user_proctored_modules_returns() {
-        return new external_single_structure(
-                array('modules' => new external_multiple_structure(
-                        new external_single_structure(
-                                array(
-                                        'id' => new external_value(PARAM_INT, 'entry id'),
-                                        'name' => new external_value(PARAM_TEXT, 'module name'),
-                                        'url' => new external_value(PARAM_TEXT, 'module url'),
-                                        'status' => new external_value(PARAM_TEXT, 'status'),
-                                        'course_name' => new external_value(PARAM_TEXT, 'module course name'),
-                                        'time_limit_mins' => new external_value(PARAM_INT, 'module duration', VALUE_OPTIONAL),
-                                        'mode' => new external_value(PARAM_TEXT, 'module proctoring mode'),
-                                        'scheduling_required' => new external_value(PARAM_BOOL, 'module calendar mode'),
-                                        'rules' => new external_single_structure(
-                                                array(
-                                                    'allow_to_use_websites' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
-                                                    'allow_to_use_books' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
-                                                    'allow_to_use_paper' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
-                                                    'allow_to_use_messengers' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
-                                                    'allow_to_use_calculator' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
-                                                    'allow_to_use_excel' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
-                                                    'allow_to_use_human_assistant' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
-                                                    'allow_absence_in_frame' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
-                                                    'allow_voices' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
-                                                    'allow_wrong_gaze_direction'=> new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
-                                        ), 'rules set', VALUE_OPTIONAL),
-                                        'is_proctored' => new external_value(PARAM_BOOL, 'module proctored'),
-                                        'accesscode' => new external_value(PARAM_TEXT, 'module code'),
-                                        'start' => new external_value(PARAM_INT, 'module start', VALUE_OPTIONAL),
-                                        'end' => new external_value(PARAM_INT, 'module end', VALUE_OPTIONAL),
-                                ), 'module')
-                ), )
-        );
+        return new external_single_structure([
+            'modules' => new external_multiple_structure(
+                new external_single_structure([
+                    'id' => new external_value(PARAM_INT, 'entry id'),
+                    'name' => new external_value(PARAM_TEXT, 'module name'),
+                    'url' => new external_value(PARAM_TEXT, 'module url'),
+                    'status' => new external_value(PARAM_TEXT, 'status'),
+                    'course_name' => new external_value(PARAM_TEXT, 'module course name'),
+                    'time_limit_mins' => new external_value(PARAM_INT, 'module duration', VALUE_OPTIONAL),
+                    'mode' => new external_value(PARAM_TEXT, 'module proctoring mode'),
+                    'scheduling_required' => new external_value(PARAM_BOOL, 'module calendar mode'),
+                    'auto_rescheduling' =>  new external_value(PARAM_BOOL, 'allow rescheduling'),
+                    'rules' => new external_single_structure([
+                        'allow_to_use_websites' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
+                        'allow_to_use_books' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
+                        'allow_to_use_paper' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
+                        'allow_to_use_messengers' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
+                        'allow_to_use_calculator' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
+                        'allow_to_use_excel' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
+                        'allow_to_use_human_assistant' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
+                        'allow_absence_in_frame' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
+                        'allow_voices' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
+                        'allow_wrong_gaze_direction'=> new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
+                    ], 'rules set', VALUE_OPTIONAL),
+                    'is_proctored' => new external_value(PARAM_BOOL, 'module proctored'),
+                    'accesscode' => new external_value(PARAM_TEXT, 'module code'),
+                    'start' => new external_value(PARAM_INT, 'module start', VALUE_OPTIONAL),
+                    'end' => new external_value(PARAM_INT, 'module end', VALUE_OPTIONAL),
+                ], 'module')
+            ),
+        ]);
     }
 
     /**
@@ -220,13 +226,12 @@ class availability_examus_external extends external_api {
      * @return external_function_parameters
      */
     public static function submit_proctoring_review_parameters() {
-        return new external_function_parameters(
-                array('accesscode' => new external_value(PARAM_TEXT, 'Access Code'),
-                        'status' => new external_value(PARAM_TEXT, 'Status of review'),
-                        'review_link' => new external_value(PARAM_TEXT, 'Link to review page', VALUE_DEFAULT, ""),
-                        'timescheduled' => new external_value(PARAM_INT, 'Time scheduled', VALUE_DEFAULT, 0)
-                )
-        );
+        return new external_function_parameters([
+            'accesscode' => new external_value(PARAM_TEXT, 'Access Code'),
+            'status' => new external_value(PARAM_TEXT, 'Status of review'),
+            'review_link' => new external_value(PARAM_TEXT, 'Link to review page', VALUE_DEFAULT, ""),
+            'timescheduled' => new external_value(PARAM_INT, 'Time scheduled', VALUE_DEFAULT, 0)
+        ]);
     }
 
     /**
@@ -242,10 +247,10 @@ class availability_examus_external extends external_api {
         global $DB;
 
         self::validate_parameters(self::submit_proctoring_review_parameters(), [
-                'accesscode' => $accesscode,
-                'review_link' => $reviewlink,
-                'status' => $status,
-                'timescheduled' => $timescheduled
+            'accesscode' => $accesscode,
+            'review_link' => $reviewlink,
+            'status' => $status,
+            'timescheduled' => $timescheduled
         ]);
 
         $timenow = time();
@@ -267,8 +272,8 @@ class availability_examus_external extends external_api {
 
             $DB->update_record('availability_examus', $entry);
 
-            if (!$entry->attemptid) {
-                \availability_examus\common::reset_entry(['accesscode' => $entry->accesscode]);
+            if (!$entry->attemptid && $status != 'Scheduled') {
+                common::reset_entry(['accesscode' => $entry->accesscode]);
             }
 
             return ['success' => true, 'error' => null];
@@ -304,7 +309,7 @@ class availability_examus_external extends external_api {
             'accesscode' => $accesscode,
         ]);
 
-        $result = \availability_examus\common::reset_entry(['accesscode' => $accesscode]);
+        $result = common::reset_entry(['accesscode' => $accesscode]);
 
         if ($result) {
             return ['success' => true, 'error' => null];

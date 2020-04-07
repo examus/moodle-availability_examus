@@ -25,6 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['examus:logaccess'] = 'Examus log access';
+$string['examus:logaccess_course'] = 'Examus log access for course';
 $string['description'] = 'Allows students to use Examus proctoring service';
 $string['pluginname'] = 'Proctoring by Examus';
 $string['title'] = 'Examus';
@@ -52,6 +53,8 @@ $string['identification_mode'] = 'Identification (Human identification, automati
 $string['rules'] = "Rules";
 
 $string['time_scheduled'] = 'Scheduled';
+$string['auto_rescheduling'] = 'Automatic reset for missed exams';
+$string['enable'] = 'Enable';
 
 $string['allow_to_use_websites'] =  'Allow to use websites';
 $string['allow_to_use_books'] =  'Allow to use books';
