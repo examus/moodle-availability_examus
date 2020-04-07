@@ -26,6 +26,8 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['examus:logaccess'] = 'Examus log access';
 $string['examus:logaccess_course'] = 'Examus log access for course';
+$string['examus:logaccess_all'] = 'Examus log access for all courses';
+
 $string['description'] = 'Allows students to use Examus proctoring service';
 $string['pluginname'] = 'Proctoring by Examus';
 $string['title'] = 'Examus';

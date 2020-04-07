@@ -94,6 +94,8 @@ class log {
         $course_ids = array_keys($this->get_course_list());
         if(!empty($course_ids)){
             $where[]= 'courseid IN('.implode(',', $course_ids).')';
+        }else{
+            $where[]= 'FALSE';
         }
 
         $orderBy = $this->table->get_sql_sort();
@@ -240,16 +242,19 @@ class log {
 
         $courses = [];
 
-        $sitecontext = \context_system::instance();
+        $site_context = \context_system::instance();
         // First check to see if we can override showcourses and showusers.
         $numcourses = $DB->count_records("course");
 
         if ($courserecords = $DB->get_records("course", null, "fullname", "id,shortname,fullname,category")) {
             foreach ($courserecords as $course) {
                 $course_context = \context_course::instance($course->id);
-                if(!has_capability('availability/examus:logaccess_course', $course_context)){
-                    continue;
+                if(!has_capability('availability/examus:logaccess_all', $site_context)){
+                    if(!has_capability('availability/examus:logaccess_course', $course_context)){
+                        continue;
+                    }
                 }
+
                 if ($course->id == SITEID) {
                     $courses[$course->id] = format_string($course->fullname) . ' (' . get_string('site') . ')';
                 } else {
