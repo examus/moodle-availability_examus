@@ -85,3 +85,5 @@ $string['session_start'] = 'Session start';
 $string['session_end'] = 'Session end';
 $string['warnings'] = 'Warnings';
 $string['comment'] = 'Comment';
+
+$string['details'] = 'Details';

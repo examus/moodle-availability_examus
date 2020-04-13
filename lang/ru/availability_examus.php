@@ -85,3 +85,5 @@ $string['session_start'] = 'Начало сессии';
 $string['session_end'] = 'Окончание сессии';
 $string['warnings'] = 'Нарушения';
 $string['comment'] = 'Комментарий';
+
+$string['details'] = 'Подробности';

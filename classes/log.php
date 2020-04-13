@@ -193,7 +193,7 @@ class log {
                 $row[] = $entry->score;
 
                 $details_url = new \moodle_url('/availability/condition/examus/index.php', ['id' => $entry->id, 'action' => 'show']);
-                $row[] = '<a href="'.$details_url.'">Details</a>';
+                $row[] = '<a href="'.$details_url.'">'.get_string('details', 'availability_examus').'</a>';
 
                 // Changed condition. Allow to reset all entries
                 // Consequences unknown
