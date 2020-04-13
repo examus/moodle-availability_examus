@@ -32,7 +32,7 @@ require_login();
 require_capability('availability/examus:logaccess', $context);
 
 global $PAGE;
-$PAGE->set_url(new \moodle_url('/course/report/completion/index.php'));
+$PAGE->set_url(new \moodle_url('/availability/condition/examus/index.php'));
 $PAGE->set_context($context);
 
 $action = optional_param('action', '', PARAM_ALPHA);
@@ -40,8 +40,9 @@ $action = optional_param('action', '', PARAM_ALPHA);
 switch ($action) {
     case 'renew':
         $id = required_param('id', PARAM_TEXT);
+        $force = optional_param('force', false, PARAM_TEXT);
 
-        if(\availability_examus\common::reset_entry(['id' => $id])){
+        if(\availability_examus\common::reset_entry(['id' => $id], $force)){
             redirect('index.php', get_string('new_entry_created', 'availability_examus'),
                      null, \core\output\notification::NOTIFY_SUCCESS);
         } else {

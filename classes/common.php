@@ -4,11 +4,14 @@ use \stdClass;
 defined('MOODLE_INTERNAL') || die();
 
 class common {
-    public static function reset_entry($conditions){
+    public static function reset_entry($conditions, $force = false){
         global $DB;
 
         $oldentry = $DB->get_record('availability_examus', $conditions);
-        if ($oldentry and $oldentry->status != 'Not inited') {
+
+        $not_inited = $oldentry && $oldentry->status == 'Not inited';
+
+        if ($oldentry && (!$not_inited || $force)) {
             $entries = $DB->get_records('availability_examus', [
                 'userid' => $oldentry->userid,
                 'courseid' => $oldentry->courseid,
@@ -16,7 +19,14 @@ class common {
                 'status' => 'Not inited'
             ]);
 
-            if (count($entries) == 0) {
+            if (count($entries) == 0 || $force) {
+                if($force){
+                    foreach($entries as $old){
+                        $old->status = "Force reset";
+                        $DB->update_record('availability_examus', $old);
+                    }
+                }
+
                 $timenow = time();
                 $entry = new stdClass();
                 $entry->userid = $oldentry->userid;

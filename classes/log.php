@@ -189,13 +189,25 @@ class log {
 
                 $expired = time() > $entry->timescheduled + condition::EXPIRATION_SLACK;
 
-                if (!$not_started || ($scheduled && $expired) ) {
-                    $row[] = "<form action='index.php' method='post'>" .
+                // Changed condition. Allow to reset all entries
+                // Consequences unknown
+                // if (!$not_started || ($scheduled && $expired) ) {
+                if (!$not_started) {
+                    $row[] =
+                        "<form action='index.php' method='post'>" .
                            "<input type='hidden' name='id' value='" . $entry->id . "'>" .
                            "<input type='hidden' name='action' value='renew'>" .
-                           "<input type='submit' value='" . get_string('new_entry', 'availability_examus') . "'></form>";
+                           "<input type='submit' value='" . get_string('new_entry', 'availability_examus') . "'>".
+                        "</form>";
                 } else {
-                    $row[] = "-";
+                    // $row[] = "-";
+                    $row[] =
+                        "<form action='index.php' method='post'>" .
+                           "<input type='hidden' name='id' value='" . $entry->id . "'>" .
+                           "<input type='hidden' name='force' value='true'>" .
+                           "<input type='hidden' name='action' value='renew'>" .
+                           "<input type='submit' value='" . get_string('new_entry_force', 'availability_examus') . "'>".
+                        "</form>";
                 }
                 $table->add_data($row);
             }

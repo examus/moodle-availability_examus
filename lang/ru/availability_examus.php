@@ -39,6 +39,7 @@ $string['status'] = 'Статус';
 $string['review'] = 'Результат';
 $string['module'] = 'Модуль';
 $string['new_entry'] = 'Новая запись';
+$string['new_entry_force'] = 'Новая запись';
 $string['error_setduration'] = 'Длительность в минутах должна быть кратна 30 (30, 60, 90)';
 $string['duration'] = 'Длительность в минутах, кратная 30';
 $string['link'] = 'Архив';

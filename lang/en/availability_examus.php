@@ -39,6 +39,7 @@ $string['status'] = 'Status';
 $string['review'] = 'Review';
 $string['module'] = 'Module';
 $string['new_entry'] = 'New entry';
+$string['new_entry_force'] = 'New entry';
 $string['error_setduration'] = 'Duration must be a multiple of 30';
 $string['duration'] = 'Duration in minutes (a multiple of 30)';
 $string['link'] = 'Logs and video';
