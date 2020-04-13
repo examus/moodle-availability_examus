@@ -344,7 +344,7 @@ class condition extends \core_availability\condition {
         }
 
         if ($allowed_attempts == NULL || count($entries) < $allowed_attempts) {
-            $entry = self::make_entry($courseid, $cmid, $userid);
+            $entry = self::make_entry($courseid, $cm->id, $userid);
             $entry->id = $DB->insert_record('availability_examus', $entry);
             return $entry;
         }
