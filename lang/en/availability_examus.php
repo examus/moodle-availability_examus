@@ -77,3 +77,11 @@ $string['allstatuses'] = 'All statuses';
 $string['userquery'] = 'User Email starts with';
 $string['fromdate'] = 'From date:';
 $string['todate'] = 'To date:';
+
+$string['score'] = 'Score';
+$string['threshold_attention'] = 'Threshold: Attention';
+$string['threshold_rejected'] = 'Threshold: Rejection';
+$string['session_start'] = 'Session start';
+$string['session_end'] = 'Session end';
+$string['warnings'] = 'Warnings';
+$string['comment'] = 'Comment';

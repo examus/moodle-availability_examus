@@ -77,3 +77,11 @@ $string['allstatuses'] = 'Все статусы';
 $string['userquery'] = 'Email пользователя начинается с';
 $string['fromdate'] = 'С:';
 $string['todate'] = 'По:';
+
+$string['score'] = 'Скоринг';
+$string['threshold_rejected'] = 'Порог подозрительности';
+$string['threshold_rejected'] = 'Порог отлонения';
+$string['session_start'] = 'Начало сессии';
+$string['session_end'] = 'Окончание сессии';
+$string['warnings'] = 'Нарушения';
+$string['comment'] = 'Комментарий';

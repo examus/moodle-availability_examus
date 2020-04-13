@@ -43,7 +43,10 @@ class log {
             'e.status status',
             'review_link',
             'cmid',
-            'courseid'
+            'courseid',
+            'score',
+            'comment',
+            'threshold',
         ];
 
         $where = ['1'];
@@ -123,8 +126,8 @@ class log {
         $table = new \flexible_table('availability_examus_table');
 
         $table->define_columns([
-            'timemodified', 'timescheduled',  'u_email', 'courseid', 
-            'cmid', 'status', 'review_link', 'create_entry'
+            'timemodified', 'timescheduled',  'u_email', 'courseid',
+            'cmid', 'status', 'review_link', 'score', 'details', 'create_entry',
         ]);
 
         $table->define_headers([
@@ -135,6 +138,8 @@ class log {
             get_string('module', 'availability_examus'),
             get_string('status', 'availability_examus'),
             get_string('review', 'availability_examus'),
+            get_string('score', 'availability_examus'),
+            '',
             ''
         ]);
 
@@ -156,14 +161,10 @@ class log {
             foreach ($entries as $entry) {
                 $row = [];
 
-                $date = usergetdate($entry->timemodified);
-                $row[] = '<b>' . $date['year'] . '.' . $date['mon'] . '.' . $date['mday'] . '</b> ' .
-                       $date['hours'] . ':' . $date['minutes'];
+                $row[] = common::format_date($entry->timemodified);
 
                 if ($entry->timescheduled) {
-                    $timescheduled = usergetdate($entry->timescheduled);
-                    $row[] = '<b>' . $timescheduled['year'] . '.' . $timescheduled['mon'] . '.' . $timescheduled['mday'] . '</b> ' .
-                           $timescheduled['hours'] . ':' . $timescheduled['minutes'];
+                    $row[] = common::format_date($entry->timescheduled);
                 } else {
                     $row[] = '';
                 }
@@ -188,6 +189,11 @@ class log {
                 $not_started = $entry->status == 'Not inited' || $scheduled;
 
                 $expired = time() > $entry->timescheduled + condition::EXPIRATION_SLACK;
+
+                $row[] = $entry->score;
+
+                $details_url = new \moodle_url('/availability/condition/examus/index.php', ['id' => $entry->id, 'action' => 'show']);
+                $row[] = '<a href="'.$details_url.'">Details</a>';
 
                 // Changed condition. Allow to reset all entries
                 // Consequences unknown

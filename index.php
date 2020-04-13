@@ -32,53 +32,67 @@ require_login();
 require_capability('availability/examus:logaccess', $context);
 
 global $PAGE;
-$PAGE->set_url(new \moodle_url('/availability/condition/examus/index.php'));
-$PAGE->set_context($context);
 
-$action = optional_param('action', '', PARAM_ALPHA);
+$base_url = '/availability/condition/examus/index.php';
 
-switch ($action) {
-    case 'renew':
-        $id = required_param('id', PARAM_TEXT);
-        $force = optional_param('force', false, PARAM_TEXT);
+$action = optional_param('action', 'index', PARAM_ALPHA);
 
-        if(\availability_examus\common::reset_entry(['id' => $id], $force)){
-            redirect('index.php', get_string('new_entry_created', 'availability_examus'),
-                     null, \core\output\notification::NOTIFY_SUCCESS);
-        } else {
-            redirect('index.php', get_string('entry_exist', 'availability_examus'),
-                    null, \core\output\notification::NOTIFY_ERROR);
-        }
+if($action == 'renew'){
+    $id = required_param('id', PARAM_TEXT);
+    $force = optional_param('force', false, PARAM_TEXT);
 
-        break;
-    default:
-        break;
+    if(\availability_examus\common::reset_entry(['id' => $id], $force)){
+        redirect('index.php', get_string('new_entry_created', 'availability_examus'),
+                 null, \core\output\notification::NOTIFY_SUCCESS);
+    } else {
+        redirect('index.php', get_string('entry_exist', 'availability_examus'),
+                 null, \core\output\notification::NOTIFY_ERROR);
+    }
 }
 
+if($action == 'index'){
+    $PAGE->set_url(new \moodle_url($base_url));
+    $PAGE->set_context($context);
 
-echo $OUTPUT->heading(get_string('pluginname', 'availability_examus'));
-echo $OUTPUT->header();
+    echo $OUTPUT->header();
+    echo $OUTPUT->heading(get_string('pluginname', 'availability_examus'));
 
-$from = isset($_GET['from']) ? $_GET['from'] : ['day' => null, 'month' => null, 'year' => null];
-$to = isset($_GET['to']) ? $_GET['to'] : ['day' => date('j'), 'month' => date('n'), 'year' => date('Y')];;
+    $from = isset($_GET['from']) ? $_GET['from'] : ['day' => null, 'month' => null, 'year' => null];
+    $to = isset($_GET['to']) ? $_GET['to'] : ['day' => date('j'), 'month' => date('n'), 'year' => date('Y')];;
 
-$filters = [
-    'courseid'     => optional_param('courseid', null, PARAM_INT),
-    'timemodified' => optional_param('timemodified', null, PARAM_INT),
-    'moduleid'     => optional_param('moduleid', null, PARAM_INT),
-    'userquery'    => optional_param('userquery', null, PARAM_TEXT),
-    'status'       => optional_param('status', null, PARAM_TEXT),
-    'from[day]'     => $from['day'],
-    'from[month]'   => $from['month'],
-    'from[year]'    => $from['year'],
-    'to[day]'     => $to['day'],
-    'to[month]'   => $to['month'],
-    'to[year]'    => $to['year'],
-];
+    $filters = [
+        'courseid'     => optional_param('courseid', null, PARAM_INT),
+        'timemodified' => optional_param('timemodified', null, PARAM_INT),
+        'moduleid'     => optional_param('moduleid', null, PARAM_INT),
+        'userquery'    => optional_param('userquery', null, PARAM_TEXT),
+        'status'       => optional_param('status', null, PARAM_TEXT),
+        'from[day]'     => $from['day'],
+        'from[month]'   => $from['month'],
+        'from[year]'    => $from['year'],
+        'to[day]'     => $to['day'],
+        'to[month]'   => $to['month'],
+        'to[year]'    => $to['year'],
+    ];
 
-$log = new \availability_examus\log($filters, optional_param('page', 0, PARAM_INT));
-$log->render_filter_form();
-$log->render_table();
+    $page = optional_param('page', 0, PARAM_INT);
+    $log = new \availability_examus\log($filters, $page);
+    $log->render_filter_form();
+    $log->render_table();
+}
+
+if($action == 'show'){
+    $id = required_param('id', PARAM_TEXT);
+
+    $url = new \moodle_url($base_url, ['action'=> $action, 'id' => $id]);
+    $PAGE->set_url($url);
+    $PAGE->set_context($context);
+
+    echo $OUTPUT->header();
+    echo $OUTPUT->heading(get_string('pluginname', 'availability_examus'));
+
+    $log_details = new \availability_examus\log_details($id, $url);
+    $log_details->render();
+}
 
 
 echo $OUTPUT->footer();

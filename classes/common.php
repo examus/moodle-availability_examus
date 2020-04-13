@@ -62,5 +62,20 @@ class common {
         $DB->delete_records('availability_examus', $condition);
     }
 
+    public static function format_date($timestamp){
+        $date = $timestamp ? usergetdate($timestamp) : null;
+        if ($date) {
+            return (
+                '<b>' .
+                $date['year'] . '.' .
+                str_pad($date['mon'], 2, 0) . '.' .
+                str_pad($date['mday'], 2, 0) . '</b> ' .
+                str_pad($date['hours'], 2, 0) . ':' .
+                str_pad($date['minutes'], 2, 0)
+            );
+        } else {
+            return null;
+        }
+    }
 
 }
