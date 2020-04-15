@@ -231,17 +231,17 @@ class availability_examus_external extends external_api {
             'status' => new external_value(PARAM_TEXT, 'Status of review'),
             'review_link' => new external_value(PARAM_TEXT, 'Link to review page', VALUE_DEFAULT, ""),
             'timescheduled' => new external_value(PARAM_INT, 'Time scheduled', VALUE_DEFAULT, 0),
-            'comment' => new external_value(PARAM_TEXT, 'Review comment', VALUE_OPTIONAL),
-            'score' => new external_value(PARAM_INT, 'Scoring value', VALUE_OPTIONAL),
+            'comment' => new external_value(PARAM_TEXT, 'Review comment', VALUE_DEFAULT, null),
+            'score' => new external_value(PARAM_INT, 'Scoring value', VALUE_DEFAULT, null),
             'threshold' => new external_single_structure([
                 'attention' => new external_value(PARAM_INT, 'Attention threshold', VALUE_OPTIONAL),
                 'rejected' => new external_value(PARAM_INT, 'Rejected threshold', VALUE_OPTIONAL),
-            ], "Thresholds", VALUE_OPTIONAL),
-            'session_start' => new external_value(PARAM_INT, 'Session start time', VALUE_OPTIONAL),
-            'session_end' => new external_value(PARAM_INT, 'Time scheduled', VALUE_OPTIONAL),
+            ], "Thresholds", VALUE_DEFAULT, ['attention' => null, 'rejected' => null]),
+            'session_start' => new external_value(PARAM_INT, 'Session start time', VALUE_DEFAULT, null),
+            'session_end' => new external_value(PARAM_INT, 'Time scheduled', VALUE_DEFAULT, null),
             'warnings' => new external_multiple_structure(
                 new external_value(PARAM_TEXT, 'Review comment', VALUE_OPTIONAL),
-                'Warnings', VALUE_OPTIONAL
+                'Warnings', VALUE_DEFAULT, []
             ),
         ]);
     }
