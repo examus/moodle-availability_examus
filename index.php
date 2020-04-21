@@ -56,23 +56,31 @@ if($action == 'index'){
 
     echo $OUTPUT->header();
     echo $OUTPUT->heading(get_string('pluginname', 'availability_examus'));
-
-    $from = isset($_GET['from']) ? $_GET['from'] : ['day' => null, 'month' => null, 'year' => null];
-    $to = isset($_GET['to']) ? $_GET['to'] : ['day' => date('j'), 'month' => date('n'), 'year' => date('Y')];;
-
     $filters = [
         'courseid'     => optional_param('courseid', null, PARAM_INT),
         'timemodified' => optional_param('timemodified', null, PARAM_INT),
         'moduleid'     => optional_param('moduleid', null, PARAM_INT),
         'userquery'    => optional_param('userquery', null, PARAM_TEXT),
         'status'       => optional_param('status', null, PARAM_TEXT),
-        'from[day]'     => $from['day'],
-        'from[month]'   => $from['month'],
-        'from[year]'    => $from['year'],
-        'to[day]'     => $to['day'],
-        'to[month]'   => $to['month'],
-        'to[year]'    => $to['year'],
     ];
+
+    $from = isset($_GET['from']) ? $_GET['from'] : ['day' => null, 'month' => null, 'year' => null];
+    $to = isset($_GET['to']) ? $_GET['to'] : ['day' => date('j'), 'month' => date('n'), 'year' => date('Y')];
+
+    if($from['day'] > 0 && $from['month'] > 0 && $from['year'] > 0){
+        $filters = array_merge($filters, [
+            'from[day]'     => $from['day'],
+            'from[month]'   => $from['month'],
+            'from[year]'    => $from['year'],
+        ]);
+    }
+    if($to['day'] > 0 && $to['month'] > 0 && $to['year'] > 0){
+        $filters = array_merge($filters, [
+            'to[day]'     => $to['day'],
+            'to[month]'   => $to['month'],
+            'to[year]'    => $to['year'],
+        ]);
+    }
 
     $page = optional_param('page', 0, PARAM_INT);
     $log = new \availability_examus\log($filters, $page);

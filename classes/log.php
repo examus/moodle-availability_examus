@@ -35,6 +35,7 @@ class log {
         $select = [
             'e.id id',
             'e.timemodified timemodified',
+            'a.timefinish timefinish',
             'timescheduled',
             'u.firstname u_firstname',
             'u.lastname u_lastname',
@@ -105,6 +106,7 @@ class log {
 
         $query = 'SELECT '.implode(', ', $select).' FROM {availability_examus} e '
                . ' LEFT JOIN {user} u ON u.id=e.userid '
+               . ' LEFT JOIN {quiz_attempts} a ON a.id=e.attemptid '
                . ' WHERE '.implode(' AND ', $where)
                . ($orderBy ? ' ORDER BY '. $orderBy : '')
                . ' LIMIT '.($this->page * $this->per_page).','.$this->per_page
@@ -112,6 +114,7 @@ class log {
 
         $queryCount = 'SELECT count(e.id) as `count` FROM {availability_examus} e '
                     . ' LEFT JOIN {user} u ON u.id=e.userid '
+                    . ' LEFT JOIN {quiz_attempts} a ON a.id=e.attemptid '
                     . ' WHERE '.implode(' AND ', $where);
 
         $this->entries = $DB->get_records_sql($query, $params);
@@ -126,12 +129,13 @@ class log {
         $table = new \flexible_table('availability_examus_table');
 
         $table->define_columns([
-            'timemodified', 'timescheduled',  'u_email', 'courseid',
-            'cmid', 'status', 'review_link', 'score', 'details', 'create_entry',
+            'timefinish', 'timescheduled', 'u_email',
+            'courseid', 'cmid', 'status', 'review_link', 'score', 'details',
+            'create_entry',
         ]);
 
         $table->define_headers([
-            get_string('date_modified', 'availability_examus'),
+            get_string('time_finish', 'availability_examus'),
             get_string('time_scheduled', 'availability_examus'),
             get_string('user'),
             get_string('course'),
@@ -144,7 +148,7 @@ class log {
         ]);
 
         $table->define_baseurl($this->url);
-        $table->sortable(true, 'date_modified');
+        $table->sortable(true);
         $table->no_sorting('courseid');
         $table->no_sorting('cmid');
         $table->set_attribute('id', 'entries');
@@ -161,7 +165,7 @@ class log {
             foreach ($entries as $entry) {
                 $row = [];
 
-                $row[] = common::format_date($entry->timemodified);
+                $row[] = common::format_date($entry->timefinish);
 
                 if ($entry->timescheduled) {
                     $row[] = common::format_date($entry->timescheduled);
@@ -435,7 +439,9 @@ class log {
 
         foreach ($dateformat as $key => $value) {
             $name = 'from['.$key.']';
-            echo html_writer::select($value, $name, $this->filters[$name], null, ['style'=>'height: 2.5rem;margin-right: 0.5rem']);
+            $current = isset($this->filters[$name]) ? $this->filters[$name] : null;
+
+            echo html_writer::select($value, $name, $current, null, ['style'=>'height: 2.5rem;margin-right: 0.5rem']);
         }
         // The YUI2 calendar only supports the gregorian calendar type so only display the calendar image if this is being used.
         if ($calendartype->get_name() === 'gregorian') {
@@ -458,7 +464,9 @@ class log {
 
         foreach ($dateformat as $key => $value) {
             $name = 'to['.$key.']';
-            echo html_writer::select($value, $name, $this->filters[$name], null, ['style'=>'height: 2.5rem;margin-right: 0.5rem']);
+            $current = isset($this->filters[$name]) ? $this->filters[$name] : null;
+
+            echo html_writer::select($value, $name, $current, null, ['style'=>'height: 2.5rem;margin-right: 0.5rem']);
         }
         // The YUI2 calendar only supports the gregorian calendar type so only display the calendar image if this is being used.
         if ($calendartype->get_name() === 'gregorian') {

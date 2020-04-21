@@ -56,6 +56,8 @@ $string['identification_mode'] = 'Identification (Human identification, automati
 $string['rules'] = "Rules";
 
 $string['time_scheduled'] = 'Scheduled';
+$string['time_finish'] = 'Attempt finished at';
+
 $string['auto_rescheduling'] = 'Automatic reset for missed exams';
 $string['enable'] = 'Enable';
 
