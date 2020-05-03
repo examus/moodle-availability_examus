@@ -140,10 +140,25 @@ class availability_examus_external extends external_api {
 
                         if (condition::has_examus_condition($cm)) {
                             $reason = '';
+
                             if(!$cm->uservisible || !$availibility_info->is_available($reason, false, $user->id)){
                                 continue;
                             }
 
+                            $selected_groups = condition::get_examus_groups($cm);
+                            if(!empty($selected_groups)){
+                                $found = false;
+                                $user_groups = $DB->get_records('groups_members', ['userid'=> $user->id], null, 'groupid');
+                                foreach($user_groups as $user_group){
+                                    if(in_array($user_group->groupid, $selected_groups)){
+                                        $found = true;
+                                        break;
+                                    }
+                                }
+                                if(!$found){
+                                    continue;
+                                }
+                            }
 
                             $entry = condition::create_entry_for_cm($user->id, $cm);
                             if ($entry == null) {

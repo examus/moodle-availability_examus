@@ -72,6 +72,7 @@ $string['allow_absence_in_frame'] = 'Allow absence in frame';
 $string['allow_voices'] =  'Allow voices';
 $string['allow_wrong_gaze_direction'] =  'Allow wrong gaze direction';
 
+$string['select_groups'] = 'Use Examus only for selected groups';
 $string['scheduling_required'] = 'A calendar entry is required';
 $string['apply_filter'] = 'Apply filter';
 $string['allcourses'] = 'All courses';

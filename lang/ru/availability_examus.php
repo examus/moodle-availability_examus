@@ -71,6 +71,7 @@ $string['allow_absence_in_frame'] = 'Разрешить выход из комн
 $string['allow_voices'] =  'Разрешить голоса';
 $string['allow_wrong_gaze_direction'] =  'Разрешить взгляд в сторону';
 
+$string['select_groups'] = 'Использовать Examus только для выбраных групп';
 $string['scheduling_required'] = 'Обязательна запись в календаре';
 $string['apply_filter'] = 'Применить фильтры';
 $string['allcourses'] = 'Все курсы';

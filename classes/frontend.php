@@ -45,7 +45,7 @@ class frontend extends \core_availability\frontend {
             'allow_to_use_books', 'allow_to_use_paper', 'allow_to_use_messengers',
             'allow_to_use_calculator', 'allow_to_use_excel', 'allow_to_use_human_assistant',
             'allow_absence_in_frame', 'allow_voices', 'allow_wrong_gaze_direction',
-            'auto_rescheduling', 'enable',
+            'select_groups', 'auto_rescheduling', 'enable',
         ];
     }
 
@@ -59,6 +59,7 @@ class frontend extends \core_availability\frontend {
      */
     protected function get_javascript_init_params($course, \cm_info $cm = null,
             \section_info $section = null) {
+        global $DB;
         $rules['allow_to_use_websites'] = false;
         $rules['allow_to_use_books'] = false;
         $rules['allow_to_use_paper'] = true;
@@ -69,7 +70,13 @@ class frontend extends \core_availability\frontend {
         $rules['allow_absence_in_frame'] = false;
         $rules['allow_voices'] = false;
         $rules['allow_wrong_gaze_direction'] = false;
-        return array($rules);
+
+        $courseid = $course->id;
+
+        $groups=[];
+        $groups = $DB->get_records('groups', ['courseid'=> $courseid], 'name', 'id,name');
+
+        return [$rules, $groups];
     }
 
     /**
