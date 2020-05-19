@@ -89,3 +89,7 @@ $string['warnings'] = 'Нарушения';
 $string['comment'] = 'Комментарий';
 
 $string['details'] = 'Подробности';
+
+// Fader screen
+$string['fader_awaiting_proctoring'] = 'Ожидание прокторинга';
+$string['fader_instructions'] = '<p>Тут инструкция если ниче не произошло</p>';

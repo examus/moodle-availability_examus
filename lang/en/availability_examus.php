@@ -90,3 +90,7 @@ $string['warnings'] = 'Warnings';
 $string['comment'] = 'Comment';
 
 $string['details'] = 'Details';
+
+// Fader screen
+$string['fader_awaiting_proctoring'] = 'Waiting for proctoring';
+$string['fader_instructions'] = '<p>If nothing happens please use Examus Web App</p>';
