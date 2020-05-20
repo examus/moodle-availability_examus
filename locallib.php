@@ -145,6 +145,7 @@ function examus_attempt_viewed_handler($event) {
     // Storing attempt and CM for future use
     $EXAMUS['attempt_data'] = [
         'cm_id' => $event->get_context()->instanceid,
+        'cm' => $event->get_context(),
         'course_id' => $event->courseid,
         'attempt_id' => $event->objectid,
         'quiz_id' => $quiz->id,

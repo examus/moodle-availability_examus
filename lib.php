@@ -1,4 +1,7 @@
 <?php
+use core_availability\info_module;
+use availability_examus\condition;
+
 function availability_examus_render_navbar_output(){
     global $PAGE;
 
@@ -21,6 +24,7 @@ function availability_examus_before_standard_html_head(){
     global $EXAMUS;
     global $DB;
 
+    // No viewing quiz attempt
     if(empty($EXAMUS)){
         return;
     }
@@ -34,6 +38,19 @@ function availability_examus_before_standard_html_head(){
     }else{
         return;
     }
+
+    // Not examused quiz
+    $cm_id = $EXAMUS['attempt_data']['cm_id'];
+    $course_id = $EXAMUS['attempt_data']['course_id'];
+
+    $modinfo = get_fast_modinfo($course_id);
+    $cm = $modinfo->get_cm($cm_id);
+
+    $availibility_info = new info_module($cm);
+    if(!condition::has_examus_condition($cm)) {
+        return;
+    }
+
 
     $origin = isset($_SESSION['examus_client_origin']) ? $_SESSION['examus_client_origin'] : '';
 
