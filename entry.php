@@ -29,7 +29,7 @@ require_login();
 global $DB;
 
 $accesscode = required_param('accesscode', PARAM_RAW);
-$client_origin = optional_param('examusClientOrigin', null, PARAM_URL);
+$client_origin = optional_param('examus-client-origin', null, PARAM_URL);
 
 $entry = $DB->get_record('availability_examus', ['accesscode' => $accesscode]);
 
