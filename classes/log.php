@@ -10,7 +10,7 @@ require_once($CFG->libdir . '/tablelib.php');
 class log {
     protected $entries = [];
     protected $entries_count = null;
-    protected $per_page = 30;
+    protected $per_page = 5;
     protected $page = 0;
 
     protected $table = null;
@@ -46,7 +46,7 @@ class log {
             'courseid'
         ];
 
-        $where = ['1'];
+        $where = [];
         $params = $this->filters;
 
         if(isset($params['from[day]']) && isset($params['from[month]']) && isset($params['from[year]'])){
@@ -98,14 +98,20 @@ class log {
 
         $orderBy = $this->table->get_sql_sort();
 
+        if ($DB->get_dbfamily() == 'postgres') {
+          $limit = ' LIMIT ' . $this->per_page . ' OFFSET ' . ($this->page * $this->per_page);
+        } else {
+          $limit = ' LIMIT ' . ($this->page * $this->per_page) . ',' . $this->per_page;
+        }
+
         $query = 'SELECT '.implode(', ', $select).' FROM {availability_examus} e '
                . ' LEFT JOIN {user} u ON u.id=e.userid '
                . ' WHERE '.implode(' AND ', $where)
                . ($orderBy ? ' ORDER BY '. $orderBy : '')
-               . ' LIMIT '.($this->page * $this->per_page).','.$this->per_page
+               . $limit
                ;
 
-        $queryCount = 'SELECT count(e.id) as `count` FROM {availability_examus} e '
+        $queryCount = 'SELECT count(e.id) as count FROM {availability_examus} e '
                     . ' LEFT JOIN {user} u ON u.id=e.userid '
                     . ' WHERE '.implode(' AND ', $where);
 
@@ -121,7 +127,7 @@ class log {
         $table = new \flexible_table('availability_examus_table');
 
         $table->define_columns([
-            'timemodified', 'timescheduled',  'u_email', 'courseid', 
+            'timemodified', 'timescheduled',  'u_email', 'courseid',
             'cmid', 'status', 'review_link', 'create_entry'
         ]);
 
