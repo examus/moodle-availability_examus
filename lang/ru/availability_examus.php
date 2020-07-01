@@ -92,4 +92,4 @@ $string['details'] = 'Подробности';
 
 // Fader screen
 $string['fader_awaiting_proctoring'] = 'Ожидание прокторинга';
-$string['fader_instructions'] = '<p>Тут инструкция если ниче не произошло</p>';
+$string['fader_instructions'] = '<p>Используйте приложение Экзамус для прохождения тестирования</p>';
