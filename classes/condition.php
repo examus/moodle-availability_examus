@@ -51,6 +51,8 @@ class condition extends \core_availability\condition {
     /** @var array Default exam rules */
     protected $rules = [];
 
+    protected $groups = [];
+
     /**
      * Construct
      *
@@ -75,6 +77,11 @@ class condition extends \core_availability\condition {
         if (!empty($structure->rules)) {
             $this->rules = $structure->rules;
         }
+
+        if (!empty($structure->groups)) {
+            $this->groups = $structure->groups;
+        }
+
     }
 
     /**
@@ -159,6 +166,18 @@ class condition extends \core_availability\condition {
     }
 
     /**
+     * get examus groups
+     *
+     * @param \cm_info $cm Cm
+     * @return bool
+     */
+    public static function get_examus_groups($cm) {
+        $econds = self::get_examus_conditions($cm);
+        return (array) (isset($econds[0]->groups) ? $econds[0]->groups : []);
+
+    }
+
+    /**
      * get examus scheduling mode
      *
      * @param \cm_info $cm Cm
@@ -198,7 +217,8 @@ class condition extends \core_availability\condition {
             'mode' => (string) $this->mode,
             'scheduling_required' => (bool) $this->scheduling_required,
             'auto_rescheduling' => (bool) $this->auto_rescheduling,
-            'rules' => (array) $this->rules
+            'rules' => (array) $this->rules,
+            'groups' => (array) $this->groups,
         ];
     }
 
@@ -344,7 +364,7 @@ class condition extends \core_availability\condition {
         }
 
         if ($allowed_attempts == NULL || count($entries) < $allowed_attempts) {
-            $entry = self::make_entry($courseid, $cmid, $userid);
+            $entry = self::make_entry($courseid, $cm->id, $userid);
             $entry->id = $DB->insert_record('availability_examus', $entry);
             return $entry;
         }

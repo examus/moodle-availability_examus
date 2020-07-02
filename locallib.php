@@ -128,3 +128,29 @@ function examus_course_module_deleted(\core\event\course_module_deleted $event) 
     $cmid = $event->contextinstanceid;
     $DB->delete_records('availability_examus', ['cmid' => $cmid]);
 }
+
+
+/**
+ * Attempt viewed
+ *
+ * @param \mod_quiz\event\attempt_viewed $event Event
+ */
+function examus_attempt_viewed_handler($event) {
+    global $DB;
+    global $EXAMUS;
+
+    $attempt = $event->get_record_snapshot('quiz_attempts', $event->objectid);
+    $quiz = $event->get_record_snapshot('quiz', $attempt->quiz);
+
+    // Storing attempt and CM for future use
+    $EXAMUS['attempt_data'] = [
+        'cm_id' => $event->get_context()->instanceid,
+        'cm' => $event->get_context(),
+        'course_id' => $event->courseid,
+        'attempt_id' => $event->objectid,
+        'quiz_id' => $quiz->id,
+
+    ];
+}
+
+

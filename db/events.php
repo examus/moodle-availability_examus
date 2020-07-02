@@ -61,4 +61,11 @@ $observers = [
         'includefile' => '/availability/condition/examus/locallib.php',
         'internal' => false,
     ],
+    [
+        'eventname' => 'mod_quiz\event\attempt_viewed',
+        'callback' => 'examus_attempt_viewed_handler',
+        'includefile' => '/availability/condition/examus/locallib.php',
+        'internal' => false,
+    ],
+
 ];

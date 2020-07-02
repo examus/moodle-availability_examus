@@ -35,6 +35,7 @@ class log {
         $select = [
             'e.id id',
             'e.timemodified timemodified',
+            'a.timefinish timefinish',
             'timescheduled',
             'u.firstname u_firstname',
             'u.lastname u_lastname',
@@ -43,7 +44,10 @@ class log {
             'e.status status',
             'review_link',
             'cmid',
-            'courseid'
+            'courseid',
+            'score',
+            'comment',
+            'threshold',
         ];
 
         $where = [];
@@ -94,6 +98,8 @@ class log {
         $course_ids = array_keys($this->get_course_list());
         if(!empty($course_ids)){
             $where[]= 'courseid IN('.implode(',', $course_ids).')';
+        }else{
+            $where[]= 'FALSE';
         }
 
         $orderBy = $this->table->get_sql_sort();
@@ -106,6 +112,7 @@ class log {
 
         $query = 'SELECT '.implode(', ', $select).' FROM {availability_examus} e '
                . ' LEFT JOIN {user} u ON u.id=e.userid '
+               . ' LEFT JOIN {quiz_attempts} a ON a.id=e.attemptid '
                . ' WHERE '.implode(' AND ', $where)
                . ($orderBy ? ' ORDER BY '. $orderBy : '')
                . $limit
@@ -113,6 +120,7 @@ class log {
 
         $queryCount = 'SELECT count(e.id) as count FROM {availability_examus} e '
                     . ' LEFT JOIN {user} u ON u.id=e.userid '
+                    . ' LEFT JOIN {quiz_attempts} a ON a.id=e.attemptid '
                     . ' WHERE '.implode(' AND ', $where);
 
         $this->entries = $DB->get_records_sql($query, $params);
@@ -127,23 +135,26 @@ class log {
         $table = new \flexible_table('availability_examus_table');
 
         $table->define_columns([
-            'timemodified', 'timescheduled',  'u_email', 'courseid',
-            'cmid', 'status', 'review_link', 'create_entry'
+            'timefinish', 'timescheduled', 'u_email',
+            'courseid', 'cmid', 'status', 'review_link', 'score', 'details',
+            'create_entry',
         ]);
 
         $table->define_headers([
-            get_string('date_modified', 'availability_examus'),
+            get_string('time_finish', 'availability_examus'),
             get_string('time_scheduled', 'availability_examus'),
             get_string('user'),
             get_string('course'),
             get_string('module', 'availability_examus'),
             get_string('status', 'availability_examus'),
             get_string('review', 'availability_examus'),
+            get_string('score', 'availability_examus'),
+            '',
             ''
         ]);
 
         $table->define_baseurl($this->url);
-        $table->sortable(true, 'date_modified');
+        $table->sortable(true);
         $table->no_sorting('courseid');
         $table->no_sorting('cmid');
         $table->set_attribute('id', 'entries');
@@ -160,14 +171,10 @@ class log {
             foreach ($entries as $entry) {
                 $row = [];
 
-                $date = usergetdate($entry->timemodified);
-                $row[] = '<b>' . $date['year'] . '.' . $date['mon'] . '.' . $date['mday'] . '</b> ' .
-                       $date['hours'] . ':' . $date['minutes'];
+                $row[] = common::format_date($entry->timefinish);
 
                 if ($entry->timescheduled) {
-                    $timescheduled = usergetdate($entry->timescheduled);
-                    $row[] = '<b>' . $timescheduled['year'] . '.' . $timescheduled['mon'] . '.' . $timescheduled['mday'] . '</b> ' .
-                           $timescheduled['hours'] . ':' . $timescheduled['minutes'];
+                    $row[] = common::format_date($entry->timescheduled);
                 } else {
                     $row[] = '';
                 }
@@ -193,13 +200,30 @@ class log {
 
                 $expired = time() > $entry->timescheduled + condition::EXPIRATION_SLACK;
 
-                if (!$not_started || ($scheduled && $expired) ) {
-                    $row[] = "<form action='index.php' method='post'>" .
+                $row[] = $entry->score;
+
+                $details_url = new \moodle_url('/availability/condition/examus/index.php', ['id' => $entry->id, 'action' => 'show']);
+                $row[] = '<a href="'.$details_url.'">'.get_string('details', 'availability_examus').'</a>';
+
+                // Changed condition. Allow to reset all entries
+                // Consequences unknown
+                // if (!$not_started || ($scheduled && $expired) ) {
+                if (!$not_started) {
+                    $row[] =
+                        "<form action='index.php' method='post'>" .
                            "<input type='hidden' name='id' value='" . $entry->id . "'>" .
                            "<input type='hidden' name='action' value='renew'>" .
-                           "<input type='submit' value='" . get_string('new_entry', 'availability_examus') . "'></form>";
+                           "<input type='submit' value='" . get_string('new_entry', 'availability_examus') . "'>".
+                        "</form>";
                 } else {
-                    $row[] = "-";
+                    // $row[] = "-";
+                    $row[] =
+                        "<form action='index.php' method='post'>" .
+                           "<input type='hidden' name='id' value='" . $entry->id . "'>" .
+                           "<input type='hidden' name='force' value='true'>" .
+                           "<input type='hidden' name='action' value='renew'>" .
+                           "<input type='submit' value='" . get_string('new_entry_force', 'availability_examus') . "'>".
+                        "</form>";
                 }
                 $table->add_data($row);
             }
@@ -246,16 +270,19 @@ class log {
 
         $courses = [];
 
-        $sitecontext = \context_system::instance();
+        $site_context = \context_system::instance();
         // First check to see if we can override showcourses and showusers.
         $numcourses = $DB->count_records("course");
 
         if ($courserecords = $DB->get_records("course", null, "fullname", "id,shortname,fullname,category")) {
             foreach ($courserecords as $course) {
                 $course_context = \context_course::instance($course->id);
-                if(!has_capability('availability/examus:logaccess_course', $course_context)){
-                    continue;
+                if(!has_capability('availability/examus:logaccess_all', $site_context)){
+                    if(!has_capability('availability/examus:logaccess_course', $course_context)){
+                        continue;
+                    }
                 }
+
                 if ($course->id == SITEID) {
                     $courses[$course->id] = format_string($course->fullname) . ' (' . get_string('site') . ')';
                 } else {
@@ -418,7 +445,9 @@ class log {
 
         foreach ($dateformat as $key => $value) {
             $name = 'from['.$key.']';
-            echo html_writer::select($value, $name, $this->filters[$name], null, ['style'=>'height: 2.5rem;margin-right: 0.5rem']);
+            $current = isset($this->filters[$name]) ? $this->filters[$name] : null;
+
+            echo html_writer::select($value, $name, $current, null, ['style'=>'height: 2.5rem;margin-right: 0.5rem']);
         }
         // The YUI2 calendar only supports the gregorian calendar type so only display the calendar image if this is being used.
         if ($calendartype->get_name() === 'gregorian') {
@@ -441,7 +470,9 @@ class log {
 
         foreach ($dateformat as $key => $value) {
             $name = 'to['.$key.']';
-            echo html_writer::select($value, $name, $this->filters[$name], null, ['style'=>'height: 2.5rem;margin-right: 0.5rem']);
+            $current = isset($this->filters[$name]) ? $this->filters[$name] : null;
+
+            echo html_writer::select($value, $name, $current, null, ['style'=>'height: 2.5rem;margin-right: 0.5rem']);
         }
         // The YUI2 calendar only supports the gregorian calendar type so only display the calendar image if this is being used.
         if ($calendartype->get_name() === 'gregorian') {

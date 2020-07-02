@@ -140,10 +140,25 @@ class availability_examus_external extends external_api {
 
                         if (condition::has_examus_condition($cm)) {
                             $reason = '';
+
                             if(!$cm->uservisible || !$availibility_info->is_available($reason, false, $user->id)){
                                 continue;
                             }
 
+                            $selected_groups = condition::get_examus_groups($cm);
+                            if(!empty($selected_groups)){
+                                $found = false;
+                                $user_groups = $DB->get_records('groups_members', ['userid'=> $user->id], null, 'groupid');
+                                foreach($user_groups as $user_group){
+                                    if(in_array($user_group->groupid, $selected_groups)){
+                                        $found = true;
+                                        break;
+                                    }
+                                }
+                                if(!$found){
+                                    continue;
+                                }
+                            }
 
                             $entry = condition::create_entry_for_cm($user->id, $cm);
                             if ($entry == null) {
@@ -230,7 +245,19 @@ class availability_examus_external extends external_api {
             'accesscode' => new external_value(PARAM_TEXT, 'Access Code'),
             'status' => new external_value(PARAM_TEXT, 'Status of review'),
             'review_link' => new external_value(PARAM_TEXT, 'Link to review page', VALUE_DEFAULT, ""),
-            'timescheduled' => new external_value(PARAM_INT, 'Time scheduled', VALUE_DEFAULT, 0)
+            'timescheduled' => new external_value(PARAM_INT, 'Time scheduled', VALUE_DEFAULT, 0),
+            'comment' => new external_value(PARAM_TEXT, 'Review comment', VALUE_DEFAULT, null),
+            'score' => new external_value(PARAM_INT, 'Scoring value', VALUE_DEFAULT, null),
+            'threshold' => new external_single_structure([
+                'attention' => new external_value(PARAM_INT, 'Attention threshold', VALUE_OPTIONAL),
+                'rejected' => new external_value(PARAM_INT, 'Rejected threshold', VALUE_OPTIONAL),
+            ], "Thresholds", VALUE_DEFAULT, ['attention' => null, 'rejected' => null]),
+            'session_start' => new external_value(PARAM_INT, 'Session start time', VALUE_DEFAULT, null),
+            'session_end' => new external_value(PARAM_INT, 'Time scheduled', VALUE_DEFAULT, null),
+            'warnings' => new external_multiple_structure(
+                new external_value(PARAM_TEXT, 'Review comment', VALUE_OPTIONAL),
+                'Warnings', VALUE_DEFAULT, []
+            ),
         ]);
     }
 
@@ -243,14 +270,31 @@ class availability_examus_external extends external_api {
      * @param string $timescheduled timescheduled
      * @return array
      */
-    public static function submit_proctoring_review($accesscode, $status, $reviewlink, $timescheduled) {
+    public static function submit_proctoring_review(
+        $accesscode,
+        $status,
+        $reviewlink,
+        $timescheduled,
+        $comment,
+        $score,
+        $threshold,
+        $session_start,
+        $session_end,
+        $warnings
+    ) {
         global $DB;
 
         self::validate_parameters(self::submit_proctoring_review_parameters(), [
             'accesscode' => $accesscode,
             'review_link' => $reviewlink,
             'status' => $status,
-            'timescheduled' => $timescheduled
+            'timescheduled' => $timescheduled,
+            'comment' => $comment,
+            'score' => $score,
+            'threshold' => $threshold,
+            'session_start' => $session_start,
+            'session_end' => $session_end,
+            'warnings' => $warnings
         ]);
 
         $timenow = time();
@@ -269,6 +313,13 @@ class availability_examus_external extends external_api {
 
             $entry->status = $status;
             $entry->timemodified = $timenow;
+
+            $entry->comment = $comment;
+            $entry->score = $score;
+            $entry->threshold = json_encode($threshold);
+            $entry->session_start = $session_start;
+            $entry->session_end = $session_end;
+            $entry->warnings = json_encode($warnings);
 
             $DB->update_record('availability_examus', $entry);
 
