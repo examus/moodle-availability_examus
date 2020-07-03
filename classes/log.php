@@ -10,7 +10,7 @@ require_once($CFG->libdir . '/tablelib.php');
 class log {
     protected $entries = [];
     protected $entries_count = null;
-    protected $per_page = 5;
+    protected $per_page = 30;
     protected $page = 0;
 
     protected $table = null;
