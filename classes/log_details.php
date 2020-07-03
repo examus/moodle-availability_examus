@@ -20,9 +20,11 @@ class log_details {
         $entry = $DB->get_record('availability_examus', ['id' => $this->id]);
         $user = $DB->get_record('user', ['id' => $entry->userid]);
 
-        $course = get_course($entry->courseid);
-        $modinfo = get_fast_modinfo($course);
-        $cm = $modinfo->get_cm($entry->cmid);
+        $course = $DB->get_record('course', ['id' => $entry->courseid]);
+        if (!empty($course)) {
+          $modinfo = get_fast_modinfo($course);
+          $cm = $modinfo->get_cm($entry->cmid);
+        }
 
         $table = new \flexible_table('availability_examus_show');
 
@@ -52,12 +54,12 @@ class log_details {
 
         $table->add_data([
             get_string('course'),
-            $course->fullname,
+            !empty($course) ? $course->fullname : null,
         ]);
 
         $table->add_data([
             get_string('module', 'availability_examus'),
-            $cm->get_formatted_name(),
+            !empty($course) ? $cm->get_formatted_name() : null,
         ]);
         $table->add_data([
             get_string('status', 'availability_examus'),
