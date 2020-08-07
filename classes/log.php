@@ -47,7 +47,7 @@ class log {
             'courseid'
         ];
 
-        $where = ['1'];
+        $where = ['true'];
         $params = $this->filters;
 
         if(isset($params['from[day]']) && isset($params['from[month]']) && isset($params['from[year]'])){
@@ -98,10 +98,10 @@ class log {
                . ' LEFT JOIN {user} u ON u.id=e.userid '
                . ' WHERE '.implode(' AND ', $where)
                . ($orderBy ? ' ORDER BY '. $orderBy : '')
-               . ' LIMIT '.($this->page * $this->per_page).','.$this->per_page
+               . ' LIMIT '.$this->per_page.' OFFSET '.($this->page * $this->per_page)
                ;
 
-        $queryCount = 'SELECT count(e.id) as `count` FROM {availability_examus} e LEFT JOIN {user} u ON u.id=e.userid WHERE '.implode(' AND ', $where);
+        $queryCount = 'SELECT count(e.id) as count FROM {availability_examus} e LEFT JOIN {user} u ON u.id=e.userid WHERE '.implode(' AND ', $where);
 
         $this->entries = $DB->get_records_sql($query, $params);
 
