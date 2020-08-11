@@ -40,10 +40,8 @@ class common {
     /**
      * Reset entry even if there are some not inited entries.
      */
-    private static function reset_entry_forcefully($props) {
-        $entries = self::db_get_entries(['status' => 'Not inited']);
-
-        foreach ($entries as $x) {
+    private static function reset_entry_forcefully($props, $not_inited_entries) {
+        foreach ($not_inited_entries as $x) {
             global $DB;
             $x->status = "Force reset";
             $DB->update_record(self::TABLE, $x);
@@ -55,17 +53,17 @@ class common {
     /**
      * Reset entry only when there are no not inited entries.
      */
-    private static function reset_entry_gently($props) {
-        $some_not_inited = count(self::db_get_entries(['status' => 'Not inited']));
-
-        if ($some_not_inited) { return false; }
+    private static function reset_entry_gently($props, $not_inited_entries) {
+        if (count($not_inited_entries)) { return false; }
         else { return self::create_new_entry($props); }
     }
 
     public static function reset_entry($props, $force = false){
+        $not_inited_entries = self::db_get_entries(['status' => 'Not inited']);
+
         $f = $force ? self::reset_entry_forcefully : self::reset_entry_gently;
 
-        return $f($props);
+        return $f($props, $not_inited_entries);
     }
 
     public static function delete_empty_entries($userid, $courseid, $cmid) {
