@@ -60,16 +60,16 @@ $string['time_finish'] = 'Время попытки';
 $string['auto_rescheduling'] = 'Автоматический сброс при пропуске экзамена';
 $string['enable'] = 'Включить';
 
-$string['allow_to_use_websites'] =  'Разрешить использование веб-сайтов';
-$string['allow_to_use_books'] =  'Разрешить использование книг';
-$string['allow_to_use_paper'] =  'Разрешить использование черновиков';
-$string['allow_to_use_messengers'] =  'Разрешить использование мессенджеров';
-$string['allow_to_use_calculator'] =  'Разрешить использование калькулятора';
-$string['allow_to_use_excel'] =  'Разрешить использование Excel';
-$string['allow_to_use_human_assistant'] =  'Разрешить использование помощи людей';
+$string['allow_to_use_websites'] = 'Разрешить использование веб-сайтов';
+$string['allow_to_use_books'] = 'Разрешить использование книг';
+$string['allow_to_use_paper'] = 'Разрешить использование черновиков';
+$string['allow_to_use_messengers'] = 'Разрешить использование мессенджеров';
+$string['allow_to_use_calculator'] = 'Разрешить использование калькулятора';
+$string['allow_to_use_excel'] = 'Разрешить использование Excel';
+$string['allow_to_use_human_assistant'] = 'Разрешить использование помощи людей';
 $string['allow_absence_in_frame'] = 'Разрешить выход из комнаты';
-$string['allow_voices'] =  'Разрешить голоса';
-$string['allow_wrong_gaze_direction'] =  'Разрешить взгляд в сторону';
+$string['allow_voices'] = 'Разрешить голоса';
+$string['allow_wrong_gaze_direction'] = 'Разрешить взгляд в сторону';
 
 $string['select_groups'] = 'Использовать Examus только для выбраных групп';
 $string['scheduling_required'] = 'Обязательна запись в календаре';

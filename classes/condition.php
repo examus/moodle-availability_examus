@@ -351,7 +351,7 @@ class condition extends \core_availability\condition {
                 // Consider expired, giving 15 minutes slack
                 $expired = time() > $entry->timescheduled + self::EXPIRATION_SLACK;
 
-                if($scheduled && $expired) {
+                if ($scheduled && $expired) {
                     $entry->timemodified = time();
                     $entry->status = 'Rescheduled';
 
