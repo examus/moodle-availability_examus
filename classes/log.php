@@ -46,7 +46,7 @@ class log {
             'courseid'
         ];
 
-        $where = ['1'];
+        $where = ['TRUE'];
         $params = $this->filters;
 
         if(isset($params['from[day]']) && isset($params['from[month]']) && isset($params['from[year]'])){
@@ -104,10 +104,10 @@ class log {
                . ' LEFT JOIN {user} u ON u.id=e.userid '
                . ' WHERE '.implode(' AND ', $where)
                . ($orderBy ? ' ORDER BY '. $orderBy : '')
-               . ' LIMIT '.($this->page * $this->per_page).','.$this->per_page
+               . ' LIMIT '.$this->per_page.' OFFSET '.($this->page * $this->per_page)
                ;
 
-        $queryCount = 'SELECT count(e.id) as `count` FROM {availability_examus} e '
+        $queryCount = 'SELECT count(e.id) as count FROM {availability_examus} e '
                     . ' LEFT JOIN {user} u ON u.id=e.userid '
                     . ' WHERE '.implode(' AND ', $where);
 
@@ -123,7 +123,7 @@ class log {
         $table = new \flexible_table('availability_examus_table');
 
         $table->define_columns([
-            'timemodified', 'timescheduled',  'u_email', 'courseid', 
+            'timemodified', 'timescheduled',  'u_email', 'courseid',
             'cmid', 'status', 'review_link', 'create_entry'
         ]);
 
