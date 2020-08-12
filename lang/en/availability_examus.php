@@ -25,6 +25,9 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['examus:logaccess'] = 'Examus log access';
+$string['examus:logaccess_course'] = 'Examus log access for course';
+$string['examus:logaccess_all'] = 'Examus log access for all courses';
+
 $string['description'] = 'Allows students to use Examus proctoring service';
 $string['pluginname'] = 'Proctoring by Examus';
 $string['title'] = 'Examus';
@@ -36,6 +39,7 @@ $string['status'] = 'Status';
 $string['review'] = 'Review';
 $string['module'] = 'Module';
 $string['new_entry'] = 'New entry';
+$string['new_entry_force'] = 'New entry';
 $string['error_setduration'] = 'Duration must be a multiple of 30';
 $string['duration'] = 'Duration in minutes (a multiple of 30)';
 $string['link'] = 'Logs and video';
@@ -52,18 +56,23 @@ $string['identification_mode'] = 'Identification (Human identification, automati
 $string['rules'] = "Rules";
 
 $string['time_scheduled'] = 'Scheduled';
+$string['time_finish'] = 'Attempt finished at';
 
-$string['allow_to_use_websites'] =  'Allow to use websites';
-$string['allow_to_use_books'] =  'Allow to use books';
-$string['allow_to_use_paper'] =  'Allow to use paper';
-$string['allow_to_use_messengers'] =  'Allow to use messengers';
-$string['allow_to_use_calculator'] =  'Allow to use calculator';
-$string['allow_to_use_excel'] =  'Allow to use excel';
-$string['allow_to_use_human_assistant'] =  'Allow to use human assistant';
+$string['auto_rescheduling'] = 'Automatic reset for missed exams';
+$string['enable'] = 'Enable';
+
+$string['allow_to_use_websites'] = 'Allow to use websites';
+$string['allow_to_use_books'] = 'Allow to use books';
+$string['allow_to_use_paper'] = 'Allow to use paper';
+$string['allow_to_use_messengers'] = 'Allow to use messengers';
+$string['allow_to_use_calculator'] = 'Allow to use calculator';
+$string['allow_to_use_excel'] = 'Allow to use excel';
+$string['allow_to_use_human_assistant'] = 'Allow to use human assistant';
 $string['allow_absence_in_frame'] = 'Allow absence in frame';
-$string['allow_voices'] =  'Allow voices';
-$string['allow_wrong_gaze_direction'] =  'Allow wrong gaze direction';
+$string['allow_voices'] = 'Allow voices';
+$string['allow_wrong_gaze_direction'] = 'Allow wrong gaze direction';
 
+$string['select_groups'] = 'Use Examus only for selected groups';
 $string['scheduling_required'] = 'A calendar entry is required';
 $string['apply_filter'] = 'Apply filter';
 $string['allcourses'] = 'All courses';
@@ -71,3 +80,17 @@ $string['allstatuses'] = 'All statuses';
 $string['userquery'] = 'User Email starts with';
 $string['fromdate'] = 'From date:';
 $string['todate'] = 'To date:';
+
+$string['score'] = 'Score';
+$string['threshold_attention'] = 'Threshold: Attention';
+$string['threshold_rejected'] = 'Threshold: Rejection';
+$string['session_start'] = 'Session start';
+$string['session_end'] = 'Session end';
+$string['warnings'] = 'Warnings';
+$string['comment'] = 'Comment';
+
+$string['details'] = 'Details';
+
+// Fader screen
+$string['fader_awaiting_proctoring'] = 'Waiting for proctoring';
+$string['fader_instructions'] = '<p>Use Examus app to take the test</p>';

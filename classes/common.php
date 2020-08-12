@@ -4,16 +4,29 @@ use \stdClass;
 defined('MOODLE_INTERNAL') || die();
 
 class common {
-    public static function reset_entry($conditions){
+    public static function reset_entry($conditions, $force = false){
         global $DB;
+
         $oldentry = $DB->get_record('availability_examus', $conditions);
-        if ($oldentry and $oldentry->status != 'Not inited') {
+
+        $not_inited = $oldentry && $oldentry->status == 'Not inited';
+
+        if ($oldentry && (!$not_inited || $force)) {
             $entries = $DB->get_records('availability_examus', [
                 'userid' => $oldentry->userid,
                 'courseid' => $oldentry->courseid,
                 'cmid' => $oldentry->cmid,
-                'status' => 'Not inited']);
-            if (count($entries) == 0) {
+                'status' => 'Not inited'
+            ]);
+
+            if (count($entries) == 0 || $force) {
+                if($force){
+                    foreach($entries as $old){
+                        $old->status = "Force reset";
+                        $DB->update_record('availability_examus', $old);
+                    }
+                }
+
                 $timenow = time();
                 $entry = new stdClass();
                 $entry->userid = $oldentry->userid;
@@ -23,8 +36,10 @@ class common {
                 $entry->status = 'Not inited';
                 $entry->timecreated = $timenow;
                 $entry->timemodified = $timenow;
-                $DB->insert_record('availability_examus', $entry);
-                return true;
+
+                $entry->id = $DB->insert_record('availability_examus', $entry);
+
+                return $entry;
             } else {
                 return false;
             }
@@ -47,5 +62,21 @@ class common {
         $DB->delete_records('availability_examus', $condition);
     }
 
+    public static function format_date($timestamp){
+        $date = $timestamp ? usergetdate($timestamp) : null;
+
+        if ($date) {
+            return (
+                '<b>' .
+                $date['year'] . '.' .
+                str_pad($date['mon'], 2, 0, STR_PAD_LEFT) . '.' .
+                str_pad($date['mday'], 2, 0, STR_PAD_LEFT) . '</b> ' .
+                str_pad($date['hours'], 2, 0, STR_PAD_LEFT) . ':' .
+                str_pad($date['minutes'], 2, 0, STR_PAD_LEFT)
+            );
+        } else {
+            return null;
+        }
+    }
 
 }
