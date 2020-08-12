@@ -50,7 +50,7 @@ class log {
             'threshold',
         ];
 
-        $where = [];
+        $where = ['TRUE'];
         $params = $this->filters;
 
         if(isset($params['from[day]']) && isset($params['from[month]']) && isset($params['from[year]'])){
@@ -104,18 +104,12 @@ class log {
 
         $orderBy = $this->table->get_sql_sort();
 
-        if ($DB->get_dbfamily() == 'postgres') {
-          $limit = ' LIMIT ' . $this->per_page . ' OFFSET ' . ($this->page * $this->per_page);
-        } else {
-          $limit = ' LIMIT ' . ($this->page * $this->per_page) . ',' . $this->per_page;
-        }
-
         $query = 'SELECT '.implode(', ', $select).' FROM {availability_examus} e '
                . ' LEFT JOIN {user} u ON u.id=e.userid '
                . ' LEFT JOIN {quiz_attempts} a ON a.id=e.attemptid '
                . ' WHERE '.implode(' AND ', $where)
                . ($orderBy ? ' ORDER BY '. $orderBy : '')
-               . $limit
+               . ' LIMIT '.$this->per_page.' OFFSET '.($this->page * $this->per_page)
                ;
 
         $queryCount = 'SELECT count(e.id) as count FROM {availability_examus} e '
