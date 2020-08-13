@@ -101,16 +101,17 @@ let examus_fader = () => {
   return x
 }
 
-  window.addEventListener("DOMContentLoaded", function() {
-    let el = examus_fader()
+window.addEventListener("DOMContentLoaded", function() {
+  let el = examus_fader()
 
-    document.body.appendChild(el)
+  document.body.appendChild(el)
 
-    proved.then(() => el.remove())
+  proved.then(() => el.remove())
 
-    /* Most of the time this action is meaningless,
-     * at the same time it's always harmless. */
-    window.parent.postMessage('proctoringRequest', expected_origin);
-  });
+  /* Most of the time this action is meaningless,
+   * at the same time it's always harmless. */
+  window.parent.postMessage('proctoringRequest', expected_origin);
+});
+
 })();
 </script>
