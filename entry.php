@@ -29,7 +29,6 @@ require_login();
 global $DB;
 
 $accesscode = required_param('accesscode', PARAM_RAW);
-$client_origin = optional_param('examus-client-origin', null, PARAM_URL);
 
 $entry = $DB->get_record('availability_examus', ['accesscode' => $accesscode]);
 
@@ -40,7 +39,6 @@ if ($entry) {
     $cmid = $entry->cmid;
 
     $_SESSION['examus'] = $accesscode;
-    $_SESSION['examus_client_origin'] = $client_origin;
 
     list($course, $cm) = get_course_and_cm_from_cmid($cmid);
 
