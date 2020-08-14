@@ -22,35 +22,34 @@ const faderHTML = strAwaitingProctoring + strInstructions;
 const {sessionStorage, location} = window;
 
 const TAG = 'proctoring fader';
-
-const expectedData = (x) => 'proctoringReady_n6EY';
+const expectedData = 'proctoringReady_n6EY';
 
 /**
  * Promise, which resolves when got a message proving the page is being proctored.
  */
 const waitForProof = () => new Promise(resolve => {
-  const f = e => {
+  const messageHandler = e => {
     console.debug(TAG, 'got some message', e.data);
 
-    if (expectedData(e.data)) {
+    if (expectedData === e.data) {
       resolve();
       console.debug(TAG, 'got proving message', e.data);
-      window.removeEventListener('message', f);
+      window.removeEventListener('message', messageHandler);
     }
   }
 
-  window.addEventListener("message", f);
+  window.addEventListener("message", messageHandler);
 });
 
 /**
  * Prepare the element to cover quiz contents.
  */
 const createFader = () => {
-  const x = document.createElement("div");
+  const fader = document.createElement("div");
 
-  x.innerHTML = faderHTML;
+  fader.innerHTML = faderHTML;
 
-  const style = {
+  Object.assign(fader.style, {
     position: 'fixed',
     zIndex: 1000,
     fontSize: '2em',
@@ -64,11 +63,9 @@ const createFader = () => {
     justifyContent: 'center',
     alignContent: 'center',
     flexDirection: 'column',
-  };
+  });
 
-  Object.assign(x.style, style);
-
-  return x;
+  return fader;
 };
 
 /**
