@@ -106,9 +106,10 @@ const createFader = () => {
 };
 
 window.addEventListener("DOMContentLoaded", () => {
-  document.body.appendChild(createFader());
+  const fader = createFader();
+  document.body.appendChild(fader);
 
-  proved.then(() => el.remove());
+  proved.then(() => fader.remove());
 
   /* Most of the time this action is meaningless,
    * at the same time it's always harmless. */
