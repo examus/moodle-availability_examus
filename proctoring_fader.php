@@ -75,31 +75,31 @@ let proved = new Promise(resolve => {
 /**
  * Prepare the element to cover quiz contents.
  */
-let examus_fader = () => {
-  let x = document.createElement("div")
+const examus_fader = () => {
+  const x = document.createElement("div");
 
-  x.innerHTML = fader_html
+  x.innerHTML = fader_html;
 
-  let style = {
+  const style = {
     position: 'fixed',
     zIndex: 1000,
-    font-size: 2em,
-    width: 100%,
-    height: 100%,
-    background: #fff,
+    fontSize: '2em',
+    width: '100%',
+    height: '100%',
+    background: '#fff',
     top: 0,
     left: 0,
-    text-align: center,
-    display: flex,
-    justify-content: center,
-    align-content: center,
-    flex-direction: column
-  }
+    textAlign: 'center',
+    display: 'flex',
+    justifyContent: 'center',
+    alignContent: 'center',
+    flexDirection: 'column',
+  };
 
-  Object.assign(x.style, style)
+  Object.assign(x.style, style);
 
-  return x
-}
+  return x;
+};
 
 window.addEventListener("DOMContentLoaded", function() {
   let el = examus_fader()
