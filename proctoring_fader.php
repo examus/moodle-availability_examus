@@ -15,17 +15,18 @@
  */
 (function(){
 
-var str_awaiting_proctoring = <?= json_encode(get_string('fader_awaiting_proctoring', 'availability_examus')) ?>;
-var str_instructions = <?= json_encode(get_string('fader_instructions', 'availability_examus')) ?>;
-let fader_html = str_awaiting_proctoring + str_instructions
+const strAwaitingProctoring = <?= json_encode(get_string('fader_awaiting_proctoring', 'availability_examus')) ?>;
+const strInstructions = <?= json_encode(get_string('fader_instructions', 'availability_examus')) ?>;
+const faderHTML = strAwaitingProctoring + strInstructions;
 
-let {sessionStorage, location} = window
+const {sessionStorage, location} = window;
 
-let TAG = 'proctoring fader'
+const TAG = 'proctoring fader';
 
-let key = 'examus-client-origin'
+const storageKey = 'examus-client-origin';
+const urlParam   = 'examus-client-origin';
 
-let expected_data = 'proctoringReady_n6EY'
+const expectedData = 'proctoringReady_n6EY';
 
 /*
  * Origin of sender, that is of the proctoring application.
@@ -33,52 +34,55 @@ let expected_data = 'proctoringReady_n6EY'
  * then we've got a previously known value.
  */
 
-let from_storage = () => sessionStorage.get(key)
-let to_storage = x => sessionStorage.set(key, x)
-let from_url = () =>
+const fromStorage = ()  => sessionStorage.get(storageKey);
+const toStorage   = (x) => sessionStorage.set(storageKey, x);
+
+const fromUrl = () =>
   new URL(location.href)
   .searchParams
-  .get('examus-client-origin')
+  .get(urlParam);
 
 /* We prefer the value stored in sessionStorage,
  * to resist against spoofing of the query param. */
 
 /* Read value from url only when there is no value stored yet. */
-if (!from_storage()) to_storage(from_url())
+if (!fromStorage()){
+  toStorage(fromUrl());
+}
 
-let expected_origin = from_storage()
+const expectedOrigin = fromStorage();
 
-if (!expected_origin) {
-  console.error(TAG, 'missing `expected_origin`')
+if (!expectedOrigin) {
+  console.error(TAG, 'missing `expectedOrigin`');
 }
 
 /**
  * Promise, which resolves when got a message proving the page is being proctored.
  * TODO postpone the effect
  */
-let proved = new Promise(resolve => {
-  let f = e => {
-    console.debug(TAG, 'got some message', e.origin, expected_origin)
+const proved = new Promise(resolve => {
+  const f = e => {
+    console.debug(TAG, 'got some message', e.origin, expectedOrigin);
 
-    if (e.origin === expected_origin &&
-        e.data === expected_data
+    if (e.origin === expectedOrigin &&
+        e.data === expectedData
     ) {
-      resolve()
-      console.debug(TAG, 'got proved message', e.data)
-      window.removeEventListener('message', f)
+      resolve();
+      console.debug(TAG, 'got proved message', e.data);
+      window.removeEventListener('message', f);
     }
   }
 
-  window.addEventListener("message", f)
-})
+  window.addEventListener("message", f);
+});
 
 /**
  * Prepare the element to cover quiz contents.
  */
-const examus_fader = () => {
+const createFader = () => {
   const x = document.createElement("div");
 
-  x.innerHTML = fader_html;
+  x.innerHTML = faderHTML;
 
   const style = {
     position: 'fixed',
@@ -101,16 +105,14 @@ const examus_fader = () => {
   return x;
 };
 
-window.addEventListener("DOMContentLoaded", function() {
-  let el = examus_fader()
+window.addEventListener("DOMContentLoaded", () => {
+  document.body.appendChild(createFader());
 
-  document.body.appendChild(el)
-
-  proved.then(() => el.remove())
+  proved.then(() => el.remove());
 
   /* Most of the time this action is meaningless,
    * at the same time it's always harmless. */
-  window.parent.postMessage('proctoringRequest', expected_origin);
+  window.parent.postMessage('proctoringRequest', expectedOrigin);
 });
 
 })();
