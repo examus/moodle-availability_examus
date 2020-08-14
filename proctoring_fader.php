@@ -23,52 +23,18 @@ const {sessionStorage, location} = window;
 
 const TAG = 'proctoring fader';
 
-const storageKey = 'examus-client-origin';
-const urlParam   = 'examus-client-origin';
-
-const expectedData = 'proctoringReady_n6EY';
-
-/*
- * Origin of sender, that is of the proctoring application.
- * We cache it in `sessionStorage`, so that if it occasionally disappears from the url,
- * then we've got a previously known value.
- */
-
-const fromStorage = ()  => sessionStorage.get(storageKey);
-const toStorage   = (x) => sessionStorage.set(storageKey, x);
-
-const fromUrl = () =>
-  new URL(location.href)
-  .searchParams
-  .get(urlParam);
-
-/* We prefer the value stored in sessionStorage,
- * to resist against spoofing of the query param. */
-
-/* Read value from url only when there is no value stored yet. */
-if (!fromStorage()){
-  toStorage(fromUrl());
-}
-
-const expectedOrigin = fromStorage();
-
-if (!expectedOrigin) {
-  console.error(TAG, 'missing `expectedOrigin`');
-}
+const expectedData = (x) => 'proctoringReady_n6EY';
 
 /**
  * Promise, which resolves when got a message proving the page is being proctored.
- * TODO postpone the effect
  */
-const proved = new Promise(resolve => {
+const waitForProof = () => new Promise(resolve => {
   const f = e => {
-    console.debug(TAG, 'got some message', e.origin, expectedOrigin);
+    console.debug(TAG, 'got some message', e.data);
 
-    if (e.origin === expectedOrigin &&
-        e.data === expectedData
-    ) {
+    if (expectedData(e.data)) {
       resolve();
-      console.debug(TAG, 'got proved message', e.data);
+      console.debug(TAG, 'got proving message', e.data);
       window.removeEventListener('message', f);
     }
   }
@@ -105,15 +71,18 @@ const createFader = () => {
   return x;
 };
 
+/**
+ * Run.
+ */
+
+/* Prepare to catch the message early. */
+const proved = waitForProof();
+
 window.addEventListener("DOMContentLoaded", () => {
   const fader = createFader();
   document.body.appendChild(fader);
 
   proved.then(() => fader.remove());
-
-  /* Most of the time this action is meaningless,
-   * at the same time it's always harmless. */
-  window.parent.postMessage('proctoringRequest', expectedOrigin);
 });
 
 })();
