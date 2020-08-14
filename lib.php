@@ -51,9 +51,6 @@ function availability_examus_before_standard_html_head(){
         return;
     }
 
-
-    $origin = isset($_SESSION['examus_client_origin']) ? $_SESSION['examus_client_origin'] : '';
-
     ob_start();
     include(dirname(__FILE__).'/proctoring_fader.php');
     $output = ob_get_clean();
