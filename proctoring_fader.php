@@ -1,10 +1,28 @@
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+defined('MOODLE_INTERNAL') || die();
+?>
 <script type="text/javascript">
     (function(){
-      var str_awaiting_proctoring = <?= json_encode(get_string('fader_awaiting_proctoring', 'availability_examus')) ?>;
-      var str_instructions = <?= json_encode(get_string('fader_instructions', 'availability_examus')) ?>;
+      var str_awaiting_proctoring = <?php echo json_encode(get_string('fader_awaiting_proctoring', 'availability_examus')) ?>;
+      var str_instructions = <?php echo json_encode(get_string('fader_instructions', 'availability_examus')) ?>;
       //msg queue, inited ASAP, so we don't miss anything
       var examus_q = [];
-      var expected_origin = <?= json_encode($origin) ?>;
+      var expected_origin = <?php echo json_encode($origin) ?>;
 
       console.log(expected_origin);
 

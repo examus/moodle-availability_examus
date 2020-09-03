@@ -33,15 +33,15 @@ require_capability('availability/examus:logaccess', $context);
 
 global $PAGE;
 
-$base_url = '/availability/condition/examus/index.php';
+$baseurl = '/availability/condition/examus/index.php';
 
 $action = optional_param('action', 'index', PARAM_ALPHA);
 
-if($action == 'renew'){
+if ($action == 'renew') {
     $id = required_param('id', PARAM_TEXT);
     $force = optional_param('force', false, PARAM_TEXT);
 
-    if(\availability_examus\common::reset_entry(['id' => $id], $force)){
+    if (\availability_examus\common::reset_entry(['id' => $id], $force)) {
         redirect('index.php', get_string('new_entry_created', 'availability_examus'),
                  null, \core\output\notification::NOTIFY_SUCCESS);
     } else {
@@ -50,8 +50,8 @@ if($action == 'renew'){
     }
 }
 
-if($action == 'index'){
-    $PAGE->set_url(new \moodle_url($base_url));
+if ($action == 'index') {
+    $PAGE->set_url(new \moodle_url($baseurl));
     $PAGE->set_context($context);
 
     echo $OUTPUT->header();
@@ -67,14 +67,14 @@ if($action == 'index'){
     $from = isset($_GET['from']) ? $_GET['from'] : ['day' => null, 'month' => null, 'year' => null];
     $to = isset($_GET['to']) ? $_GET['to'] : ['day' => date('j'), 'month' => date('n'), 'year' => date('Y')];
 
-    if($from['day'] > 0 && $from['month'] > 0 && $from['year'] > 0){
+    if ($from['day'] > 0 && $from['month'] > 0 && $from['year'] > 0) {
         $filters = array_merge($filters, [
             'from[day]'     => $from['day'],
             'from[month]'   => $from['month'],
             'from[year]'    => $from['year'],
         ]);
     }
-    if($to['day'] > 0 && $to['month'] > 0 && $to['year'] > 0){
+    if ($to['day'] > 0 && $to['month'] > 0 && $to['year'] > 0) {
         $filters = array_merge($filters, [
             'to[day]'     => $to['day'],
             'to[month]'   => $to['month'],
@@ -88,18 +88,18 @@ if($action == 'index'){
     $log->render_table();
 }
 
-if($action == 'show'){
+if ($action == 'show') {
     $id = required_param('id', PARAM_TEXT);
 
-    $url = new \moodle_url($base_url, ['action'=> $action, 'id' => $id]);
+    $url = new \moodle_url($baseurl, ['action' => $action, 'id' => $id]);
     $PAGE->set_url($url);
     $PAGE->set_context($context);
 
     echo $OUTPUT->header();
     echo $OUTPUT->heading(get_string('pluginname', 'availability_examus'));
 
-    $log_details = new \availability_examus\log_details($id, $url);
-    $log_details->render();
+    $logdetails = new \availability_examus\log_details($id, $url);
+    $logdetails->render();
 }
 
 

@@ -73,8 +73,8 @@ class frontend extends \core_availability\frontend {
 
         $courseid = $course->id;
 
-        $groups=[];
-        $groups = $DB->get_records('groups', ['courseid'=> $courseid], 'name', 'id,name');
+        $groups = [];
+        $groups = $DB->get_records('groups', ['courseid' => $courseid], 'name', 'id,name');
 
         return [$rules, $groups];
     }

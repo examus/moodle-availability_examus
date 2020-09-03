@@ -76,14 +76,13 @@ function xmldb_availability_examus_upgrade($oldversion) {
         $fields[] = new xmldb_field('session_end', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
         $fields[] = new xmldb_field('warnings', XMLDB_TYPE_TEXT, null, null, null, null, null);
 
-        foreach($fields as $field){
+        foreach ($fields as $field) {
             if (!$dbman->field_exists($table, $field)) {
                 $dbman->add_field($table, $field);
             }
         }
 
     }
-
 
     return true;
 }

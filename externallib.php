@@ -50,7 +50,7 @@ class availability_examus_external extends external_api {
     }
 
 
-    static function moduleanswer($entry) {
+    protected static function moduleanswer($entry) {
         global $DB;
 
         $course = get_course($entry->courseid);
@@ -76,7 +76,6 @@ class availability_examus_external extends external_api {
             'accesscode' => $entry->accesscode,
         ];
 
-
         $rules = condition::get_examus_rules($cm);
         if ($rules) {
             $moduleanswer['rules'] = $rules;
@@ -89,8 +88,6 @@ class availability_examus_external extends external_api {
         }
 
         $moduleanswer['status'] = $entry->status;
-
-
 
         return $moduleanswer;
     }
@@ -120,7 +117,7 @@ class availability_examus_external extends external_api {
                 array_push($answer, self::moduleanswer($entry));
             }
 
-        } elseif ($useremail) {
+        } else if ($useremail) {
 
             $_SESSION['examus_api'] = true;
 
@@ -136,26 +133,26 @@ class availability_examus_external extends external_api {
                 $instancesbytypes = $modinfo->get_instances();
                 foreach ($instancesbytypes as $instances) {
                     foreach ($instances as $cm) {
-                        $availibility_info = new info_module($cm);
+                        $availibilityinfo = new info_module($cm);
 
                         if (condition::has_examus_condition($cm)) {
                             $reason = '';
 
-                            if(!$cm->uservisible || !$availibility_info->is_available($reason, false, $user->id)){
+                            if (!$cm->uservisible || !$availibilityinfo->is_available($reason, false, $user->id)) {
                                 continue;
                             }
 
-                            $selected_groups = condition::get_examus_groups($cm);
-                            if(!empty($selected_groups)){
+                            $selectedgroups = condition::get_examus_groups($cm);
+                            if (!empty($selectedgroups)) {
                                 $found = false;
-                                $user_groups = $DB->get_records('groups_members', ['userid'=> $user->id], null, 'groupid');
-                                foreach($user_groups as $user_group){
-                                    if(in_array($user_group->groupid, $selected_groups)){
+                                $usergroups = $DB->get_records('groups_members', ['userid' => $user->id], null, 'groupid');
+                                foreach ($usergroups as $usergroup) {
+                                    if (in_array($usergroup->groupid, $selectedgroups)) {
                                         $found = true;
                                         break;
                                     }
                                 }
-                                if(!$found){
+                                if (!$found) {
                                     continue;
                                 }
                             }
@@ -176,7 +173,7 @@ class availability_examus_external extends external_api {
             }
         } else {
 
-            // Shows all modules
+            // Shows all modules.
 
             $courses = get_courses();
             foreach ($courses as $course) {
@@ -213,7 +210,7 @@ class availability_examus_external extends external_api {
                     'time_limit_mins' => new external_value(PARAM_INT, 'module duration', VALUE_OPTIONAL),
                     'mode' => new external_value(PARAM_TEXT, 'module proctoring mode'),
                     'scheduling_required' => new external_value(PARAM_BOOL, 'module calendar mode'),
-                    'auto_rescheduling' =>  new external_value(PARAM_BOOL, 'allow rescheduling'),
+                    'auto_rescheduling' => new external_value(PARAM_BOOL, 'allow rescheduling'),
                     'rules' => new external_single_structure([
                         'allow_to_use_websites' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
                         'allow_to_use_books' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
@@ -224,7 +221,7 @@ class availability_examus_external extends external_api {
                         'allow_to_use_human_assistant' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
                         'allow_absence_in_frame' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
                         'allow_voices' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
-                        'allow_wrong_gaze_direction'=> new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
+                        'allow_wrong_gaze_direction' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
                     ], 'rules set', VALUE_OPTIONAL),
                     'is_proctored' => new external_value(PARAM_BOOL, 'module proctored'),
                     'accesscode' => new external_value(PARAM_TEXT, 'module code'),
@@ -278,8 +275,8 @@ class availability_examus_external extends external_api {
         $comment,
         $score,
         $threshold,
-        $session_start,
-        $session_end,
+        $sessionstart,
+        $sessionend,
         $warnings
     ) {
         global $DB;
@@ -292,8 +289,8 @@ class availability_examus_external extends external_api {
             'comment' => $comment,
             'score' => $score,
             'threshold' => $threshold,
-            'session_start' => $session_start,
-            'session_end' => $session_end,
+            'session_start' => $sessionstart,
+            'session_end' => $sessionend,
             'warnings' => $warnings
         ]);
 
@@ -317,8 +314,8 @@ class availability_examus_external extends external_api {
             $entry->comment = $comment;
             $entry->score = $score;
             $entry->threshold = json_encode($threshold);
-            $entry->session_start = $session_start;
-            $entry->session_end = $session_end;
+            $entry->session_start = $sessionstart;
+            $entry->session_end = $sessionend;
             $entry->warnings = json_encode($warnings);
 
             $DB->update_record('availability_examus', $entry);
@@ -364,7 +361,7 @@ class availability_examus_external extends external_api {
 
         if ($result) {
             return ['success' => true, 'error' => null];
-        }else{
+        } else {
             return ['success' => false, 'error' => 'Entry was not found'];
         }
 

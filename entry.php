@@ -29,7 +29,7 @@ require_login();
 global $DB;
 
 $accesscode = required_param('accesscode', PARAM_RAW);
-$client_origin = optional_param('examus-client-origin', null, PARAM_URL);
+$clientorigin = optional_param('examus-client-origin', null, PARAM_URL);
 
 $entry = $DB->get_record('availability_examus', ['accesscode' => $accesscode]);
 
@@ -40,14 +40,14 @@ if ($entry) {
     $cmid = $entry->cmid;
 
     $_SESSION['examus'] = $accesscode;
-    $_SESSION['examus_client_origin'] = $client_origin;
+    $_SESSION['examus_client_origin'] = $clientorigin;
 
     list($course, $cm) = get_course_and_cm_from_cmid($cmid);
 
     redirect($cm->url->out(false));
-}else{
+} else {
     echo "Unknown access code";
 }
 
-// TODO: Show message for user that smth went wrong
+// TODO: Show message for user that something went wrong.
 die;

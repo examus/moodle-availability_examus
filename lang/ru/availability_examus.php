@@ -90,6 +90,6 @@ $string['comment'] = 'Комментарий';
 
 $string['details'] = 'Подробности';
 
-// Fader screen
+// Fader screen.
 $string['fader_awaiting_proctoring'] = 'Ожидание прокторинга';
 $string['fader_instructions'] = '<p>Используйте приложение Экзамус для прохождения тестирования</p>';

@@ -61,15 +61,15 @@ function examus_attempt_started_handler($event) {
 
     $attempt = $event->get_record_snapshot('quiz_attempts', $event->objectid);
 
-    if(isset($_SESSION['examus'])){
+    if (isset($_SESSION['examus'])) {
         $accesscode = $_SESSION['examus'];
 
         $condition = [
             'accesscode' => $accesscode
         ];
-    }else{
+    } else {
         $condition = [
-            'attemptid' => NULL,
+            'attemptid' => null,
             'status' => 'Not inited',
             'userid' => $event->userid,
             'courseid' => $event->courseid,
@@ -79,7 +79,7 @@ function examus_attempt_started_handler($event) {
 
     $entry = $DB->get_record('availability_examus', $condition);
 
-    if($entry && $attempt){
+    if ($entry && $attempt) {
         $entry->attemptid = $attempt->id;
         $entry->status = "Started";
         $DB->update_record('availability_examus', $entry);
@@ -142,7 +142,7 @@ function examus_attempt_viewed_handler($event) {
     $attempt = $event->get_record_snapshot('quiz_attempts', $event->objectid);
     $quiz = $event->get_record_snapshot('quiz', $attempt->quiz);
 
-    // Storing attempt and CM for future use
+    // Storing attempt and CM for future use.
     $EXAMUS['attempt_data'] = [
         'cm_id' => $event->get_context()->instanceid,
         'cm' => $event->get_context(),

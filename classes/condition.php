@@ -34,7 +34,7 @@ use quiz;
 use stdClass;
 
 class condition extends \core_availability\condition {
-    const EXPIRATION_SLACK = 15*60;
+    const EXPIRATION_SLACK = 15 * 60;
 
     /** @var int Default exam duration */
     protected $duration = 60;
@@ -61,16 +61,16 @@ class condition extends \core_availability\condition {
     public function __construct($structure) {
         $manual_modes = ['normal', 'identification'];
 
-        if(!empty($structure->duration)) {
+        if (!empty($structure->duration)) {
             $this->duration = $structure->duration;
         }
-        if(!empty($structure->mode)) {
+        if (!empty($structure->mode)) {
             $this->mode = $structure->mode;
         }
 
         $this->scheduling_required = in_array($this->mode, $manual_modes);
 
-        if(!empty($structure->auto_rescheduling)){
+        if (!empty($structure->auto_rescheduling)) {
             $this->auto_rescheduling = $structure->auto_rescheduling;
         }
 
@@ -325,12 +325,12 @@ class condition extends \core_availability\condition {
 
         $quizobj = quiz::create($cm->instance, $userid);
         $allowed_attempts = $quizobj->get_num_attempts_allowed();
-        $allowed_attempts = $allowed_attempts > 0 ? $allowed_attempts : NULL;
+        $allowed_attempts = $allowed_attempts > 0 ? $allowed_attempts : null;
 
         $course = $cm->get_course();
         $courseid = $course->id;
 
-        $auto_rescheduling = condition::get_auto_rescheduling($cm);
+        $auto_rescheduling = self::get_auto_rescheduling($cm);
 
         $entries = $DB->get_records('availability_examus', [
             'userid' => $userid,
@@ -345,10 +345,10 @@ class condition extends \core_availability\condition {
         }
 
         foreach ($entries as $entry) {
-            if($auto_rescheduling){
-                // Was schduled and not completed
+            if ($auto_rescheduling) {
+                // Was schduled and not completed.
                 $scheduled = !$entry->attemptid && $entry->status == 'Scheduled';
-                // Consider expired, giving 15 minutes slack
+                // Consider expired, giving 15 minutes slack.
                 $expired = time() > $entry->timescheduled + self::EXPIRATION_SLACK;
 
                 if ($scheduled && $expired) {
@@ -363,7 +363,7 @@ class condition extends \core_availability\condition {
             }
         }
 
-        if ($allowed_attempts == NULL || count($entries) < $allowed_attempts) {
+        if ($allowed_attempts == null || count($entries) < $allowed_attempts) {
             $entry = self::make_entry($courseid, $cm->id, $userid);
             $entry->id = $DB->insert_record('availability_examus', $entry);
             return $entry;

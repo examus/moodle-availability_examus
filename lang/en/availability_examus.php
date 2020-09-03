@@ -91,6 +91,6 @@ $string['comment'] = 'Comment';
 
 $string['details'] = 'Details';
 
-// Fader screen
+// Fader screen.
 $string['fader_awaiting_proctoring'] = 'Waiting for proctoring';
 $string['fader_instructions'] = '<p>Use Examus app to take the test</p>';

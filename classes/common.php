@@ -1,17 +1,32 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace availability_examus;
 use \stdClass;
 defined('MOODLE_INTERNAL') || die();
 
 class common {
-    public static function reset_entry($conditions, $force = false){
+    public static function reset_entry($conditions, $force = false) {
         global $DB;
 
         $oldentry = $DB->get_record('availability_examus', $conditions);
 
-        $not_inited = $oldentry && $oldentry->status == 'Not inited';
+        $notinited = $oldentry && $oldentry->status == 'Not inited';
 
-        if ($oldentry && (!$not_inited || $force)) {
+        if ($oldentry && (!$notinited || $force)) {
             $entries = $DB->get_records('availability_examus', [
                 'userid' => $oldentry->userid,
                 'courseid' => $oldentry->courseid,
@@ -20,8 +35,8 @@ class common {
             ]);
 
             if (count($entries) == 0 || $force) {
-                if($force){
-                    foreach($entries as $old){
+                if ($force) {
+                    foreach ($entries as $old) {
                         $old->status = "Force reset";
                         $DB->update_record('availability_examus', $old);
                     }
@@ -46,7 +61,7 @@ class common {
         }
     }
 
-    public static function delete_empty_entries($userid, $courseid, $cmid = null){
+    public static function delete_empty_entries($userid, $courseid, $cmid = null) {
         global $DB;
 
         $condition = [
@@ -55,14 +70,14 @@ class common {
           'status' => 'Not inited'
         ];
 
-        if(!empty($cmid)) {
+        if (!empty($cmid)) {
             $condition['cmid'] = $cmid;
         }
 
         $DB->delete_records('availability_examus', $condition);
     }
 
-    public static function format_date($timestamp){
+    public static function format_date($timestamp) {
         $date = $timestamp ? usergetdate($timestamp) : null;
 
         if ($date) {
