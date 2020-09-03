@@ -33,8 +33,8 @@ defined('MOODLE_INTERNAL') || die();
  */
 (function(){
 
-const strAwaitingProctoring = <?= json_encode(get_string('fader_awaiting_proctoring', 'availability_examus')) ?>;
-const strInstructions = <?= json_encode(get_string('fader_instructions', 'availability_examus')) ?>;
+const strAwaitingProctoring = <?php echo json_encode(get_string('fader_awaiting_proctoring', 'availability_examus')) ?>;
+const strInstructions = <?php echo json_encode(get_string('fader_instructions', 'availability_examus')) ?>;
 const faderHTML = strAwaitingProctoring + strInstructions;
 
 const {sessionStorage, location} = window;
