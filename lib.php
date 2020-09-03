@@ -16,6 +16,7 @@
 
 use core_availability\info_module;
 use availability_examus\condition;
+use availability_examus\state;
 
 function availability_examus_render_navbar_output() {
     global $PAGE;
@@ -36,16 +37,10 @@ function availability_examus_render_navbar_output() {
 }
 
 function availability_examus_before_standard_html_head() {
-    global $EXAMUS;
     global $DB;
 
-    // Not viewing quiz attempt.
-    if (empty($EXAMUS)) {
-        return;
-    }
-
-    if (isset($EXAMUS['attempt_data']['attempt_id'])) {
-        $attemptid = $EXAMUS['attempt_data']['attempt_id'];
+    if (isset(state::$attempt['attempt_id'])) {
+        $attemptid = state::$attempt['attempt_id'];
         $attempt = $DB->get_record('quiz_attempts', ['id' => $attemptid]);
         if (!$attempt || $attempt->state != 'inprogress') {
             return;
@@ -55,8 +50,8 @@ function availability_examus_before_standard_html_head() {
     }
 
     // Not examused quiz.
-    $cmid = $EXAMUS['attempt_data']['cm_id'];
-    $courseid = $EXAMUS['attempt_data']['course_id'];
+    $cmid = state::$attempt['cm_id'];
+    $courseid = state::$attempt['course_id'];
 
     $modinfo = get_fast_modinfo($courseid);
     $cm = $modinfo->get_cm($cmid);

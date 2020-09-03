@@ -24,6 +24,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+use availability_examus\state;
+
 /**
  * Finish attempt on attempt finish event.
  *
@@ -137,13 +139,12 @@ function examus_course_module_deleted(\core\event\course_module_deleted $event) 
  */
 function examus_attempt_viewed_handler($event) {
     global $DB;
-    global $EXAMUS;
 
     $attempt = $event->get_record_snapshot('quiz_attempts', $event->objectid);
     $quiz = $event->get_record_snapshot('quiz', $attempt->quiz);
 
     // Storing attempt and CM for future use.
-    $EXAMUS['attempt_data'] = [
+    state::$attempt = [
         'cm_id' => $event->get_context()->instanceid,
         'cm' => $event->get_context(),
         'course_id' => $event->courseid,
@@ -152,5 +153,3 @@ function examus_attempt_viewed_handler($event) {
 
     ];
 }
-
-
