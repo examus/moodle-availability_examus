@@ -218,7 +218,6 @@ class log {
 
                 // Changed condition. Allow to reset all entries.
                 // Consequences unknown.
-                // if (!$not_started || ($scheduled && $expired) ) {
                 if (!$notstarted) {
                     $row[] =
                         "<form action='index.php' method='post'>" .
@@ -227,7 +226,6 @@ class log {
                            "<input type='submit' value='" . get_string('new_entry', 'availability_examus') . "'>".
                         "</form>";
                 } else {
-                    // $row[] = "-";
                     $row[] =
                         "<form action='index.php' method='post'>" .
                            "<input type='hidden' name='id' value='" . $entry->id . "'>" .
@@ -408,7 +406,13 @@ class log {
 
         echo html_writer::start_div(null, ['class' => '', 'style' => 'padding: 0 0 0.8rem;']);
         echo html_writer::label(get_string('selectacourse'), 'menuid', false, ['class' => 'accesshide']);
-        echo html_writer::select($courses, "courseid", $courseid, get_string('allcourses', 'availability_examus'), ['style' => 'height: 2.5rem;margin-right: 0.5rem']);
+        echo html_writer::select(
+            $courses,
+            "courseid",
+            $courseid,
+            get_string('allcourses', 'availability_examus'),
+            ['style' => 'height: 2.5rem;margin-right: 0.5rem']
+        );
 
         // Add user selector.
         echo html_writer::label(get_string('selctauser'), 'menuuser', false, ['class' => 'accesshide']);
@@ -417,11 +421,18 @@ class log {
             'value' => $userquery,
             'placeholder' => get_string("userquery", 'availability_examus'),
             'class' => 'form-control',
-            'style' => 'width: auto;clear: none;display: inline-block;vertical-align: middle;font-size:inherit;height: 2.5rem;margin-right: 0.5rem'
-        ]);
+            'style' => implode(';', [
+                'width: auto',
+                'clear: none',
+                'display: inline-block',
+                'vertical-align: middle',
+                'font-size:inherit',
+                'height: 2.5rem',
+                'margin-right: 0.5rem'
+            ])
+        );
 
         // Add status selector.
-        // echo html_writer::label(get_string('selectstatus'), 'menuuser', false, array('class' => 'accesshide'));
         echo html_writer::select(
             $statuses,
             "status",
@@ -430,11 +441,7 @@ class log {
             ['style' => 'height: 2.5rem;margin-right: 0.5rem']
         );
 
-        /*
         // Add date selector.
-        echo html_writer::label(get_string('date'), 'menudate', false, ['class' => 'accesshide']);
-        echo html_writer::select($dates, "timemodified", $date, get_string('alldays'));
-        */
 
         // Get the calendar type used - see MDL-18375.
         $calendartype = \core_calendar\type_factory::get_calendar_instance();
@@ -446,7 +453,7 @@ class log {
 
         echo html_writer::end_div();
 
-        // From date
+        // From date.
         echo html_writer::start_div(null, ['class' => 'fdate_selector', 'style' => 'padding: 0 0 0.8rem;']);
 
         echo html_writer::label(get_string('fromdate',  'availability_examus'), '', false, ['style' => 'width: 12%;']);
@@ -471,7 +478,7 @@ class log {
         }
         echo html_writer::end_div();
 
-        // To date
+        // To date.
         echo html_writer::start_div(null, ['class' => 'fdate_selector', 'style' => 'padding: 0 0 0.8rem;']);
 
         echo html_writer::label(get_string('todate',  'availability_examus'), '', false, ['style' => 'width: 12%;']);
