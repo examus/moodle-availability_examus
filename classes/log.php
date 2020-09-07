@@ -430,7 +430,7 @@ class log {
                 'height: 2.5rem',
                 'margin-right: 0.5rem'
             ])
-        );
+        ]);
 
         // Add status selector.
         echo html_writer::select(
