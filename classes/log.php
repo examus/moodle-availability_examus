@@ -54,6 +54,9 @@ class log {
         $this->fetch_data();
     }
 
+    /**
+     * Fetches data for log table
+     */
     protected function fetch_data() {
         global $DB;
         $select = [
@@ -147,6 +150,9 @@ class log {
         $this->table->pagesize($this->perpage, $this->entriescount);
     }
 
+    /**
+     * Sets up \flexible_table instance
+     */
     protected function setup_table() {
         $table = new \flexible_table('availability_examus_table');
 
@@ -179,6 +185,9 @@ class log {
         $this->table = $table;
     }
 
+    /**
+     * Renders and echoes log table
+     */
     public function render_table() {
         $entries = $this->entries;
         $table = $this->table;
@@ -394,6 +403,9 @@ class log {
         return $dates;
     }
 
+    /**
+     * Renders end echoes table filters form
+     */
     public function render_filter_form() {
         global $OUTPUT;
 

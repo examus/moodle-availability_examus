@@ -52,6 +52,9 @@ class condition extends \core_availability\condition {
     /** @var array Default exam rules */
     protected $rules = [];
 
+    /**
+     * @var array Apply condition to specified groups
+     */
     protected $groups = [];
 
     /**
@@ -299,6 +302,14 @@ class condition extends \core_availability\condition {
     }
 
 
+    /**
+     * Initialize new entry, ready to write to DB
+     * @todo: move out to common?
+     * @param integer $courseid
+     * @param integer $cmid
+     * @param integer $userid
+     * @return \stdClass entry
+     */
     public static function make_entry($courseid, $cmid, $userid=null) {
         $timenow = time();
         $entry = new stdClass();
@@ -316,9 +327,10 @@ class condition extends \core_availability\condition {
     /**
      * create entry if not exist
      *
-     * @param int $userid User id
-     * @param int $courseid Course id
-     * @param int $cmid Cm id
+     * @todo: move out to common?
+     * @param integer $userid User id
+     * @param integer $courseid Course id
+     * @param integer $cmid Cm id
      * @return stdClass
      */
     private static function create_entry_if_not_exist($userid, $cm) {

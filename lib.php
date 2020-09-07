@@ -27,6 +27,10 @@ use core_availability\info_module;
 use availability_examus\condition;
 use availability_examus\state;
 
+/**
+ * Hooks into navbar rendering, add link to log, if user has such capability
+ * @return string
+ */
 function availability_examus_render_navbar_output() {
     global $PAGE;
 
@@ -45,6 +49,13 @@ function availability_examus_render_navbar_output() {
     return '';
 }
 
+/**
+ * Hooks into head rendering. Adds proctoring fader/shade and accompanying javascript
+ * This is used to prevent users from seeing questions before it is known that 
+ * attempt is viewed thorough Examus WebApp
+ * 
+ * @return string
+ */
 function availability_examus_before_standard_html_head() {
     global $DB;
 
@@ -52,10 +63,10 @@ function availability_examus_before_standard_html_head() {
         $attemptid = state::$attempt['attempt_id'];
         $attempt = $DB->get_record('quiz_attempts', ['id' => $attemptid]);
         if (!$attempt || $attempt->state != 'inprogress') {
-            return;
+            return '';
         }
     } else {
-        return;
+        return '';
     }
 
     // Not examused quiz.

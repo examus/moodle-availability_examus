@@ -39,6 +39,9 @@ class log_details {
         $this->id = $id;
     }
 
+    /**
+     * Renders and echoes log entry detail page
+     */
     public function render() {
         global $DB;
         $entry = $DB->get_record('availability_examus', ['id' => $this->id]);

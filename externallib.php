@@ -31,11 +31,7 @@ use core_availability\info_module;
 use availability_examus\condition;
 use availability_examus\common;
 
-/**
- * Availability examus class
- * @copyright  2017 Max Pomazuev
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+
 class availability_examus_external extends external_api {
 
     /**
@@ -51,6 +47,12 @@ class availability_examus_external extends external_api {
     }
 
 
+    /**
+     * Prepares entry data for outside world
+     * 
+     * @param \stdClass $entry
+     * @return array Entry data, ready for serialization
+     */
     protected static function moduleanswer($entry) {
         global $DB;
 
@@ -92,11 +94,12 @@ class availability_examus_external extends external_api {
 
         return $moduleanswer;
     }
+
     /**
-     * Returns welcome message
+     * Returns list of entries based on provided criteria
      *
-     * @param string $useremail Useremail
-     * @param string $accesscode Accesscode
+     * @param string|null $useremail Useremail
+     * @param string|null $accesscode Accesscode
      * @return array
      */
     public static function user_proctored_modules($useremail, $accesscode) {
@@ -260,7 +263,7 @@ class availability_examus_external extends external_api {
     }
 
     /**
-     * Returns welcome message
+     * Stores entry review results
      *
      * @param string $accesscode accesscode
      * @param string $status status
@@ -352,8 +355,6 @@ class availability_examus_external extends external_api {
      * @return array
      */
     public static function reset_entry($accesscode) {
-        global $DB;
-
         self::validate_parameters(self::reset_entry_parameters(), [
             'accesscode' => $accesscode,
         ]);

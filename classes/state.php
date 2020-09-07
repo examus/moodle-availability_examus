@@ -33,5 +33,8 @@ defined('MOODLE_INTERNAL') || die();
  * actual codestyle for globals, or written codestyle rules.
  */
 class state {
+    /**
+     * @var array $attempt Array containing data about current attempt
+     */
     public static $attempt;
 }

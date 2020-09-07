@@ -27,7 +27,18 @@ namespace availability_examus;
 use \stdClass;
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Collection of static methods, used throughout the code
+ */
 class common {
+    /**
+     * Resets user entry ensuring there is only one 'not inited' entry. 
+     * If there is already one not inited entry, return it(unless forse reset is requested)
+     * @todo Rework this function to be more readable
+     * @param array $conditions array of conditions 
+     * @param boolean $force
+     * @return \stdClass|null entry or null
+     */
     public static function reset_entry($conditions, $force = false) {
         global $DB;
 
@@ -65,11 +76,17 @@ class common {
 
                 return $entry;
             } else {
-                return false;
+                return null;
             }
         }
     }
 
+    /**
+     * Deletes entries that have "Not inited" status
+     * @param integer|string $userid
+     * @param integer|string $courseid
+     * @param integer|string|null $cmid
+     */
     public static function delete_empty_entries($userid, $courseid, $cmid = null) {
         global $DB;
 
@@ -86,6 +103,11 @@ class common {
         $DB->delete_records('availability_examus', $condition);
     }
 
+    /**
+     * Format timestamp as YYYY.MM.DD HH:MM, converting from GMT to user's timezone
+     * @param integer $timestamp Timestamp in GMT
+     * @return string|null
+     */
     public static function format_date($timestamp) {
         $date = $timestamp ? usergetdate($timestamp) : null;
 
