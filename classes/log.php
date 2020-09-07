@@ -14,6 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Availability plugin for integration with Examus proctoring system.
+ *
+ * @package    availability_examus
+ * @copyright  2019-2020 Maksim Burnin <maksim.burnin@gmail.com>
+ * @copyright  based on work by 2017 Max Pomazuev
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace availability_examus;
 use \stdClass;
 use \html_writer;
