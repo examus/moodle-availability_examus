@@ -349,7 +349,7 @@ class condition extends \core_availability\condition {
             'userid' => $userid,
             'courseid' => $courseid,
             'cmid' => $cm->id,
-        ], $sort = 'id');
+        ], 'id');
 
         foreach ($entries as $entry) {
             if ($entry->status == 'Not inited') {

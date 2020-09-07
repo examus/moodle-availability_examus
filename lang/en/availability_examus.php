@@ -25,6 +25,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * @global
+ * @var array $string
+ */
 $string['examus:logaccess'] = 'Examus log access';
 $string['examus:logaccess_course'] = 'Examus log access for course';
 $string['examus:logaccess_all'] = 'Examus log access for all courses';

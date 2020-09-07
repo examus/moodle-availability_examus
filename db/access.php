@@ -25,6 +25,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * @global
+ * @var array $capabilities
+ */
 $capabilities = [
     'availability/examus:logaccess' => [
         'riskbitmask' => RISK_PERSONAL | RISK_CONFIG,

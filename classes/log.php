@@ -24,7 +24,6 @@
  */
 
 namespace availability_examus;
-use \stdClass;
 use \html_writer;
 
 defined('MOODLE_INTERNAL') || die();
@@ -223,8 +222,6 @@ class log {
 
                 $notstarted = $entry->status == 'Not inited' || $scheduled;
 
-                $expired = time() > $entry->timescheduled + condition::EXPIRATION_SLACK;
-
                 $row[] = $entry->score;
 
                 $detailsurl = new \moodle_url('/availability/condition/examus/index.php', [
@@ -412,17 +409,13 @@ class log {
         $courseid = $this->filters['courseid'];
 
         $userquery = $this->filters['userquery'];
-        $date = $this->filters['timemodified'];
         $status = $this->filters['status'];
 
         echo html_writer::start_tag('form', ['class' => 'examuslogselecform', 'action' => $this->url, 'method' => 'get']);
         echo html_writer::start_div();
 
         // Add course selector.
-        $sitecontext = \context_system::instance();
         $courses = $this->get_course_list();
-        $users = $this->get_user_list();
-        $dates = $this->get_date_options();
         $statuses = $this->get_status_list();
 
         echo html_writer::start_div(null, ['class' => '', 'style' => 'padding: 0 0 0.8rem;']);

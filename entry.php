@@ -41,7 +41,7 @@ if ($entry) {
 
     $_SESSION['examus'] = $accesscode;
 
-    list($course, $cm) = get_course_and_cm_from_cmid($cmid);
+    list(, $cm) = get_course_and_cm_from_cmid($cmid);
 
     redirect($cm->url->out(false));
 } else {

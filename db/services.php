@@ -56,7 +56,11 @@ $functions = [
 
 ];
 
-// We define the services to install as pre-build services. A pre-build service is not editable by administrator.
+/**
+ * We define the services to install as pre-build services. A pre-build service is not editable by administrator.
+ * @global
+ * @var array $services
+ */
 $services = [
     'Examus' => [
         'functions' => array_keys($functions),

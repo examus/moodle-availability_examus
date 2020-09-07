@@ -24,8 +24,6 @@
  */
 
 namespace availability_examus;
-use stdClass;
-use html_writer;
 
 defined('MOODLE_INTERNAL') || die();
 
