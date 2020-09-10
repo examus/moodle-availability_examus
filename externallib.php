@@ -49,7 +49,7 @@ class availability_examus_external extends external_api {
 
     /**
      * Prepares entry data for outside world
-     * 
+     *
      * @param \stdClass $entry
      * @return array Entry data, ready for serialization
      */
