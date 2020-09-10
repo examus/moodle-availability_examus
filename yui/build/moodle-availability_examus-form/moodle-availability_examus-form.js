@@ -64,7 +64,7 @@ M.availability_examus.form.getNode = function(json) {
     if(this.groups){
         html += '<div class="groups">';
 
-        html += '<label>Use examus only for selected groups:</label>';
+        html += '<label>' + getString('select_groups') + ':</label>';
         for (var i in this.groups) {
             id = this.groups[i].id;
             var name = this.groups[i].name;

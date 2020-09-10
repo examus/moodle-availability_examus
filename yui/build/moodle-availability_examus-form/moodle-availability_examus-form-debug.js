@@ -23,7 +23,6 @@ M.availability_examus.form.instId = 0;
 
 M.availability_examus.form.getNode = function(json) {
     var html, node, root, id, modeId, durationId, keyId;
-    console.log(json);
 
     /** Returns string from translations. */
     function getString(identifier) {
@@ -65,7 +64,7 @@ M.availability_examus.form.getNode = function(json) {
     if(this.groups){
         html += '<div class="groups">';
 
-        html += '<label>Use examus only for selected groups:</label>';
+        html += '<label>' + getString('select_groups') + ':</label>';
         for (var i in this.groups) {
             id = this.groups[i].id;
             var name = this.groups[i].name;
@@ -155,7 +154,6 @@ M.availability_examus.form.fillValue = function(value, node) {
         }
     });
 
-    console.log('value', value);
 };
 
 M.availability_examus.form.fillErrors = function(errors, node) {
