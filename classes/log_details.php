@@ -37,13 +37,14 @@ class log_details {
      * @var integer Entry id
      */
     protected $id = null;
-    
+
     /**
      * @var string URL
      */
     protected $url = null;
 
     /**
+     * Constructor
      * @param integer $id Entry id
      * @param string $url
      */

@@ -25,10 +25,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-/**
- * @global
- * @var array $observers
- */
 $observers = [
     [
         'eventname' => 'core\event\course_module_deleted',

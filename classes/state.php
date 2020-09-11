@@ -29,7 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Holds global state to pass data from event handlers to other code.
- * 
+ *
  * Used to avoid using gloals and violating either.
  * actual codestyle for globals, or written codestyle rules.
  */

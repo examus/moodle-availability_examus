@@ -38,17 +38,17 @@ class log {
      * @var array Entries to display
      */
     protected $entries = [];
-    
+
     /**
      * @var integer Total count of entries
      */
     protected $entriescount = null;
-    
+
     /**
      * @var integer
      */
     protected $perpage = 30;
-    
+
     /**
      * @var integer
      */
@@ -58,17 +58,22 @@ class log {
      * @var \flexible_table
      */
     protected $table = null;
-    
+
     /**
      * @var string URL
      */
     protected $url = null;
-    
+
     /**
      * @var array list of filters
      */
     protected $filters = null;
 
+    /**
+     * Constructor
+     * @param array $filters Filters
+     * @param integer $page Page
+     */
     public function __construct($filters, $page) {
         global $PAGE;
 

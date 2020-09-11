@@ -35,7 +35,7 @@ use quiz;
 use stdClass;
 
 /**
- * @inheritdoc
+ * Examus condition
  */
 class condition extends \core_availability\condition {
     /**
@@ -333,7 +333,7 @@ class condition extends \core_availability\condition {
      * create entry if not exist
      *
      * @param integer $userid User id
-     * @param integer $cmid Cm id
+     * @param integer $cm Cm id
      * @return stdClass
      */
     private static function create_entry_if_not_exist($userid, $cm) {
