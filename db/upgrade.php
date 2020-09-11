@@ -52,7 +52,6 @@ function xmldb_availability_examus_upgrade($oldversion) {
 
         // Examus savepoint reached.
         upgrade_plugin_savepoint(true, 2017061602, 'availability', 'examus');
-
     }
 
     if ($oldversion < 2019031502) {
@@ -65,6 +64,8 @@ function xmldb_availability_examus_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
+        // Examus savepoint reached.
+        upgrade_plugin_savepoint(true, 2019031502, 'availability', 'examus');
     }
 
     if ($oldversion < 2020041303) {
@@ -83,6 +84,8 @@ function xmldb_availability_examus_upgrade($oldversion) {
             }
         }
 
+        // Examus savepoint reached.
+        upgrade_plugin_savepoint(true, 202004130, 'availability', 'examus');
     }
 
     return true;
