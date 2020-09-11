@@ -85,7 +85,7 @@ function xmldb_availability_examus_upgrade($oldversion) {
         }
 
         // Examus savepoint reached.
-        upgrade_plugin_savepoint(true, 202004130, 'availability', 'examus');
+        upgrade_plugin_savepoint(true, 2020041303, 'availability', 'examus');
     }
 
     return true;
