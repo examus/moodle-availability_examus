@@ -32,10 +32,10 @@ defined('MOODLE_INTERNAL') || die();
  */
 class common {
     /**
-     * Resets user entry ensuring there is only one 'not inited' entry. 
+     * Resets user entry ensuring there is only one 'not inited' entry.
      * If there is already one not inited entry, return it(unless forse reset is requested)
      * @todo Rework this function to be more readable
-     * @param array $conditions array of conditions 
+     * @param array $conditions array of conditions
      * @param boolean $force
      * @return \stdClass|null entry or null
      */

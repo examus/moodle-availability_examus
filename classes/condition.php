@@ -34,7 +34,13 @@ use moodle_exception;
 use quiz;
 use stdClass;
 
+/**
+ * @inheritdoc
+ */
 class condition extends \core_availability\condition {
+    /**
+     * @var integer Time for entry to expire
+     */
     const EXPIRATION_SLACK = 15 * 60;
 
     /** @var int Default exam duration */
@@ -304,7 +310,6 @@ class condition extends \core_availability\condition {
 
     /**
      * Initialize new entry, ready to write to DB
-     * @todo: move out to common?
      * @param integer $courseid
      * @param integer $cmid
      * @param integer $userid
@@ -327,9 +332,7 @@ class condition extends \core_availability\condition {
     /**
      * create entry if not exist
      *
-     * @todo: move out to common?
      * @param integer $userid User id
-     * @param integer $courseid Course id
      * @param integer $cmid Cm id
      * @return stdClass
      */

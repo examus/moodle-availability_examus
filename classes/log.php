@@ -30,14 +30,43 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/tablelib.php');
 
+/**
+ * Displays and filters log entries
+ */
 class log {
+    /**
+     * @var array Entries to display
+     */
     protected $entries = [];
+    
+    /**
+     * @var integer Total count of entries
+     */
     protected $entriescount = null;
+    
+    /**
+     * @var integer
+     */
     protected $perpage = 30;
+    
+    /**
+     * @var integer
+     */
     protected $page = 0;
 
+    /**
+     * @var \flexible_table
+     */
     protected $table = null;
+    
+    /**
+     * @var string URL
+     */
     protected $url = null;
+    
+    /**
+     * @var array list of filters
+     */
     protected $filters = null;
 
     public function __construct($filters, $page) {

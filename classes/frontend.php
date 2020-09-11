@@ -29,8 +29,6 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Frontend class
- * @copyright  2017 Max Pomazuev
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class frontend extends \core_availability\frontend {
 

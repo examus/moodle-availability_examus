@@ -29,10 +29,24 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/tablelib.php');
 
+/**
+ * Outputs detailed info about log entry
+ */
 class log_details {
+    /**
+     * @var integer Entry id
+     */
     protected $id = null;
+    
+    /**
+     * @var string URL
+     */
     protected $url = null;
 
+    /**
+     * @param integer $id Entry id
+     * @param string $url
+     */
     public function __construct($id, $url) {
         $this->id = $id;
     }

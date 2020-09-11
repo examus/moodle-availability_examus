@@ -32,6 +32,9 @@ use availability_examus\condition;
 use availability_examus\common;
 
 
+/**
+ * External API
+ */
 class availability_examus_external extends external_api {
 
     /**
@@ -269,6 +272,12 @@ class availability_examus_external extends external_api {
      * @param string $status status
      * @param string $reviewlink reviewlink
      * @param string $timescheduled timescheduled
+     * @param string $comment Proctoring comment
+     * @param float $score Proctoring score
+     * @param float $threshold Proctoring score threshold
+     * @param integer $sessionstart Quiz/Proctoring start time
+     * @param integer $sessionend  Quiz/Proctoring end time
+     * @param array $warnings Warnings
      * @return array
      */
     public static function submit_proctoring_review(
