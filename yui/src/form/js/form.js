@@ -21,8 +21,8 @@ M.availability_examus.form.getNode = function(json) {
     var html, node, root, id, modeId, durationId, keyId;
 
     /**
-     * @param string identifier A string identifier
-     * @returns string A string from translations.
+     * @param {string} identifier A string identifier
+     * @returns {string} A string from translations.
      */
     function getString(identifier) {
         return M.util.get_string(identifier, 'availability_examus');
@@ -91,8 +91,7 @@ M.availability_examus.form.getNode = function(json) {
 
     if (json.auto_rescheduling !== undefined) {
         var value = json.auto_rescheduling ? 'checked' : null;
-        node.one('#'+autoReschedulingId).set('checked', value);
-
+        node.one('#' + autoReschedulingId).set('checked', value);
     }
 
     if (json.rules === undefined) {

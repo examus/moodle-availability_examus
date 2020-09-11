@@ -1,6 +1,5 @@
 YUI.add('moodle-availability_examus-form', function (Y, NAME) {
 
-/* global M */
 /**
  * JavaScript for form editing profile conditions.
  *
@@ -13,8 +12,7 @@ M.availability_examus.form = Y.Object(M.core_availability.plugin);
 
 M.availability_examus.form.rules = null;
 
-M.availability_examus.form.initInner = function(rules, groups)
-{
+M.availability_examus.form.initInner = function(rules, groups) {
     this.rules = rules;
     this.groups = groups;
 };
@@ -24,7 +22,10 @@ M.availability_examus.form.instId = 0;
 M.availability_examus.form.getNode = function(json) {
     var html, node, root, id, modeId, durationId, keyId;
 
-    /** Returns string from translations. */
+    /**
+     * @param {string} identifier A string identifier
+     * @returns {string} A string from translations.
+     */
     function getString(identifier) {
         return M.util.get_string(identifier, 'availability_examus');
     }
@@ -61,7 +62,7 @@ M.availability_examus.form.getNode = function(json) {
     }
     html += '</div>';
 
-    if(this.groups){
+    if (this.groups) {
         html += '<div class="groups">';
 
         html += '<label>' + getString('select_groups') + ':</label>';
@@ -72,7 +73,7 @@ M.availability_examus.form.getNode = function(json) {
 
             html += '<br>'
                 + '<label>'
-                + '<input value='+id+' type="checkbox" name=groups[] '+checked+'>'
+                + '<input value=' + id + ' type="checkbox" name=groups[] ' + checked + '>'
                 + '&nbsp;' + name
                 + '</label>';
         }
@@ -92,17 +93,16 @@ M.availability_examus.form.getNode = function(json) {
 
     if (json.auto_rescheduling !== undefined) {
         var value = json.auto_rescheduling ? 'checked' : null;
-        node.one('#'+autoReschedulingId).set('checked', value);
-
+        node.one('#' + autoReschedulingId).set('checked', value);
     }
 
     if (json.rules === undefined) {
         json.rules = this.rules;
     }
 
-    for (key in json.rules) {
-        if (json.rules[key]) {
-            node.one('.rules input[name=' + key + ']').set('checked', 'checked');
+    for (var ruleKey in json.rules) {
+        if (json.rules[ruleKey]) {
+            node.one('.rules input[name=' + ruleKey + ']').set('checked', 'checked');
         }
     }
 
@@ -136,7 +136,7 @@ M.availability_examus.form.fillValue = function(value, node) {
 
     value.rules = {};
     rulesInputs = node.all('.rules input');
-    Y.each(rulesInputs, function (ruleInput) {
+    Y.each(rulesInputs, function(ruleInput) {
         key = ruleInput.get('value');
         if (ruleInput.get('checked') === true) {
             value.rules[key] = true;
@@ -147,7 +147,7 @@ M.availability_examus.form.fillValue = function(value, node) {
 
     value.groups = [];
     rulesInputs = node.all('.groups input');
-    Y.each(rulesInputs, function (ruleInput) {
+    Y.each(rulesInputs, function(ruleInput) {
         var id = ruleInput.get('value');
         if (ruleInput.get('checked') === true) {
             value.groups.push(id);
