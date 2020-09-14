@@ -171,8 +171,7 @@ class condition extends \core_availability\condition {
      */
     public static function get_examus_scheduling($cm) {
         $econds = self::get_examus_conditions($cm);
-        return (bool) $econds[0]->scheduling_required;
-
+        return (bool) $econds[0]->schedulingrequired;
     }
 
     /**
@@ -184,7 +183,6 @@ class condition extends \core_availability\condition {
     public static function get_examus_groups($cm) {
         $econds = self::get_examus_conditions($cm);
         return (array) (isset($econds[0]->groups) ? $econds[0]->groups : []);
-
     }
 
     /**
@@ -195,8 +193,7 @@ class condition extends \core_availability\condition {
      */
     public static function get_auto_rescheduling($cm) {
         $econds = self::get_examus_conditions($cm);
-        return (bool) $econds[0]->auto_rescheduling;
-
+        return (bool) $econds[0]->autorescheduling;
     }
 
     /**
