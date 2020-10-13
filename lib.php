@@ -68,7 +68,6 @@ function availability_examus_before_standard_html_head() {
         return '';
     }
 
-    // Not examused quiz.
     $cmid = state::$attempt['cm_id'];
     $courseid = state::$attempt['course_id'];
 
