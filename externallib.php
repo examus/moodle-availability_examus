@@ -68,7 +68,7 @@ class availability_examus_external extends external_api {
         $userpictureurl = null;
         if($user && $user->picture){
             $userpicture = new user_picture($user);
-            $userpicture->size = 1; // Size f1.
+            $userpicture->size = 200; // Size f3.
             $userpictureurl = $userpicture->get_url($PAGE)->out(false);
         }
 
