@@ -18,7 +18,8 @@
  * Availability plugin for integration with Examus proctoring system.
  *
  * @package    availability_examus
- * @copyright  2017 Max Pomazuev
+ * @copyright  2019-2020 Maksim Burnin <maksim.burnin@gmail.com>
+ * @copyright  based on work by 2017 Max Pomazuev
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -91,6 +92,6 @@ $string['comment'] = 'Comment';
 
 $string['details'] = 'Details';
 
-// Fader screen
+// Fader screen.
 $string['fader_awaiting_proctoring'] = 'Waiting for proctoring';
 $string['fader_instructions'] = '<p>Use Examus app to take the test</p>';

@@ -18,7 +18,8 @@
  * Availability plugin for integration with Examus proctoring system.
  *
  * @package    availability_examus
- * @copyright  2017 Max Pomazuev
+ * @copyright  2019-2020 Maksim Burnin <maksim.burnin@gmail.com>
+ * @copyright  based on work by 2017 Max Pomazuev
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -51,7 +52,6 @@ function xmldb_availability_examus_upgrade($oldversion) {
 
         // Examus savepoint reached.
         upgrade_plugin_savepoint(true, 2017061602, 'availability', 'examus');
-
     }
 
     if ($oldversion < 2019031502) {
@@ -64,6 +64,8 @@ function xmldb_availability_examus_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
+        // Examus savepoint reached.
+        upgrade_plugin_savepoint(true, 2019031502, 'availability', 'examus');
     }
 
     if ($oldversion < 2020041303) {
@@ -76,14 +78,15 @@ function xmldb_availability_examus_upgrade($oldversion) {
         $fields[] = new xmldb_field('session_end', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
         $fields[] = new xmldb_field('warnings', XMLDB_TYPE_TEXT, null, null, null, null, null);
 
-        foreach($fields as $field){
+        foreach ($fields as $field) {
             if (!$dbman->field_exists($table, $field)) {
                 $dbman->add_field($table, $field);
             }
         }
 
+        // Examus savepoint reached.
+        upgrade_plugin_savepoint(true, 2020041303, 'availability', 'examus');
     }
-
 
     return true;
 }

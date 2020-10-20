@@ -22,11 +22,20 @@
  * @copyright  based on work by 2017 Max Pomazuev
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+namespace availability_examus;
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'availability_examus';
-$plugin->version = 2020091102;
-$plugin->release = 'v0.8';
-$plugin->requires = 2018111800;
-$plugin->maturity = MATURITY_STABLE;
+
+/**
+ * Holds global state to pass data from event handlers to other code.
+ *
+ * Used to avoid using gloals and violating either.
+ * actual codestyle for globals, or written codestyle rules.
+ */
+class state {
+    /**
+     * @var array $attempt Array containing data about current attempt
+     */
+    public static $attempt;
+}

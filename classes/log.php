@@ -1,22 +1,79 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Availability plugin for integration with Examus proctoring system.
+ *
+ * @package    availability_examus
+ * @copyright  2019-2020 Maksim Burnin <maksim.burnin@gmail.com>
+ * @copyright  based on work by 2017 Max Pomazuev
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace availability_examus;
-use \stdClass;
 use \html_writer;
 
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/tablelib.php');
 
+/**
+ * Displays and filters log entries
+ */
 class log {
+    /**
+     * @var array Entries to display
+     */
     protected $entries = [];
-    protected $entries_count = null;
-    protected $per_page = 30;
+
+    /**
+     * @var integer Total count of entries
+     */
+    protected $entriescount = null;
+
+    /**
+     * @var integer
+     */
+    protected $perpage = 30;
+
+    /**
+     * @var integer
+     */
     protected $page = 0;
 
+    /**
+     * @var \flexible_table
+     */
     protected $table = null;
+
+    /**
+     * @var string URL
+     */
     protected $url = null;
+
+    /**
+     * @var array list of filters
+     */
     protected $filters = null;
 
+    /**
+     * Constructor
+     * @param array $filters Filters
+     * @param integer $page Page
+     */
     public function __construct($filters, $page) {
         global $PAGE;
 
@@ -30,7 +87,10 @@ class log {
         $this->fetch_data();
     }
 
-    protected function fetch_data(){
+    /**
+     * Fetches data for log table
+     */
+    protected function fetch_data() {
         global $DB;
         $select = [
             'e.id id',
@@ -53,79 +113,80 @@ class log {
         $where = ['TRUE'];
         $params = $this->filters;
 
-        if(isset($params['from[day]']) && isset($params['from[month]']) && isset($params['from[year]'])){
+        if (isset($params['from[day]']) && isset($params['from[month]']) && isset($params['from[year]'])) {
             $month = $params['from[month]'];
             $day = $params['from[day]'];
             $year = $params['from[year]'];
             unset($params['from[month]'], $params['from[day]'], $params['from[year]']);
 
-            $params['from'] = mktime(0,0,0, $month, $day, $year);
+            $params['from'] = mktime(0, 0, 0, $month, $day, $year);
         };
 
-        if(isset($params['to[day]']) && isset($params['to[month]']) && isset($params['to[year]'])){
+        if (isset($params['to[day]']) && isset($params['to[month]']) && isset($params['to[year]'])) {
             $month = $params['to[month]'];
             $day = $params['to[day]'];
             $year = $params['to[year]'];
             unset($params['to[month]'], $params['to[day]'], $params['to[year]']);
 
-            $params['to'] = mktime(23,59,59, $month, $day, $year);
+            $params['to'] = mktime(23, 59, 59, $month, $day, $year);
         };
 
-
-        foreach($params as $key => $value){
-            if(empty($value)){
+        foreach ($params as $key => $value) {
+            if (empty($value)) {
                 continue;
             }
-            switch($key){
+            switch ($key) {
                 case 'from':
-                    $where[]= 'e.timemodified > :'.$key;
+                    $where[] = 'e.timemodified > :'.$key;
                     break;
 
                 case 'to':
-                    $where[]= 'e.timemodified <= :'.$key;
+                    $where[] = 'e.timemodified <= :'.$key;
                     break;
 
                 case 'userquery':
                     $params[$key] = $value.'%';
-                    $where[]= 'u.email LIKE :'.$key;
+                    $where[] = 'u.email LIKE :'.$key;
                     break;
 
                 default:
-                    $where[]= $key.' = :'.$key;
+                    $where[] = $key.' = :'.$key;
             }
         }
 
-        $course_ids = array_keys($this->get_course_list());
-        if(!empty($course_ids)){
-            $where[]= 'courseid IN('.implode(',', $course_ids).')';
-        }else{
-            $where[]= 'FALSE';
+        $courseids = array_keys($this->get_course_list());
+        if (!empty($courseids)) {
+            $where[] = 'courseid IN('.implode(',', $courseids).')';
+        } else {
+            $where[] = 'FALSE';
         }
 
-        $orderBy = $this->table->get_sql_sort();
+        $orderby = $this->table->get_sql_sort();
 
         $query = 'SELECT '.implode(', ', $select).' FROM {availability_examus} e '
                . ' LEFT JOIN {user} u ON u.id=e.userid '
                . ' LEFT JOIN {quiz_attempts} a ON a.id=e.attemptid '
                . ' WHERE '.implode(' AND ', $where)
-               . ($orderBy ? ' ORDER BY '. $orderBy : '')
-               . ' LIMIT '.$this->per_page.' OFFSET '.($this->page * $this->per_page)
-               ;
+               . ($orderby ? ' ORDER BY '. $orderby : '')
+               . ' LIMIT '.$this->perpage.' OFFSET '.($this->page * $this->perpage);
 
-        $queryCount = 'SELECT count(e.id) as count FROM {availability_examus} e '
+        $querycount = 'SELECT count(e.id) as count FROM {availability_examus} e '
                     . ' LEFT JOIN {user} u ON u.id=e.userid '
                     . ' LEFT JOIN {quiz_attempts} a ON a.id=e.attemptid '
                     . ' WHERE '.implode(' AND ', $where);
 
         $this->entries = $DB->get_records_sql($query, $params);
 
-        $result = $DB->get_records_sql($queryCount, $params);
-        $this->entries_count = reset($result)->count;
+        $result = $DB->get_records_sql($querycount, $params);
+        $this->entriescount = reset($result)->count;
 
-        $this->table->pagesize($this->per_page, $this->entries_count);
+        $this->table->pagesize($this->perpage, $this->entriescount);
     }
 
-    protected function setup_table(){
+    /**
+     * Sets up \flexible_table instance
+     */
+    protected function setup_table() {
         $table = new \flexible_table('availability_examus_table');
 
         $table->define_columns([
@@ -157,6 +218,9 @@ class log {
         $this->table = $table;
     }
 
+    /**
+     * Renders and echoes log table
+     */
     public function render_table() {
         $entries = $this->entries;
         $table = $this->table;
@@ -188,21 +252,22 @@ class log {
                     $row[] = "-";
                 }
 
-                $scheduled =  $entry->status == 'Scheduled' && $entry->timescheduled;
+                $scheduled = $entry->status == 'Scheduled' && $entry->timescheduled;
 
-                $not_started = $entry->status == 'Not inited' || $scheduled;
-
-                $expired = time() > $entry->timescheduled + condition::EXPIRATION_SLACK;
+                $notstarted = $entry->status == 'Not inited' || $scheduled;
 
                 $row[] = $entry->score;
 
-                $details_url = new \moodle_url('/availability/condition/examus/index.php', ['id' => $entry->id, 'action' => 'show']);
-                $row[] = '<a href="'.$details_url.'">'.get_string('details', 'availability_examus').'</a>';
+                $detailsurl = new \moodle_url('/availability/condition/examus/index.php', [
+                    'id' => $entry->id,
+                    'action' => 'show'
+                ]);
 
-                // Changed condition. Allow to reset all entries
-                // Consequences unknown
-                // if (!$not_started || ($scheduled && $expired) ) {
-                if (!$not_started) {
+                $row[] = '<a href="'.$detailsurl.'">'.get_string('details', 'availability_examus').'</a>';
+
+                // Changed condition. Allow to reset all entries.
+                // Consequences unknown.
+                if (!$notstarted) {
                     $row[] =
                         "<form action='index.php' method='post'>" .
                            "<input type='hidden' name='id' value='" . $entry->id . "'>" .
@@ -210,7 +275,6 @@ class log {
                            "<input type='submit' value='" . get_string('new_entry', 'availability_examus') . "'>".
                         "</form>";
                 } else {
-                    // $row[] = "-";
                     $row[] =
                         "<form action='index.php' method='post'>" .
                            "<input type='hidden' name='id' value='" . $entry->id . "'>" .
@@ -232,13 +296,9 @@ class log {
      * @return array list of courses.
      */
     public function get_module_list() {
-        global $DB, $SITE;
+        global $DB;
 
         $courses = ['' => 'All modules'];
-
-        $sitecontext = \context_system::instance();
-        // First check to see if we can override showcourses and showusers.
-        $numcourses = $DB->count_records("course");
 
         if ($courserecords = $DB->get_records("module", null, "fullname", "id,shortname,fullname,category")) {
             foreach ($courserecords as $course) {
@@ -260,19 +320,17 @@ class log {
      * @return array list of courses.
      */
     public function get_course_list() {
-        global $DB, $SITE;
+        global $DB;
 
         $courses = [];
 
-        $site_context = \context_system::instance();
-        // First check to see if we can override showcourses and showusers.
-        $numcourses = $DB->count_records("course");
+        $sitecontext = \context_system::instance();
 
         if ($courserecords = $DB->get_records("course", null, "fullname", "id,shortname,fullname,category")) {
             foreach ($courserecords as $course) {
-                $course_context = \context_course::instance($course->id);
-                if(!has_capability('availability/examus:logaccess_all', $site_context)){
-                    if(!has_capability('availability/examus:logaccess_course', $course_context)){
+                $coursecontext = \context_course::instance($course->id);
+                if (!has_capability('availability/examus:logaccess_all', $sitecontext)) {
+                    if (!has_capability('availability/examus:logaccess_course', $coursecontext)) {
                         continue;
                     }
                 }
@@ -302,7 +360,6 @@ class log {
             'Clean' => 'Clean',
             'Suspicious' => 'Suspicious',
         ];
-
 
         return $statuses;
     }
@@ -377,29 +434,33 @@ class log {
         return $dates;
     }
 
+    /**
+     * Renders end echoes table filters form
+     */
     public function render_filter_form() {
         global $OUTPUT;
 
         $courseid = $this->filters['courseid'];
 
         $userquery = $this->filters['userquery'];
-        $date = $this->filters['timemodified'];
         $status = $this->filters['status'];
 
         echo html_writer::start_tag('form', ['class' => 'examuslogselecform', 'action' => $this->url, 'method' => 'get']);
         echo html_writer::start_div();
 
         // Add course selector.
-        $sitecontext = \context_system::instance();
         $courses = $this->get_course_list();
-        $users = $this->get_user_list();
-        $dates = $this->get_date_options();
         $statuses = $this->get_status_list();
 
         echo html_writer::start_div(null, ['class' => '', 'style' => 'padding: 0 0 0.8rem;']);
         echo html_writer::label(get_string('selectacourse'), 'menuid', false, ['class' => 'accesshide']);
-        echo html_writer::select($courses, "courseid", $courseid, get_string('allcourses', 'availability_examus'), ['style'=>'height: 2.5rem;margin-right: 0.5rem']);
-
+        echo html_writer::select(
+            $courses,
+            "courseid",
+            $courseid,
+            get_string('allcourses', 'availability_examus'),
+            ['style' => 'height: 2.5rem;margin-right: 0.5rem']
+        );
 
         // Add user selector.
         echo html_writer::label(get_string('selctauser'), 'menuuser', false, ['class' => 'accesshide']);
@@ -408,19 +469,27 @@ class log {
             'value' => $userquery,
             'placeholder' => get_string("userquery", 'availability_examus'),
             'class' => 'form-control',
-            'style' => 'width: auto;clear: none;display: inline-block;vertical-align: middle;font-size:inherit;height: 2.5rem;margin-right: 0.5rem'
+            'style' => implode(';', [
+                'width: auto',
+                'clear: none',
+                'display: inline-block',
+                'vertical-align: middle',
+                'font-size:inherit',
+                'height: 2.5rem',
+                'margin-right: 0.5rem'
+            ])
         ]);
 
         // Add status selector.
-        //echo html_writer::label(get_string('selectstatus'), 'menuuser', false, array('class' => 'accesshide'));
-        echo html_writer::select($statuses, "status", $status, get_string('allstatuses', 'availability_examus'), ['style'=>'height: 2.5rem;margin-right: 0.5rem']);
+        echo html_writer::select(
+            $statuses,
+            "status",
+            $status,
+            get_string('allstatuses', 'availability_examus'),
+            ['style' => 'height: 2.5rem;margin-right: 0.5rem']
+        );
 
-        /*
         // Add date selector.
-        echo html_writer::label(get_string('date'), 'menudate', false, ['class' => 'accesshide']);
-        echo html_writer::select($dates, "timemodified", $date, get_string('alldays'));
-        */
-
 
         // Get the calendar type used - see MDL-18375.
         $calendartype = \core_calendar\type_factory::get_calendar_instance();
@@ -432,7 +501,7 @@ class log {
 
         echo html_writer::end_div();
 
-        // From date
+        // From date.
         echo html_writer::start_div(null, ['class' => 'fdate_selector', 'style' => 'padding: 0 0 0.8rem;']);
 
         echo html_writer::label(get_string('fromdate',  'availability_examus'), '', false, ['style' => 'width: 12%;']);
@@ -441,7 +510,7 @@ class log {
             $name = 'from['.$key.']';
             $current = isset($this->filters[$name]) ? $this->filters[$name] : null;
 
-            echo html_writer::select($value, $name, $current, null, ['style'=>'height: 2.5rem;margin-right: 0.5rem']);
+            echo html_writer::select($value, $name, $current, null, ['style' => 'height: 2.5rem;margin-right: 0.5rem']);
         }
         // The YUI2 calendar only supports the gregorian calendar type so only display the calendar image if this is being used.
         if ($calendartype->get_name() === 'gregorian') {
@@ -457,7 +526,7 @@ class log {
         }
         echo html_writer::end_div();
 
-        // To date
+        // To date.
         echo html_writer::start_div(null, ['class' => 'fdate_selector', 'style' => 'padding: 0 0 0.8rem;']);
 
         echo html_writer::label(get_string('todate',  'availability_examus'), '', false, ['style' => 'width: 12%;']);
@@ -466,7 +535,7 @@ class log {
             $name = 'to['.$key.']';
             $current = isset($this->filters[$name]) ? $this->filters[$name] : null;
 
-            echo html_writer::select($value, $name, $current, null, ['style'=>'height: 2.5rem;margin-right: 0.5rem']);
+            echo html_writer::select($value, $name, $current, null, ['style' => 'height: 2.5rem;margin-right: 0.5rem']);
         }
         // The YUI2 calendar only supports the gregorian calendar type so only display the calendar image if this is being used.
         if ($calendartype->get_name() === 'gregorian') {
@@ -482,7 +551,6 @@ class log {
         }
         echo html_writer::end_div();
 
-
         echo html_writer::empty_tag('input', [
             'type' => 'submit',
             'value' => get_string('apply_filter', 'availability_examus'),
@@ -491,8 +559,5 @@ class log {
 
         echo html_writer::end_div();
         echo html_writer::end_tag('form');
-
-
-
     }
 }

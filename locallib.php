@@ -18,11 +18,14 @@
  * Availability plugin for integration with Examus proctoring system.
  *
  * @package    availability_examus
- * @copyright  2017 Max Pomazuev
+ * @copyright  2019-2020 Maksim Burnin <maksim.burnin@gmail.com>
+ * @copyright  based on work by 2017 Max Pomazuev
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
+
+use availability_examus\state;
 
 /**
  * Finish attempt on attempt finish event.
@@ -32,9 +35,6 @@ defined('MOODLE_INTERNAL') || die();
 function examus_attempt_submitted_handler($event) {
     global $DB;
 
-    $course = $DB->get_record('course', array('id' => $event->courseid));
-    $attempt = $event->get_record_snapshot('quiz_attempts', $event->objectid);
-    $quiz = $event->get_record_snapshot('quiz', $attempt->quiz);
     $cm = get_coursemodule_from_id('quiz', $event->get_context()->instanceid, $event->courseid);
 
     $userid = $event->userid;
@@ -61,15 +61,15 @@ function examus_attempt_started_handler($event) {
 
     $attempt = $event->get_record_snapshot('quiz_attempts', $event->objectid);
 
-    if(isset($_SESSION['examus'])){
+    if (isset($_SESSION['examus'])) {
         $accesscode = $_SESSION['examus'];
 
         $condition = [
             'accesscode' => $accesscode
         ];
-    }else{
+    } else {
         $condition = [
-            'attemptid' => NULL,
+            'attemptid' => null,
             'status' => 'Not inited',
             'userid' => $event->userid,
             'courseid' => $event->courseid,
@@ -79,7 +79,7 @@ function examus_attempt_started_handler($event) {
 
     $entry = $DB->get_record('availability_examus', $condition);
 
-    if($entry && $attempt){
+    if ($entry && $attempt) {
         $entry->attemptid = $attempt->id;
         $entry->status = "Started";
         $DB->update_record('availability_examus', $entry);
@@ -93,14 +93,10 @@ function examus_attempt_started_handler($event) {
  * @param stdClass $event Event
  */
 function examus_attempt_deleted_handler($event) {
-    global $DB;
-
-    $course = $DB->get_record('course', ['id' => $event->courseid]);
     $attempt = $event->get_record_snapshot('quiz_attempts', $event->objectid);
-    $quiz = $event->get_record_snapshot('quiz', $attempt->quiz);
     $cm = get_coursemodule_from_id('quiz', $event->get_context()->instanceid, $event->courseid);
 
-    $result = \availability_examus\common::reset_entry([
+    \availability_examus\common::reset_entry([
         'cmid' => $cm->id,
         'attemptid' => $attempt->id
     ]);
@@ -112,7 +108,6 @@ function examus_attempt_deleted_handler($event) {
  * @param \core\event\user_enrolment_deleted $event Event
  */
 function examus_user_enrolment_deleted(\core\event\user_enrolment_deleted $event) {
-    $course = get_course($event->courseid);
     $userid = $event->relateduserid;
 
     \availability_examus\common::delete_empty_entries($userid, $event->courseid);
@@ -136,14 +131,11 @@ function examus_course_module_deleted(\core\event\course_module_deleted $event) 
  * @param \mod_quiz\event\attempt_viewed $event Event
  */
 function examus_attempt_viewed_handler($event) {
-    global $DB;
-    global $EXAMUS;
-
     $attempt = $event->get_record_snapshot('quiz_attempts', $event->objectid);
     $quiz = $event->get_record_snapshot('quiz', $attempt->quiz);
 
-    // Storing attempt and CM for future use
-    $EXAMUS['attempt_data'] = [
+    // Storing attempt and CM for future use.
+    state::$attempt = [
         'cm_id' => $event->get_context()->instanceid,
         'cm' => $event->get_context(),
         'course_id' => $event->courseid,
@@ -152,5 +144,3 @@ function examus_attempt_viewed_handler($event) {
 
     ];
 }
-
-

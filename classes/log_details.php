@@ -1,29 +1,69 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Availability plugin for integration with Examus proctoring system.
+ *
+ * @package    availability_examus
+ * @copyright  2019-2020 Maksim Burnin <maksim.burnin@gmail.com>
+ * @copyright  based on work by 2017 Max Pomazuev
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace availability_examus;
-use \stdClass;
-use \html_writer;
 
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/tablelib.php');
 
+/**
+ * Outputs detailed info about log entry
+ */
 class log_details {
+    /**
+     * @var integer Entry id
+     */
     protected $id = null;
+
+    /**
+     * @var string URL
+     */
     protected $url = null;
 
+    /**
+     * Constructor
+     * @param integer $id Entry id
+     * @param string $url
+     */
     public function __construct($id, $url) {
         $this->id = $id;
     }
 
-    public function render(){
+    /**
+     * Renders and echoes log entry detail page
+     */
+    public function render() {
         global $DB;
         $entry = $DB->get_record('availability_examus', ['id' => $this->id]);
         $user = $DB->get_record('user', ['id' => $entry->userid]);
 
         $course = $DB->get_record('course', ['id' => $entry->courseid]);
         if (!empty($course)) {
-          $modinfo = get_fast_modinfo($course);
-          $cm = $modinfo->get_cm($entry->cmid);
+            $modinfo = get_fast_modinfo($course);
+            $cm = $modinfo->get_cm($entry->cmid);
         }
 
         $table = new \flexible_table('availability_examus_show');
@@ -35,7 +75,7 @@ class log_details {
         $table->define_baseurl($this->url);
         $table->setup();
 
-        $threshold = $entry->threshold ? json_decode($entry->threshold) : (object)['attention'=>null, 'rejected'=> null];
+        $threshold = $entry->threshold ? json_decode($entry->threshold) : (object)['attention' => null, 'rejected' => null];
 
         $table->add_data([
             get_string('date_modified', 'availability_examus'),
@@ -67,14 +107,14 @@ class log_details {
         ]);
 
         if ($entry->review_link !== null) {
-            $review_link = "<a href='" . $entry->review_link . "'>" . get_string('link', 'availability_examus') . "</a>";
+            $reviewlink = "<a href='" . $entry->review_link . "'>" . get_string('link', 'availability_examus') . "</a>";
         } else {
-            $review_link = "-";
+            $reviewlink = "-";
         }
 
         $table->add_data([
             get_string('review', 'availability_examus'),
-            $review_link,
+            $reviewlink,
         ]);
         $table->add_data([
             get_string('score', 'availability_examus'),
@@ -109,10 +149,6 @@ class log_details {
             $entry->comment,
         ]);
 
-
         $table->print_html();
-
-
-
     }
 }
