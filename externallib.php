@@ -57,11 +57,20 @@ class availability_examus_external extends external_api {
      * @return array Entry data, ready for serialization
      */
     protected static function moduleanswer($entry) {
-        global $DB;
+        global $DB, $PAGE;
 
         $course = get_course($entry->courseid);
         $modinfo = get_fast_modinfo($course);
         $cm = $modinfo->get_cm($entry->cmid);
+
+
+        $user = $DB->get_record('user', ['id' => $entry->userid]);
+        $userpictureurl = null;
+        if($user && $user->picture){
+            $userpicture = new user_picture($user);
+            $userpicture->size = 1; // Size f1.
+            $userpictureurl = $userpicture->get_url($PAGE)->out(false);
+        }
 
         $url = new moodle_url('/availability/condition/examus/entry.php', [
             'accesscode' => $entry->accesscode
@@ -80,6 +89,7 @@ class availability_examus_external extends external_api {
             'scheduling_required' => condition::get_examus_scheduling($cm),
             'auto_rescheduling' => condition::get_auto_rescheduling($cm),
             'accesscode' => $entry->accesscode,
+            'userpicture' => $userpictureurl,
         ];
 
         $rules = condition::get_examus_rules($cm);
@@ -220,6 +230,7 @@ class availability_examus_external extends external_api {
                         'allow_wrong_gaze_direction' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
                     ], 'rules set', VALUE_OPTIONAL),
                     'is_proctored' => new external_value(PARAM_BOOL, 'module proctored'),
+                    'userpicture' => new external_value(PARAM_TEXT, 'user pic url', VALUE_OPTIONAL),
                     'accesscode' => new external_value(PARAM_TEXT, 'module code'),
                     'start' => new external_value(PARAM_INT, 'module start', VALUE_OPTIONAL),
                     'end' => new external_value(PARAM_INT, 'module end', VALUE_OPTIONAL),
