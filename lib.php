@@ -56,7 +56,7 @@ function availability_examus_render_navbar_output() {
  * @return string
  */
 function availability_examus_before_standard_html_head() {
-    global $DB;
+    global $DB, $USER;
 
     if (isset(state::$attempt['attempt_id'])) {
         $attemptid = state::$attempt['attempt_id'];
@@ -76,7 +76,10 @@ function availability_examus_before_standard_html_head() {
     $cm = $modinfo->get_cm($cmid);
 
     if (!condition::has_examus_condition($cm)) {
-        return;
+        return '';
+    }
+    if(!condition::user_in_proctored_groups($cm, $USER->id)){
+        return '';
     }
 
     ob_start();

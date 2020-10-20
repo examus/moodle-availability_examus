@@ -128,7 +128,7 @@ class availability_examus_external extends external_api {
 
             $_SESSION['examus_api'] = true;
 
-            $user = $DB->get_record('user', array('email' => $useremail));
+            $user = $DB->get_record('user', ['email' => $useremail]);
             $courses = enrol_get_users_courses($user->id, true);
 
             foreach ($courses as $course) {
@@ -149,19 +149,8 @@ class availability_examus_external extends external_api {
                                 continue;
                             }
 
-                            $selectedgroups = condition::get_examus_groups($cm);
-                            if (!empty($selectedgroups)) {
-                                $found = false;
-                                $usergroups = $DB->get_records('groups_members', ['userid' => $user->id], null, 'groupid');
-                                foreach ($usergroups as $usergroup) {
-                                    if (in_array($usergroup->groupid, $selectedgroups)) {
-                                        $found = true;
-                                        break;
-                                    }
-                                }
-                                if (!$found) {
-                                    continue;
-                                }
+                            if(!condition::user_in_proctored_groups($cm, $user->id)){
+                                continue;
                             }
 
                             $entry = condition::create_entry_for_cm($user->id, $cm);
