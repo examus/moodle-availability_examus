@@ -87,10 +87,22 @@ class availability_examus_external extends external_api {
             $moduleanswer['rules'] = $rules;
         }
 
-        if ($cm->modname == "quiz") {
-            $quiz = $DB->get_record('quiz', ['id' => $cm->instance]);
-            $moduleanswer['start'] = $quiz->timeopen;
-            $moduleanswer['end'] = $quiz->timeclose;
+        // Ref
+        switch ($cm->modname) {
+            case 'quiz':
+                try {
+                    $quiz = $DB->get_record('quiz', ['id' => $cm->instance]);
+                    $moduleanswer['start'] = $quiz->timeopen;
+                    $moduleanswer['end'] = $quiz->timeclose;
+                } catch (\dml_missing_record_exception $ex) {}
+                break;
+            case 'assign':
+                try {
+                    $assign = $DB->get_record('assign', ['id' => $cm->instance]);
+                    $moduleanswer['start'] = $assign->allowsubmissionsfromdate;
+                    $moduleanswer['end'] = $assign->duedate;
+                } catch (\dml_missing_record_exception $ex) {}
+                break;
         }
 
         $moduleanswer['status'] = $entry->status;
