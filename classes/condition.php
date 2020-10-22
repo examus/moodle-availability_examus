@@ -267,19 +267,37 @@ class condition extends \core_availability\condition {
      */
     public function is_available($not,
             \core_availability\info $info, $grabthelot, $userid) {
+
+        $course = $info->get_course();
+        $cm = $info->get_course_module();
+
+        $allow = self::is_available_internal($course->id, $cm->id, $userid);
+
+        if ($not) {
+            $allow = !$allow;
+        }
+        return $allow;
+    }
+
+    /**
+     * is available internal
+     *
+     * @param bool $not Not
+     * @param int $userid User id
+     * @return bool
+     */
+    public static function is_available_internal($courseid, $cmid, $userid) {
         global $DB;
 
         $allow = false;
 
         if (isset($_SESSION['examus'])) {
-            $course = $info->get_course();
-            $cm = $info->get_course_module();
             $accesscode = $_SESSION['examus'];
 
             $entry = $DB->get_record('availability_examus', [
                 'userid' => $userid,
-                'courseid' => $course->id,
-                'cmid' => $cm->id,
+                'courseid' => $courseid,
+                'cmid' => $cmid,
                 'accesscode' => $accesscode
             ]);
 
@@ -293,17 +311,15 @@ class condition extends \core_availability\condition {
             $allow = true;
         }
 
-        if ($not) {
-            $allow = !$allow;
-        }
         return $allow;
+
     }
+
 
     /**
      * get description
      *
      * @param string $full Full
-     * @param bool $not Not
      * @param \core_availability\info $info Info
      * @return string
      */
