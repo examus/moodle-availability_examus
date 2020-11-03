@@ -38,39 +38,17 @@ use availability_examus\common;
 class availability_examus_external extends external_api {
 
     /**
-     * Returns description of method parameters
-     *
-     * @return external_function_parameters
-     */
-    public static function user_proctored_modules_parameters() {
-        return new external_function_parameters([
-            'useremail' => new external_value(PARAM_TEXT, 'User Email', VALUE_DEFAULT, ""),
-            'accesscode' => new external_value(PARAM_TEXT, 'Access Code', VALUE_DEFAULT, ""),
-        ]);
-    }
-
-
-    /**
      * Prepares entry data for outside world
      *
      * @param \stdClass $entry
      * @return array Entry data, ready for serialization
      */
     protected static function moduleanswer($entry) {
-        global $DB, $PAGE;
+        global $DB;
 
         $course = get_course($entry->courseid);
         $modinfo = get_fast_modinfo($course);
         $cm = $modinfo->get_cm($entry->cmid);
-
-
-        $user = $DB->get_record('user', ['id' => $entry->userid]);
-        $userpictureurl = null;
-        if($user && $user->picture){
-            $userpicture = new user_picture($user);
-            $userpicture->size = 200; // Size f3.
-            $userpictureurl = $userpicture->get_url($PAGE)->out(false);
-        }
 
         $url = new moodle_url('/availability/condition/examus/entry.php', [
             'accesscode' => $entry->accesscode
@@ -106,6 +84,18 @@ class availability_examus_external extends external_api {
         $moduleanswer['status'] = $entry->status;
 
         return $moduleanswer;
+    }
+
+    /**
+     * Returns description of method parameters
+     *
+     * @return external_function_parameters
+     */
+    public static function user_proctored_modules_parameters() {
+        return new external_function_parameters([
+            'useremail' => new external_value(PARAM_TEXT, 'User Email', VALUE_DEFAULT, ""),
+            'accesscode' => new external_value(PARAM_TEXT, 'Access Code', VALUE_DEFAULT, ""),
+        ]);
     }
 
     /**
@@ -230,7 +220,6 @@ class availability_examus_external extends external_api {
                         'allow_wrong_gaze_direction' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
                     ], 'rules set', VALUE_OPTIONAL),
                     'is_proctored' => new external_value(PARAM_BOOL, 'module proctored'),
-                    'userpicture' => new external_value(PARAM_TEXT, 'user pic url', VALUE_OPTIONAL),
                     'accesscode' => new external_value(PARAM_TEXT, 'module code'),
                     'start' => new external_value(PARAM_INT, 'module start', VALUE_OPTIONAL),
                     'end' => new external_value(PARAM_INT, 'module end', VALUE_OPTIONAL),
@@ -356,7 +345,6 @@ class availability_examus_external extends external_api {
         ]);
     }
 
-
     /**
      * Returns success flag and error message for reset operation
      *
@@ -399,5 +387,59 @@ class availability_examus_external extends external_api {
             'success' => new external_value(PARAM_BOOL, 'request success status'),
             'error' => new external_value(PARAM_TEXT, 'error message')
         ]);
+    }
+
+    /**
+     * Returns description of method parameters
+     *
+     * @return external_function_parameters
+     */
+    public static function user_picture_parameters() {
+        return new external_function_parameters([
+            'useremail' => new external_value(PARAM_TEXT, 'User Email', VALUE_DEFAULT, ""),
+        ]);
+    }
+
+    /**
+     * Returns description of method result value
+     *
+     * @return external_description
+     */
+    public static function user_picture_returns() {
+        return new external_single_structure([
+            'success' => new external_value(PARAM_BOOL, 'request success status'),
+            'userpicture' => new external_value(PARAM_TEXT, 'user pic url', VALUE_OPTIONAL),
+            'error' => new external_value(PARAM_TEXT, 'error message', VALUE_OPTIONAL)
+        ]);
+    }
+
+    /**
+     * Returns user picture for user by email
+     *
+     * @param string $accesscode accesscode
+     * @return array
+     */
+    public static function user_picture($useremail) {
+        global $DB, $PAGE;
+
+        self::validate_parameters(self::user_picture_parameters(), [
+            'useremail' => $useremail,
+        ]);
+
+        $user = $DB->get_record('user', ['email' => $useremail]);
+
+        if(!$user) {
+            return ['success' => false, 'error' => 'User was not found'];
+        }
+
+        $userpictureurl = null;
+        if($user && $user->picture){
+            $userpicture = new user_picture($user);
+            $userpicture->size = 200; // Size f3.
+            $userpictureurl = $userpicture->get_url($PAGE)->out(false);
+            return ['success' => true, 'userpicture' => $userpictureurl];
+        } else {
+            return ['success' => false, 'error' => 'User has no image'];
+        }
     }
 }
