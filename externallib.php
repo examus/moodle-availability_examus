@@ -449,7 +449,15 @@ class availability_examus_external extends external_api {
             $userpicture = new user_picture($user);
             $userpicture->size = 200; // Size f3.
             $userpictureurl = $userpicture->get_url($PAGE)->out(false);
-            return ['success' => true, 'userpicture' => $userpictureurl];
+            $validuntill = time()+(60*60);
+
+            if($userpictureurl){
+                $key = get_user_key('core_files', $user->id, null, null, $validuntill);
+                $userpictureurl = str_replace('/pluginfile.php/', '/tokenpluginfile.php/'.$key.'/', $userpictureurl);
+                return ['success' => true, 'userpicture' => $userpictureurl];
+            } else {
+                return ['success' => false, 'error' => 'User has no image'];
+            }
         } else {
             return ['success' => false, 'error' => 'User has no image'];
         }
