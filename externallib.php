@@ -256,13 +256,14 @@ class availability_examus_external extends external_api {
             'threshold' => new external_single_structure([
                 'attention' => new external_value(PARAM_INT, 'Attention threshold', VALUE_OPTIONAL),
                 'rejected' => new external_value(PARAM_INT, 'Rejected threshold', VALUE_OPTIONAL),
-            ], "Thresholds", VALUE_DEFAULT, ['attention' => null, 'rejected' => null]),
+            ], 'Thresholds', VALUE_DEFAULT, ['attention' => null, 'rejected' => null]),
             'session_start' => new external_value(PARAM_INT, 'Session start time', VALUE_DEFAULT, null),
             'session_end' => new external_value(PARAM_INT, 'Time scheduled', VALUE_DEFAULT, null),
             'warnings' => new external_multiple_structure(
-                new external_value(PARAM_TEXT, 'Review comment', VALUE_OPTIONAL),
+                new external_value(PARAM_TEXT, 'Warning', VALUE_OPTIONAL),
                 'Warnings', VALUE_DEFAULT, []
             ),
+            'warning_titles' => new external_value(PARAM_TEXT, 'Warnings Titles JSON', VALUE_OPTIONAL)
         ]);
     }
 
@@ -291,7 +292,8 @@ class availability_examus_external extends external_api {
         $threshold,
         $sessionstart,
         $sessionend,
-        $warnings
+        $warnings,
+        $warningtitles
     ) {
         global $DB;
 
@@ -305,7 +307,8 @@ class availability_examus_external extends external_api {
             'threshold' => $threshold,
             'session_start' => $sessionstart,
             'session_end' => $sessionend,
-            'warnings' => $warnings
+            'warnings' => $warnings,
+            'warning_titles' => $warningtitles
         ]);
 
         $timenow = time();
@@ -331,6 +334,7 @@ class availability_examus_external extends external_api {
             $entry->session_start = $sessionstart;
             $entry->session_end = $sessionend;
             $entry->warnings = json_encode($warnings);
+            $entry->warning_titles = !empty($warningtitles) ? json_encode(@json_decode($warningtitles)) : null;
 
             $DB->update_record('availability_examus', $entry);
 

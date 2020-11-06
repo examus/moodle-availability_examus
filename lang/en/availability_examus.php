@@ -95,3 +95,9 @@ $string['details'] = 'Details';
 // Fader screen.
 $string['fader_awaiting_proctoring'] = 'Waiting for proctoring';
 $string['fader_instructions'] = '<p>Use Examus app to take the test</p>';
+
+$string['log_details_warnings'] = 'Warnings';
+$string['log_details_warning_type'] = 'Type';
+$string['log_details_warning_title'] = 'Description';
+$string['log_details_warning_start'] = 'Start';
+$string['log_details_warning_end'] = 'End';
