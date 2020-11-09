@@ -263,7 +263,7 @@ class availability_examus_external extends external_api {
                 new external_value(PARAM_TEXT, 'Warning', VALUE_OPTIONAL),
                 'Warnings', VALUE_DEFAULT, []
             ),
-            'warning_titles' => new external_value(PARAM_TEXT, 'Warnings Titles JSON', VALUE_OPTIONAL)
+            'warning_titles' => new external_value(PARAM_TEXT, 'Warnings Titles JSON', VALUE_DEFAULT, null)
         ]);
     }
 
