@@ -67,7 +67,6 @@ class availability_examus_external extends external_api {
             'scheduling_required' => condition::get_examus_scheduling($cm),
             'auto_rescheduling' => condition::get_auto_rescheduling($cm),
             'accesscode' => $entry->accesscode,
-            'userpicture' => $userpictureurl,
         ];
 
         $rules = condition::get_examus_rules($cm);

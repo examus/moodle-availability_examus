@@ -35,13 +35,13 @@ use availability_examus\state;
 function examus_attempt_submitted_handler($event) {
     global $DB;
 
-    $cm = get_coursemodule_from_id('quiz', $event->get_context()->instanceid, $event->courseid);
+    $cmid = $event->get_context()->instanceid;
 
     $userid = $event->userid;
     $entries = $DB->get_records('availability_examus', [
         'userid' => $userid,
         'courseid' => $event->courseid,
-        'cmid' => $cm->id,
+        'cmid' => $cmid,
         'status' => "Started"
     ], '-id');
 
@@ -60,6 +60,7 @@ function examus_attempt_started_handler($event) {
     global $DB;
 
     $attempt = $event->get_record_snapshot('quiz_attempts', $event->objectid);
+    $cmid = $event->get_context()->instanceid;
 
     if (isset($_SESSION['examus'])) {
         $accesscode = $_SESSION['examus'];
@@ -73,7 +74,7 @@ function examus_attempt_started_handler($event) {
             'status' => 'Not inited',
             'userid' => $event->userid,
             'courseid' => $event->courseid,
-            'cmid' => $event->get_context()->instanceid,
+            'cmid' => $cmid,
         ];
     }
 
