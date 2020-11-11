@@ -94,3 +94,9 @@ $string['details'] = 'Подробности';
 // Fader screen.
 $string['fader_awaiting_proctoring'] = 'Ожидание прокторинга';
 $string['fader_instructions'] = '<p>Используйте приложение Экзамус для прохождения тестирования</p>';
+
+$string['log_details_warnings'] = 'Нарушения';
+$string['log_details_warning_type'] = 'Тип';
+$string['log_details_warning_title'] = 'Описание';
+$string['log_details_warning_start'] = 'Начало';
+$string['log_details_warning_end'] = 'Конец';
