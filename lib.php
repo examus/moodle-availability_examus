@@ -68,17 +68,29 @@ function availability_examus_before_standard_html_head() {
         return '';
     }
 
-    // Not examused quiz.
     $cmid = state::$attempt['cm_id'];
     $courseid = state::$attempt['course_id'];
 
     $modinfo = get_fast_modinfo($courseid);
     $cm = $modinfo->get_cm($cmid);
 
+    if(!condition::user_in_proctored_groups($cm, $USER->id)){
+        return '';
+    }
+
     if (!condition::has_examus_condition($cm)) {
         return '';
     }
-    if(!condition::user_in_proctored_groups($cm, $USER->id)){
+
+    // Check that theres more rules, which pass.
+    // If we have no examus accesstoken (condition fails),
+    // but the module is still avalible, this means we should not
+    // enfoce proctoring.
+    $availibilityinfo = new \core_availability\info_module($cm);
+    $reason = '';
+    $isavailiblegeneral = $availibilityinfo->is_available($reason, false, $USER->id);
+    $isavailibleexamus  = condition::is_available_internal($courseid, $cm->id, $USER->id);
+    if(!$isavailibleexamus && $isavailiblegeneral){
         return '';
     }
 

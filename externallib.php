@@ -38,19 +38,6 @@ use availability_examus\common;
 class availability_examus_external extends external_api {
 
     /**
-     * Returns description of method parameters
-     *
-     * @return external_function_parameters
-     */
-    public static function user_proctored_modules_parameters() {
-        return new external_function_parameters([
-            'useremail' => new external_value(PARAM_TEXT, 'User Email', VALUE_DEFAULT, ""),
-            'accesscode' => new external_value(PARAM_TEXT, 'Access Code', VALUE_DEFAULT, ""),
-        ]);
-    }
-
-
-    /**
      * Prepares entry data for outside world
      *
      * @param \stdClass $entry
@@ -87,15 +74,39 @@ class availability_examus_external extends external_api {
             $moduleanswer['rules'] = $rules;
         }
 
-        if ($cm->modname == "quiz") {
-            $quiz = $DB->get_record('quiz', ['id' => $cm->instance]);
-            $moduleanswer['start'] = $quiz->timeopen;
-            $moduleanswer['end'] = $quiz->timeclose;
+        // Ref
+        switch ($cm->modname) {
+            case 'quiz':
+                try {
+                    $quiz = $DB->get_record('quiz', ['id' => $cm->instance]);
+                    $moduleanswer['start'] = $quiz->timeopen;
+                    $moduleanswer['end'] = $quiz->timeclose;
+                } catch (\dml_missing_record_exception $ex) {}
+                break;
+            case 'assign':
+                try {
+                    $assign = $DB->get_record('assign', ['id' => $cm->instance]);
+                    $moduleanswer['start'] = $assign->allowsubmissionsfromdate;
+                    $moduleanswer['end'] = $assign->duedate;
+                } catch (\dml_missing_record_exception $ex) {}
+                break;
         }
 
         $moduleanswer['status'] = $entry->status;
 
         return $moduleanswer;
+    }
+
+    /**
+     * Returns description of method parameters
+     *
+     * @return external_function_parameters
+     */
+    public static function user_proctored_modules_parameters() {
+        return new external_function_parameters([
+            'useremail' => new external_value(PARAM_TEXT, 'User Email', VALUE_DEFAULT, ""),
+            'accesscode' => new external_value(PARAM_TEXT, 'Access Code', VALUE_DEFAULT, ""),
+        ]);
     }
 
     /**
@@ -244,13 +255,14 @@ class availability_examus_external extends external_api {
             'threshold' => new external_single_structure([
                 'attention' => new external_value(PARAM_INT, 'Attention threshold', VALUE_OPTIONAL),
                 'rejected' => new external_value(PARAM_INT, 'Rejected threshold', VALUE_OPTIONAL),
-            ], "Thresholds", VALUE_DEFAULT, ['attention' => null, 'rejected' => null]),
+            ], 'Thresholds', VALUE_DEFAULT, ['attention' => null, 'rejected' => null]),
             'session_start' => new external_value(PARAM_INT, 'Session start time', VALUE_DEFAULT, null),
             'session_end' => new external_value(PARAM_INT, 'Time scheduled', VALUE_DEFAULT, null),
             'warnings' => new external_multiple_structure(
-                new external_value(PARAM_TEXT, 'Review comment', VALUE_OPTIONAL),
+                new external_value(PARAM_TEXT, 'Warning', VALUE_OPTIONAL),
                 'Warnings', VALUE_DEFAULT, []
             ),
+            'warning_titles' => new external_value(PARAM_TEXT, 'Warnings Titles JSON', VALUE_DEFAULT, null)
         ]);
     }
 
@@ -279,7 +291,8 @@ class availability_examus_external extends external_api {
         $threshold,
         $sessionstart,
         $sessionend,
-        $warnings
+        $warnings,
+        $warningtitles
     ) {
         global $DB;
 
@@ -293,7 +306,8 @@ class availability_examus_external extends external_api {
             'threshold' => $threshold,
             'session_start' => $sessionstart,
             'session_end' => $sessionend,
-            'warnings' => $warnings
+            'warnings' => $warnings,
+            'warning_titles' => $warningtitles
         ]);
 
         $timenow = time();
@@ -319,6 +333,7 @@ class availability_examus_external extends external_api {
             $entry->session_start = $sessionstart;
             $entry->session_end = $sessionend;
             $entry->warnings = json_encode($warnings);
+            $entry->warning_titles = !empty($warningtitles) ? json_encode(@json_decode($warningtitles)) : null;
 
             $DB->update_record('availability_examus', $entry);
 
@@ -344,7 +359,6 @@ class availability_examus_external extends external_api {
             'error' => new external_value(PARAM_TEXT, 'error message')
         ]);
     }
-
 
     /**
      * Returns success flag and error message for reset operation
@@ -388,5 +402,67 @@ class availability_examus_external extends external_api {
             'success' => new external_value(PARAM_BOOL, 'request success status'),
             'error' => new external_value(PARAM_TEXT, 'error message')
         ]);
+    }
+
+    /**
+     * Returns description of method parameters
+     *
+     * @return external_function_parameters
+     */
+    public static function user_picture_parameters() {
+        return new external_function_parameters([
+            'useremail' => new external_value(PARAM_TEXT, 'User Email', VALUE_DEFAULT, ""),
+        ]);
+    }
+
+    /**
+     * Returns description of method result value
+     *
+     * @return external_description
+     */
+    public static function user_picture_returns() {
+        return new external_single_structure([
+            'success' => new external_value(PARAM_BOOL, 'request success status'),
+            'userpicture' => new external_value(PARAM_TEXT, 'user pic url', VALUE_OPTIONAL),
+            'error' => new external_value(PARAM_TEXT, 'error message', VALUE_OPTIONAL)
+        ]);
+    }
+
+    /**
+     * Returns user picture for user by email
+     *
+     * @param string $accesscode accesscode
+     * @return array
+     */
+    public static function user_picture($useremail) {
+        global $DB, $PAGE;
+
+        self::validate_parameters(self::user_picture_parameters(), [
+            'useremail' => $useremail,
+        ]);
+
+        $user = $DB->get_record('user', ['email' => $useremail]);
+
+        if(!$user) {
+            return ['success' => false, 'error' => 'User was not found'];
+        }
+
+        $userpictureurl = null;
+        if($user && $user->picture){
+            $userpicture = new user_picture($user);
+            $userpicture->size = 200; // Size f3.
+            $userpictureurl = $userpicture->get_url($PAGE)->out(false);
+            $validuntill = time()+(60*60);
+
+            if($userpictureurl){
+                $key = get_user_key('core_files', $user->id, null, null, $validuntill);
+                $userpictureurl = str_replace('/pluginfile.php/', '/tokenpluginfile.php/'.$key.'/', $userpictureurl);
+                return ['success' => true, 'userpicture' => $userpictureurl];
+            } else {
+                return ['success' => false, 'error' => 'User has no image'];
+            }
+        } else {
+            return ['success' => false, 'error' => 'User has no image'];
+        }
     }
 }

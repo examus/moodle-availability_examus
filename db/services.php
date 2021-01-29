@@ -54,6 +54,15 @@ $functions = [
         'services' => 'Examus',
     ],
 
+    'availability_examus_user_picture' => [
+        'classname' => 'availability_examus_external',
+        'methodname' => 'user_picture',
+        'classpath' => 'availability/condition/examus/externallib.php',
+        'description' => 'Returns user picture',
+        'type' => 'read',
+        'services' => 'Examus',
+    ],
+
 ];
 
 // We define the services to install as pre-build services. A pre-build service is not editable by administrator.

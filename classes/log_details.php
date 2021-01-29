@@ -66,6 +66,68 @@ class log_details {
             $cm = $modinfo->get_cm($entry->cmid);
         }
 
+        $warnings = [];
+        $lang = current_language();
+
+        if (!$entry->warnings) {
+            $warningsraw = [];
+        }else{
+            $warningsraw = json_decode($entry->warnings, true);
+        }
+
+        $titles = @json_decode($entry->warning_titles, true);
+        if(empty($titles) || !is_array($titles)){
+            $titles = [];
+        }
+
+        foreach ($warningsraw as $warningraw) {
+            $warning = [];
+            if(is_string($warningraw)){
+                $warning = @json_decode($warningraw, true);
+                if (!$warning) {
+                    $warning = ['type' => $warningraw];
+                }
+            } else {
+                $warning = $warningraw;
+            }
+
+            $type  = isset($warning['type']) ? $warning['type'] : null;
+            $title = isset($titles[$type]) ? $titles[$type] : null;
+
+            if (is_array($title)) {
+                $localized = null;
+
+                // Try current language.
+                if (isset($title[$lang])) {
+                    $localized = $title[$lang];
+                }
+
+                // Default to english.
+                if (isset($title['en']) && !$localized) {
+                    $localized = $title['en'];
+                }
+
+                // Default to to first;
+                if (!$localized) {
+                    $localized = reset($title);
+                }
+
+                $warning['title'] = $localized;
+            }
+
+            if (isset($warning['start']) && !is_numeric($warning['start'])) {
+                $datetime = \DateTime::createFromFormat(\DateTime::ISO8601, $warning['start']);
+                $warning['start'] = $datetime->getTimestamp();
+            }
+
+            if (isset($warning['end']) && !is_numeric($warning['end'])) {
+                $datetime = \DateTime::createFromFormat(\DateTime::ISO8601, $warning['end']);
+                $warning['end'] = $datetime->getTimestamp();
+            }
+
+            $warnings[] = $warning;
+        }
+
         $table = new \flexible_table('availability_examus_show');
 
         $table->define_columns(['key', 'value']);
@@ -141,14 +203,39 @@ class log_details {
             common::format_date($entry->session_end),
         ]);
         $table->add_data([
-            get_string('warnings', 'availability_examus'),
-            $entry->warnings ? implode('<br>', json_decode($entry->warnings)) : ''
-        ]);
-        $table->add_data([
             get_string('comment', 'availability_examus'),
             $entry->comment,
         ]);
+        $table->print_html();
 
+        if (count($warnings) == 0) {
+            return;
+        }
+
+        echo "<hr>";
+        echo "<h2>".get_string('log_details_warnings', 'availability_examus')."</h2>";
+
+        $table = new \flexible_table('availability_examus_show');
+
+        $table->define_columns(['type', 'title', 'start', 'end']);
+        $table->define_headers([
+            get_string('log_details_warning_type', 'availability_examus'),
+            get_string('log_details_warning_title', 'availability_examus'),
+            get_string('log_details_warning_start', 'availability_examus'),
+            get_string('log_details_warning_end', 'availability_examus'),
+        ]);
+        $table->sortable(false);
+        $table->set_attribute('class', 'generaltable generalbox');
+        $table->define_baseurl($this->url);
+        $table->setup();
+        foreach($warnings as $warning){
+            $table->add_data([
+                (isset($warning['type']) ? $warning['type'] : ''),
+                (isset($warning['title']) ? $warning['title'] : ''),
+                (isset($warning['start']) ? common::format_date($warning['start']) : ''),
+                (isset($warning['end']) ? common::format_date($warning['end']) : '')
+            ]);
+        }
         $table->print_html();
     }
 }

@@ -88,5 +88,20 @@ function xmldb_availability_examus_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020041303, 'availability', 'examus');
     }
 
+    if ($oldversion < 2020110602) {
+        $table = new xmldb_table('availability_examus');
+
+        $fields[] = new xmldb_field('warning_titles', XMLDB_TYPE_TEXT, null, null, null, null, null);
+
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+
+        // Examus savepoint reached.
+        upgrade_plugin_savepoint(true, 2020110602, 'availability', 'examus');
+    }
+
     return true;
 }
