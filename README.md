@@ -17,8 +17,8 @@ Due to security reasons, it's recommended to have a separate user with special p
 2. Create a new role for the integration, for example, `webservice`. Go to `Site administration → Users → Permissions → Define roles`. Click the `Add a new role` button. Choose a role archetype `Authenticated user` as a basis. Click `Continue`.
 3. Select the context `System` where this role can be assigned.
 In the bottom part of the page, allow the following capabilities:
-    - local/rcommon:authenticate ???
-    - Use REST protocol  
+    - local/rcommon:authenticate
+    - Use REST protocol
 Fill in all other required fields: `Short name`, `Custom full name`.
 Click the `Create this role` button.
 4. Go to `Site administration → Users → Permissions → Assign system roles`. Choose the role created in the previous step (`webservice`). Add the previously created `examus` user to the `Existing users` field.

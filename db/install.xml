@@ -21,9 +21,9 @@
         <FIELD NAME="comment" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="comment"/>
         <FIELD NAME="threshold" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="warnings"/>
         <FIELD NAME="warnings" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="warnings"/>
+        <FIELD NAME="warnings_titles" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="warning_titles"/>
         <FIELD NAME="session_start" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="session_end" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
-
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
