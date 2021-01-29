@@ -38,19 +38,6 @@ use availability_examus\common;
 class availability_examus_external extends external_api {
 
     /**
-     * Returns description of method parameters
-     *
-     * @return external_function_parameters
-     */
-    public static function user_proctored_modules_parameters() {
-        return new external_function_parameters([
-            'useremail' => new external_value(PARAM_TEXT, 'User Email', VALUE_DEFAULT, ""),
-            'accesscode' => new external_value(PARAM_TEXT, 'Access Code', VALUE_DEFAULT, ""),
-        ]);
-    }
-
-
-    /**
      * Prepares entry data for outside world
      *
      * @param \stdClass $entry
@@ -87,15 +74,39 @@ class availability_examus_external extends external_api {
             $moduleanswer['rules'] = $rules;
         }
 
-        if ($cm->modname == "quiz") {
-            $quiz = $DB->get_record('quiz', ['id' => $cm->instance]);
-            $moduleanswer['start'] = $quiz->timeopen;
-            $moduleanswer['end'] = $quiz->timeclose;
+        // Ref
+        switch ($cm->modname) {
+            case 'quiz':
+                try {
+                    $quiz = $DB->get_record('quiz', ['id' => $cm->instance]);
+                    $moduleanswer['start'] = $quiz->timeopen;
+                    $moduleanswer['end'] = $quiz->timeclose;
+                } catch (\dml_missing_record_exception $ex) {}
+                break;
+            case 'assign':
+                try {
+                    $assign = $DB->get_record('assign', ['id' => $cm->instance]);
+                    $moduleanswer['start'] = $assign->allowsubmissionsfromdate;
+                    $moduleanswer['end'] = $assign->duedate;
+                } catch (\dml_missing_record_exception $ex) {}
+                break;
         }
 
         $moduleanswer['status'] = $entry->status;
 
         return $moduleanswer;
+    }
+
+    /**
+     * Returns description of method parameters
+     *
+     * @return external_function_parameters
+     */
+    public static function user_proctored_modules_parameters() {
+        return new external_function_parameters([
+            'useremail' => new external_value(PARAM_TEXT, 'User Email', VALUE_DEFAULT, ""),
+            'accesscode' => new external_value(PARAM_TEXT, 'Access Code', VALUE_DEFAULT, ""),
+        ]);
     }
 
     /**
@@ -345,7 +356,6 @@ class availability_examus_external extends external_api {
         ]);
     }
 
-
     /**
      * Returns success flag and error message for reset operation
      *
@@ -388,5 +398,67 @@ class availability_examus_external extends external_api {
             'success' => new external_value(PARAM_BOOL, 'request success status'),
             'error' => new external_value(PARAM_TEXT, 'error message')
         ]);
+    }
+
+    /**
+     * Returns description of method parameters
+     *
+     * @return external_function_parameters
+     */
+    public static function user_picture_parameters() {
+        return new external_function_parameters([
+            'useremail' => new external_value(PARAM_TEXT, 'User Email', VALUE_DEFAULT, ""),
+        ]);
+    }
+
+    /**
+     * Returns description of method result value
+     *
+     * @return external_description
+     */
+    public static function user_picture_returns() {
+        return new external_single_structure([
+            'success' => new external_value(PARAM_BOOL, 'request success status'),
+            'userpicture' => new external_value(PARAM_TEXT, 'user pic url', VALUE_OPTIONAL),
+            'error' => new external_value(PARAM_TEXT, 'error message', VALUE_OPTIONAL)
+        ]);
+    }
+
+    /**
+     * Returns user picture for user by email
+     *
+     * @param string $accesscode accesscode
+     * @return array
+     */
+    public static function user_picture($useremail) {
+        global $DB, $PAGE;
+
+        self::validate_parameters(self::user_picture_parameters(), [
+            'useremail' => $useremail,
+        ]);
+
+        $user = $DB->get_record('user', ['email' => $useremail]);
+
+        if(!$user) {
+            return ['success' => false, 'error' => 'User was not found'];
+        }
+
+        $userpictureurl = null;
+        if($user && $user->picture){
+            $userpicture = new user_picture($user);
+            $userpicture->size = 200; // Size f3.
+            $userpictureurl = $userpicture->get_url($PAGE)->out(false);
+            $validuntill = time()+(60*60);
+
+            if($userpictureurl){
+                $key = get_user_key('core_files', $user->id, null, null, $validuntill);
+                $userpictureurl = str_replace('/pluginfile.php/', '/tokenpluginfile.php/'.$key.'/', $userpictureurl);
+                return ['success' => true, 'userpicture' => $userpictureurl];
+            } else {
+                return ['success' => false, 'error' => 'User has no image'];
+            }
+        } else {
+            return ['success' => false, 'error' => 'User has no image'];
+        }
     }
 }
