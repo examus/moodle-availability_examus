@@ -78,6 +78,9 @@ class condition extends \core_availability\condition {
 
         if (!empty($structure->scheduling_required)) {
             $this->schedulingrequired = $structure->scheduling_required;
+        } else {
+            $manualmodes = ['normal', 'identification'];
+            $this->schedulingrequired = in_array($this->mode, $manualmodes);
         }
 
         if (!empty($structure->auto_rescheduling)) {
