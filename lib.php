@@ -74,7 +74,7 @@ function availability_examus_before_standard_html_head() {
     $modinfo = get_fast_modinfo($courseid);
     $cm = $modinfo->get_cm($cmid);
 
-    if(!condition::user_in_proctored_groups($cm, $USER->id)){
+    if (!condition::user_in_proctored_groups($cm, $USER->id)) {
         return '';
     }
 
@@ -90,7 +90,7 @@ function availability_examus_before_standard_html_head() {
     $reason = '';
     $isavailiblegeneral = $availibilityinfo->is_available($reason, false, $USER->id);
     $isavailibleexamus  = condition::is_available_internal($courseid, $cm->id, $USER->id);
-    if(!$isavailibleexamus && $isavailiblegeneral){
+    if (!$isavailibleexamus && $isavailiblegeneral) {
         return '';
     }
 

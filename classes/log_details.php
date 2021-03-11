@@ -71,18 +71,18 @@ class log_details {
 
         if (!$entry->warnings) {
             $warningsraw = [];
-        }else{
+        } else {
             $warningsraw = json_decode($entry->warnings, true);
         }
 
         $titles = @json_decode($entry->warning_titles, true);
-        if(empty($titles) || !is_array($titles)){
+        if(empty($titles) || !is_array($titles)) {
             $titles = [];
         }
 
         foreach ($warningsraw as $warningraw) {
             $warning = [];
-            if(is_string($warningraw)){
+            if(is_string($warningraw)) {
                 $warning = @json_decode($warningraw, true);
                 if (!$warning) {
                     $warning = ['type' => $warningraw];
@@ -107,7 +107,7 @@ class log_details {
                     $localized = $title['en'];
                 }
 
-                // Default to to first;
+                // Default to first.
                 if (!$localized) {
                     $localized = reset($title);
                 }
@@ -228,7 +228,8 @@ class log_details {
         $table->set_attribute('class', 'generaltable generalbox');
         $table->define_baseurl($this->url);
         $table->setup();
-        foreach($warnings as $warning){
+
+        foreach($warnings as $warning) {
             $table->add_data([
                 (isset($warning['type']) ? $warning['type'] : ''),
                 (isset($warning['title']) ? $warning['title'] : ''),
@@ -236,6 +237,7 @@ class log_details {
                 (isset($warning['end']) ? common::format_date($warning['end']) : '')
             ]);
         }
+
         $table->print_html();
     }
 }

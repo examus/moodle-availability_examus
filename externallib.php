@@ -81,14 +81,18 @@ class availability_examus_external extends external_api {
                     $quiz = $DB->get_record('quiz', ['id' => $cm->instance]);
                     $moduleanswer['start'] = $quiz->timeopen;
                     $moduleanswer['end'] = $quiz->timeclose;
-                } catch (\dml_missing_record_exception $ex) {}
+                } catch (\dml_missing_record_exception $ex) {
+                    // We dont want this handled.
+                }
                 break;
             case 'assign':
                 try {
                     $assign = $DB->get_record('assign', ['id' => $cm->instance]);
                     $moduleanswer['start'] = $assign->allowsubmissionsfromdate;
                     $moduleanswer['end'] = $assign->duedate;
-                } catch (\dml_missing_record_exception $ex) {}
+                } catch (\dml_missing_record_exception $ex) {
+                    // We dont want this handled.
+                }
                 break;
         }
 
@@ -160,7 +164,7 @@ class availability_examus_external extends external_api {
                                 continue;
                             }
 
-                            if(!condition::user_in_proctored_groups($cm, $user->id)){
+                            if (!condition::user_in_proctored_groups($cm, $user->id)) {
                                 continue;
                             }
 
@@ -443,18 +447,18 @@ class availability_examus_external extends external_api {
 
         $user = $DB->get_record('user', ['email' => $useremail]);
 
-        if(!$user) {
+        if (!$user) {
             return ['success' => false, 'error' => 'User was not found'];
         }
 
         $userpictureurl = null;
-        if($user && $user->picture){
+        if ($user && $user->picture) {
             $userpicture = new user_picture($user);
             $userpicture->size = 200; // Size f3.
             $userpictureurl = $userpicture->get_url($PAGE)->out(false);
-            $validuntill = time()+(60*60);
+            $validuntill = time() + (60 * 60);
 
-            if($userpictureurl){
+            if ($userpictureurl) {
                 $key = get_user_key('core_files', $user->id, null, null, $validuntill);
                 $userpictureurl = str_replace('/pluginfile.php/', '/tokenpluginfile.php/'.$key.'/', $userpictureurl);
                 return ['success' => true, 'userpicture' => $userpictureurl];
