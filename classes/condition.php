@@ -33,6 +33,7 @@ use core_availability\info_module;
 use moodle_exception;
 use quiz;
 use stdClass;
+use availability_examus\state;
 
 /**
  * Examus condition
@@ -287,12 +288,12 @@ class condition extends \core_availability\condition {
      * @return bool
      */
     public static function is_available_internal($courseid, $cmid, $userid) {
-        global $DB;
+        global $DB, $SESSION;
 
         $allow = false;
 
-        if (isset($_SESSION['examus'])) {
-            $accesscode = $_SESSION['examus'];
+        if (isset($SESSION->availibilityexamustoken)) {
+            $accesscode = $SESSION->availibilityexamustoken;
 
             $entry = $DB->get_record('availability_examus', [
                 'userid' => $userid,
@@ -306,8 +307,7 @@ class condition extends \core_availability\condition {
             }
         }
 
-        if (isset($_SESSION['examus_api'])) {
-            // Call from api function.
+        if (state::$apirequest) {
             $allow = true;
         }
 
@@ -327,14 +327,6 @@ class condition extends \core_availability\condition {
         return get_string('use_examus', 'availability_examus');
     }
 
-    /**
-     * get debug string
-     *
-     * @return string
-     */
-    protected function get_debug_string() {
-        return in_array('examus', $_SESSION) ? 'YES' : 'NO';
-    }
 
     /**
      * create entry for cm
@@ -430,6 +422,17 @@ class condition extends \core_availability\condition {
         }
 
         return null;
+    }
+
+    /**
+     * Get debug string
+     * Implements abstract method `core_availability\condition::get_debug_string`
+     *
+     * @return string
+     */
+    protected function get_debug_string() {
+        global $SESSION;
+        return isset($SESSION->availibilityexamustoken) ? 'YES' : 'NO';
     }
 
 }

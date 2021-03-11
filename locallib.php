@@ -32,7 +32,7 @@ use availability_examus\state;
  *
  * @param stdClass $event Event
  */
-function examus_attempt_submitted_handler($event) {
+function avalibility_examus_attempt_submitted_handler($event) {
     global $DB;
 
     $cmid = $event->get_context()->instanceid;
@@ -56,14 +56,14 @@ function examus_attempt_submitted_handler($event) {
  *
  * @param stdClass $event Event
  */
-function examus_attempt_started_handler($event) {
-    global $DB;
+function avalibility_examus_attempt_started_handler($event) {
+    global $DB, $SESSION;
 
     $attempt = $event->get_record_snapshot('quiz_attempts', $event->objectid);
     $cmid = $event->get_context()->instanceid;
 
-    if (isset($_SESSION['examus'])) {
-        $accesscode = $_SESSION['examus'];
+    if (isset($SESSION->availibilityexamustoken)) {
+        $accesscode = $SESSION->availibilityexamustoken;
 
         $condition = [
             'accesscode' => $accesscode
@@ -93,7 +93,7 @@ function examus_attempt_started_handler($event) {
  *
  * @param stdClass $event Event
  */
-function examus_attempt_deleted_handler($event) {
+function avalibility_examus_attempt_deleted_handler($event) {
     $attempt = $event->get_record_snapshot('quiz_attempts', $event->objectid);
     $cm = get_coursemodule_from_id('quiz', $event->get_context()->instanceid, $event->courseid);
 
@@ -108,7 +108,7 @@ function examus_attempt_deleted_handler($event) {
  *
  * @param \core\event\user_enrolment_deleted $event Event
  */
-function examus_user_enrolment_deleted(\core\event\user_enrolment_deleted $event) {
+function avalibility_examus_user_enrolment_deleted(\core\event\user_enrolment_deleted $event) {
     $userid = $event->relateduserid;
 
     \availability_examus\common::delete_empty_entries($userid, $event->courseid);
@@ -119,7 +119,7 @@ function examus_user_enrolment_deleted(\core\event\user_enrolment_deleted $event
  *
  * @param \core\event\course_module_deleted $event Event
  */
-function examus_course_module_deleted(\core\event\course_module_deleted $event) {
+function avalibility_examus_course_module_deleted(\core\event\course_module_deleted $event) {
     global $DB;
     $cmid = $event->contextinstanceid;
     $DB->delete_records('availability_examus', ['cmid' => $cmid]);
@@ -131,7 +131,7 @@ function examus_course_module_deleted(\core\event\course_module_deleted $event) 
  *
  * @param \mod_quiz\event\attempt_viewed $event Event
  */
-function examus_attempt_viewed_handler($event) {
+function avalibility_examus_attempt_viewed_handler($event) {
     $attempt = $event->get_record_snapshot('quiz_attempts', $event->objectid);
     $quiz = $event->get_record_snapshot('quiz', $attempt->quiz);
 
