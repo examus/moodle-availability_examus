@@ -222,11 +222,11 @@ class condition extends \core_availability\condition {
      * @param \cm_info $cm Cm
      * @params int $userid userid
      */
-    public static function user_in_proctored_groups($cm, $userid){
+    public static function user_in_proctored_groups($cm, $userid) {
         global $DB;
         $user = $DB->get_record('user', ['id' => $userid]);
 
-        $selectedgroups = condition::get_examus_groups($cm);
+        $selectedgroups = self::get_examus_groups($cm);
         if (!empty($selectedgroups)) {
             $usergroups = $DB->get_records('groups_members', ['userid' => $user->id], null, 'groupid');
             foreach ($usergroups as $usergroup) {
