@@ -27,7 +27,7 @@ require_once('../../../config.php');
 
 require_login();
 
-global $DB;
+global $DB, $SESSION;
 
 $accesscode = required_param('accesscode', PARAM_RAW);
 
@@ -39,7 +39,7 @@ if ($entry) {
     $DB->update_record('availability_examus', $entry);
     $cmid = $entry->cmid;
 
-    $_SESSION['examus'] = $accesscode;
+    $SESSION->availibilityexamustoken = $accesscode;
 
     list(, $cm) = get_course_and_cm_from_cmid($cmid);
 

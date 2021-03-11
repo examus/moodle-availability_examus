@@ -57,13 +57,13 @@ function avalibility_examus_attempt_submitted_handler($event) {
  * @param stdClass $event Event
  */
 function avalibility_examus_attempt_started_handler($event) {
-    global $DB;
+    global $DB, $SESSION;
 
     $attempt = $event->get_record_snapshot('quiz_attempts', $event->objectid);
     $cmid = $event->get_context()->instanceid;
 
-    if (isset($_SESSION['examus'])) {
-        $accesscode = $_SESSION['examus'];
+    if (isset($SESSION->availibilityexamustoken)) {
+        $accesscode = $SESSION->availibilityexamustoken;
 
         $condition = [
             'accesscode' => $accesscode

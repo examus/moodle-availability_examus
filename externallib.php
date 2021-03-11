@@ -30,6 +30,7 @@ require_once($CFG->libdir . "/externallib.php");
 use core_availability\info_module;
 use availability_examus\condition;
 use availability_examus\common;
+use availability_examus\state;
 
 
 /**
@@ -74,7 +75,6 @@ class availability_examus_external extends external_api {
             $moduleanswer['rules'] = $rules;
         }
 
-        // Ref
         switch ($cm->modname) {
             case 'quiz':
                 try {
@@ -137,7 +137,7 @@ class availability_examus_external extends external_api {
 
         } else if ($useremail) {
 
-            $_SESSION['examus_api'] = true;
+            state::$apirequest = true;
 
             $user = $DB->get_record('user', ['email' => $useremail]);
             $courses = enrol_get_users_courses($user->id, true);
