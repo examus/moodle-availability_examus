@@ -1,7 +1,7 @@
 # EXAMUS MOODLE PLUGIN
 
 ## Requirements
-1. Examus plugin was tested with Moodle 3.3.1 and 3.3.2 version.
+1. Examus plugin was tested with Moodle versions 3.6 to 3.10.
 2. Examus proctoring needs an OAuth2 server plugin installed.
     * You can download the plugin from https://github.com/examus/moodle-local_oauth/releases (ZIP archive). To install it, login to your Moodle site as an admin, go to `Site administration → Plugins → Install plugins`, upload the ZIP file and install the plugin as prompted.
     * If you have an OAuth2 server plugin installed from another source, **please make sure it allows HTTPS url as Redirect URL**.
