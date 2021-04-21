@@ -364,6 +364,64 @@ class availability_examus_external extends external_api {
         ]);
     }
 
+    public static function auth_access($useremail) {
+        global $DB;
+        self::validate_parameters(self::auth_access_parameters(), [
+            'useremail' => $useremail,
+        ]);
+
+        $user = $DB->get_record('user', ['email' => $useremail]);
+
+        if(!$user){
+            return [
+                'success' => false,
+                'error' => 'User not found'
+            ];
+        }
+
+        $courses = enrol_get_users_courses($user->id, true);
+
+        $reviewerauth = [];
+        $proctorauth = [];
+
+        foreach ($courses as $course) {
+            $coursecontext = \context_course::instance($course->id);
+            if (has_capability('availability/examus:reviewer_auth', $coursecontext, $user->id)) {
+                $reviewerauth []= $course->id;
+            }
+            if (has_capability('availability/examus:proctor_auth', $coursecontext, $user->id)) {
+                $proctorauth []= $course->id;
+            }
+        }
+
+        return [
+            'success' => true,
+            'error' => null,
+            'proctor_auth' => count($proctorauth) > 0,
+            'reviewer_auth' => count($reciewerauth) > 0
+        ];
+    }
+
+    public static function auth_access_parameters() {
+        return new external_function_parameters([
+            'useremail' => new external_value(PARAM_TEXT, 'User email'),
+        ]);
+    }
+
+    /**
+     * Returns description of method result value
+     *
+     * @return external_description
+     */
+    public static function auth_access_returns() {
+        return new external_single_structure([
+            'success' => new external_value(PARAM_BOOL, 'request success status'),
+            'error' => new external_value(PARAM_TEXT, 'error message'),
+            'proctor_auth' => new external_value(PARAM_BOOL, 'Has proctor access', VALUE_OPTIONAL),
+            'reviewer_auth' => new external_value(PARAM_BOOL, 'Has reviewer access', VALUE_OPTIONAL)
+        ]);
+    }
+
     /**
      * Returns success flag and error message for reset operation
      *

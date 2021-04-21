@@ -28,6 +28,8 @@ defined('MOODLE_INTERNAL') || die();
 $string['examus:logaccess'] = 'Доступ к отчету Экзамус';
 $string['examus:logaccess_course'] = 'Доступ к отчету Экзамус(определенный курс)';
 $string['examus:logaccess_all'] = 'Доступ к отчету Экзамус(все курсы)';
+$string['examus:proctor_auth'] = 'Авторизация в Examus App как проктор';
+$string['examus:reviewer_auth'] = 'Авторизация в Examus App как reviewer';
 
 $string['description'] = 'Позволяет студентам использовать сервис прокторинга "Экзамус"';
 $string['pluginname'] = 'Прокторинг "Экзамус"';
