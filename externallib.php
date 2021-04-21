@@ -398,7 +398,7 @@ class availability_examus_external extends external_api {
             'success' => true,
             'error' => null,
             'proctor_auth' => count($proctorauth) > 0,
-            'reviewer_auth' => count($reciewerauth) > 0
+            'reviewer_auth' => count($reviewerauth) > 0
         ];
     }
 
