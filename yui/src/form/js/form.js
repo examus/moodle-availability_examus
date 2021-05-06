@@ -26,6 +26,17 @@ M.availability_examus.form.getNode = function(json) {
         return M.util.get_string(identifier, 'availability_examus');
     }
 
+    function formGroup(id, label, content) {
+        return '<span class="availability-group form-group mb-2">' +
+            '<div class="col-md-5 col-form-label d-flex pb-0 pr-md-0">' +
+            '  <label for="' + id + '">' + label + '</label>' +
+            '</div>' +
+            '<div class="col-md-7 form-inline align-items-start felement">' +
+            content +
+            '</div>' +
+            '</span>';
+    }
+
     var html, node, root, value;
 
     M.availability_examus.form.instId += 1;
@@ -35,55 +46,83 @@ M.availability_examus.form.getNode = function(json) {
     var modeId = id + '_mode';
     var schedulingRequiredId = id + '_schedulingRequired';
     var autoReschedulingId = id + '_autoRescheduling';
+    var isTrialId = id + '_isTrial';
+    var identificationId = id + '_identification';
+    var customRulesId = id + '_customRules';
 
     html = '<label><strong>' + getString('title') + '</strong></label><br><br>';
 
 
-    html += '<label for="' + durationId + '">' + getString('duration') + '</label> ';
-    html += '<input type="text" name="duration" id="' + durationId + '">';
+    html += formGroup(durationId, getString('duration'),
+        '<input type="text" name="duration" id="' + durationId + '" class="form-control">'
+    );
 
-    html += '<br><label for="' + modeId + '">' + getString('mode') + '</label> ';
-    html += '<select name="mode" id="' + modeId + '">';
-    html += '  <option value="normal">' + getString('normal_mode') + '</option>';
-    html += '  <option value="identification">' + getString('identification_mode') + '</option>';
-    html += '  <option value="olympics">' + getString('olympics_mode') + '</option>';
-    html += '</select>';
+    html += formGroup(modeId, getString('mode'),
+        '<select name="mode" id="' + modeId + '" class="custom-select">' +
+        '  <option value="normal">' + getString('normal_mode') + '</option>' +
+        '  <option value="identification">' + getString('identification_mode') + '</option>' +
+        '  <option value="olympics">' + getString('olympics_mode') + '</option>' +
+        '</select>'
+    );
 
-    html += '<br><label for="' +  schedulingRequiredId+ '">' + getString('scheduling_required') + '</label> ';
-    html += '<input type="checkbox" name="scheduling_required" id="' + schedulingRequiredId + '" value="1">&nbsp;';
-    html += '<label for="' + schedulingRequiredId + '">' + getString('enable') + '</label> ';
+    html += formGroup(identificationId, getString('identification'),
+        '<select name="identification" id="' + identificationId + '" class="custom-select">' +
+        '  <option value="passport">' + getString('passport_identification') + '</option>' +
+        '  <option value="face">' + getString('face_identification') + '</option>' +
+        '  <option value="face_and_passport">' + getString('face_passport_identification') + '</option>' +
+        '</select>'
+    );
 
-    html += '<br><label for="' + autoReschedulingId + '">' + getString('auto_rescheduling') + '</label> ';
-    html += '<input type="checkbox" name="auto_rescheduling" id="' + autoReschedulingId + '" value="1">&nbsp;';
-    html += '<label for="' + autoReschedulingId + '">' + getString('enable') + '</label> ';
+    html += formGroup(schedulingRequiredId, getString('scheduling_required'),
+        '<input type="checkbox" name="scheduling_required" id="' + schedulingRequiredId + '" value="1">&nbsp;' +
+        '<label for="' + schedulingRequiredId + '">' + getString('enable') + '</label> '
+    );
 
-    html += '<div class="rules" style="padding-bottom:20px">';
-    html += '<label>' + getString('rules') + '</label> ';
+    html += formGroup(autoReschedulingId, getString('auto_rescheduling'),
+        '<input type="checkbox" name="auto_rescheduling" id="' + autoReschedulingId + '" value="1">&nbsp;' +
+        '<label for="' + autoReschedulingId + '">' + getString('enable') + '</label> '
+    );
+
+    html += formGroup(isTrialId, getString('is_trial'),
+        '<input type="checkbox" name="istrial" id="' + isTrialId + '" value="1">&nbsp;' +
+        '<label for="' + isTrialId + '">' + getString('enable') + '</label> '
+    );
+
+    html += formGroup(customRulesId, getString('custom_rules'),
+        '<textarea name="customrules" id="' + customRulesId + '" style="width: 100%" class="form-control"></textarea>'
+    );
+
+
+    var ruleOptions = '';
     for (var key in this.rules) {
         var keyId = id + '_' + key;
-        html += '  <br><input type="checkbox" name="' + key + '" id="' + keyId + '" value="' + key + '" >';
-        html += '  <label for="' + keyId + '">' + getString(key) + '</label>';
+        ruleOptions += '  <br><input type="checkbox" name="' + key + '" id="' + keyId + '" value="' + key + '" >';
+        ruleOptions += '  <label for="' + keyId + '">' + getString(key) + '</label>';
     }
-    html += '</div>';
+
+    html += formGroup(null, getString('rules'), '<div class="rules"' + ruleOptions + '</div>');
+
 
     if (this.groups) {
-        html += '<div class="groups">';
 
-        html += '<label>' + getString('select_groups') + ':</label>';
+        var groupOptions = '';
         for (var i in this.groups) {
             id = this.groups[i].id;
             var name = this.groups[i].name;
             var checked = (json.groups instanceof Array && json.groups.indexOf(id) > -1) ? 'checked' : '';
 
-            html += '<br>'
+            groupOptions += '<br>'
                 + '<label>'
                 + '<input value=' + id + ' type="checkbox" name=groups[] ' + checked + '>'
                 + '&nbsp;' + name
                 + '</label>';
         }
 
-        html += '</div>';
+        html += formGroup(null, getString('select_groups'), '<div class="groups"' + groupOptions + '</div>');
     }
+
+
+
 
     node = Y.Node.create('<span> ' + html + ' </span>');
     if (json.duration !== undefined) {
@@ -94,9 +133,18 @@ M.availability_examus.form.getNode = function(json) {
         node.one('select[name=mode] option[value=' + json.mode + ']').set('selected', 'selected');
     }
 
+    if (json.identification !== undefined) {
+        node.one('select[name=identification] option[value=' + json.identification + ']').set('selected', 'selected');
+    }
+
     if (json.auto_rescheduling !== undefined) {
         value = json.auto_rescheduling ? 'checked' : null;
         node.one('#' + autoReschedulingId).set('checked', value);
+    }
+
+    if (json.istrial !== undefined) {
+        value = json.istrial ? 'checked' : null;
+        node.one('#' + isTrialId).set('checked', value);
     }
 
     if (json.scheduling_required !== undefined) {
@@ -114,22 +162,20 @@ M.availability_examus.form.getNode = function(json) {
         }
     }
 
+    if (json.customrules !== undefined) {
+        node.one('#' + customRulesId).set('value', json.customrules);
+    }
+
+
     if (!M.availability_examus.form.addedEvents) {
         M.availability_examus.form.addedEvents = true;
         root = Y.one(".availability-field");
         root.delegate('valuechange', function() {
             M.core_availability.form.update();
-        }, '.availability_examus input[name=duration]');
-        root.delegate('valuechange', function() {
-            M.core_availability.form.update();
-        }, '.availability_examus select[name=mode]');
+        }, '.availability_examus input,.availability_examus textarea,.availability_examus select');
         root.delegate('click', function() {
             M.core_availability.form.update();
-        }, '.availability_examus .rules input');
-
-        root.delegate('click', function() {
-            M.core_availability.form.update();
-        }, '.availability_examus input[type=checkbox]');
+        }, '.availability_examus input[type=checkbox],');
 
     }
 
@@ -140,8 +186,11 @@ M.availability_examus.form.fillValue = function(value, node) {
     var rulesInputs, key;
     value.duration = node.one('input[name=duration]').get('value').trim();
     value.mode = node.one('select[name=mode]').get('value').trim();
+    value.identification = node.one('select[name=identification]').get('value').trim();
     value.auto_rescheduling = node.one('input[name=auto_rescheduling]').get('checked');
     value.scheduling_required = node.one('input[name=scheduling_required]').get('checked');
+    value.istrial = node.one('input[name=istrial]').get('checked');
+    value.customrules = node.one('textarea[name=customrules]').get('value').trim();
 
     value.rules = {};
     rulesInputs = node.all('.rules input');

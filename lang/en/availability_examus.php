@@ -56,7 +56,15 @@ $string['normal_mode'] = 'Normal (Full human proctoring)';
 $string['olympics_mode'] = 'Olympics (Automatic)';
 $string['identification_mode'] = 'Identification (Human identification, automatic proctoring)';
 
+$string['identification'] = 'Identification mode';
+$string['face_passport_identification'] = 'Face & Passport';
+$string['passport_identification'] = 'Passport';
+$string['face_identification'] = 'Face';
+
+$string['is_trial'] = 'Trial exam';
+
 $string['rules'] = "Rules";
+$string['custom_rules'] = "Custom rules";
 
 $string['time_scheduled'] = 'Scheduled';
 $string['time_finish'] = 'Attempt finished at';

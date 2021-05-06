@@ -68,6 +68,8 @@ class availability_examus_external extends external_api {
             'scheduling_required' => condition::get_examus_scheduling($cm),
             'auto_rescheduling' => condition::get_auto_rescheduling($cm),
             'accesscode' => $entry->accesscode,
+            'identification' => condition::get_identification($cm),
+            'is_trial' => condition::get_is_trial($cm),
         ];
 
         $rules = condition::get_examus_rules($cm);
@@ -233,11 +235,14 @@ class availability_examus_external extends external_api {
                         'allow_absence_in_frame' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
                         'allow_voices' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
                         'allow_wrong_gaze_direction' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
+                        'custom_rules' => new external_value(PARAM_TEXT, 'Custom Rules', VALUE_OPTIONAL),
                     ], 'rules set', VALUE_OPTIONAL),
                     'is_proctored' => new external_value(PARAM_BOOL, 'module proctored'),
                     'accesscode' => new external_value(PARAM_TEXT, 'module code'),
                     'start' => new external_value(PARAM_INT, 'module start', VALUE_OPTIONAL),
                     'end' => new external_value(PARAM_INT, 'module end', VALUE_OPTIONAL),
+                    'identification' => new external_value(PARAM_TEXT, 'Identification mode', VALUE_OPTIONAL),
+                    'is_trial' => new external_value(PARAM_BOOL, 'Trial exam')
                 ], 'module')
             ),
         ]);
