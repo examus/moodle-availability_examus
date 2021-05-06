@@ -372,7 +372,7 @@ class availability_examus_external extends external_api {
 
         $user = $DB->get_record('user', ['email' => $useremail]);
 
-        if(!$user){
+        if (!$user) {
             return [
                 'success' => false,
                 'error' => 'User not found'
@@ -387,10 +387,10 @@ class availability_examus_external extends external_api {
         foreach ($courses as $course) {
             $coursecontext = \context_course::instance($course->id);
             if (has_capability('availability/examus:reviewer_auth', $coursecontext, $user->id)) {
-                $reviewerauth []= $course->id;
+                $reviewerauth [] = $course->id;
             }
             if (has_capability('availability/examus:proctor_auth', $coursecontext, $user->id)) {
-                $proctorauth []= $course->id;
+                $proctorauth [] = $course->id;
             }
         }
 
