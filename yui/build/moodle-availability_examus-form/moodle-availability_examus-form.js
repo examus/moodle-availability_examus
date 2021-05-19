@@ -51,6 +51,7 @@ M.availability_examus.form.getNode = function(json) {
     var isTrialId = id + '_isTrial';
     var identificationId = id + '_identification';
     var customRulesId = id + '_customRules';
+    var noProtectionId = id + '_noProtection';
 
     html = '<label><strong>' + getString('title') + '</strong></label><br><br>';
 
@@ -88,6 +89,11 @@ M.availability_examus.form.getNode = function(json) {
     html += formGroup(isTrialId, getString('is_trial'),
         '<input type="checkbox" name="istrial" id="' + isTrialId + '" value="1">&nbsp;' +
         '<label for="' + isTrialId + '">' + getString('enable') + '</label> '
+    );
+
+    html += formGroup(noProtectionId, getString('no_protection'),
+        '<input type="checkbox" name="noprotection" id="' + noProtectionId + '" value="1">&nbsp;' +
+        '<label for="' + noProtectionId + '">' + getString('enable') + '</label> '
     );
 
     html += formGroup(customRulesId, getString('custom_rules'),
@@ -144,6 +150,11 @@ M.availability_examus.form.getNode = function(json) {
         node.one('#' + autoReschedulingId).set('checked', value);
     }
 
+    if (json.noprotection !== undefined) {
+        value = json.noprotection ? 'checked' : null;
+        node.one('#' + noProtectionId).set('checked', value);
+    }
+
     if (json.istrial !== undefined) {
         value = json.istrial ? 'checked' : null;
         node.one('#' + isTrialId).set('checked', value);
@@ -193,6 +204,7 @@ M.availability_examus.form.fillValue = function(value, node) {
     value.scheduling_required = node.one('input[name=scheduling_required]').get('checked');
     value.istrial = node.one('input[name=istrial]').get('checked');
     value.customrules = node.one('textarea[name=customrules]').get('value').trim();
+    value.noprotection = node.one('input[name=noprotection]').get('checked');
 
     value.rules = {};
     rulesInputs = node.all('.rules input');

@@ -65,6 +65,9 @@ class condition extends \core_availability\condition {
     /** @var string identification method **/
     protected $identification;
 
+    /** @var bool No protection (shade) */
+    protected $noprotection = false;
+
     /**
      * @var array Apply condition to specified groups
      */
@@ -116,6 +119,12 @@ class condition extends \core_availability\condition {
             $this->istrial = $structure->istrial;
         } else {
             $this->istrial = false;
+        }
+
+        if (isset($structure->noprotection)) {
+            $this->noprotection = $structure->noprotection;
+        } else {
+            $this->noprotection = false;
         }
     }
 
@@ -244,6 +253,17 @@ class condition extends \core_availability\condition {
     }
 
     /**
+     * get no protection
+     *
+     * @param \cm_info $cm Cm
+     * @return bool
+     */
+    public static function get_no_protection($cm) {
+        $econds = self::get_examus_conditions($cm);
+        return (bool) $econds[0]->noprotection;
+    }
+
+    /**
      * get examus conditions
      *
      * @param \cm_info $cm Cm
@@ -300,6 +320,7 @@ class condition extends \core_availability\condition {
             'auto_rescheduling' => (bool) $this->autorescheduling,
             'rules' => (array) $this->rules,
             'groups' => (array) $this->groups,
+            'noprotection' => (bool) $this->noprotection,
         ];
     }
 

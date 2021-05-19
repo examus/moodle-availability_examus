@@ -46,7 +46,7 @@ class frontend extends \core_availability\frontend {
             'allow_absence_in_frame', 'allow_voices', 'allow_wrong_gaze_direction',
             'select_groups', 'auto_rescheduling', 'enable', 'scheduling_required',
             'identification', 'face_passport_identification', 'face_identification',
-            'passport_identification', 'is_trial', 'custom_rules',
+            'passport_identification', 'is_trial', 'custom_rules', 'noprotection',
         ];
     }
 

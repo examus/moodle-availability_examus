@@ -62,6 +62,7 @@ $string['passport_identification'] = 'Passport';
 $string['face_identification'] = 'Face';
 
 $string['is_trial'] = 'Trial exam';
+$string['noprotection'] = 'No protection against starting outside Examus APP';
 
 $string['rules'] = "Rules";
 $string['custom_rules'] = "Custom rules";

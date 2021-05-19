@@ -82,6 +82,10 @@ function availability_examus_before_standard_html_head() {
         return '';
     }
 
+    if (condition::get_no_protection($cm)) {
+        return '';
+    }
+
     // Check that theres more rules, which pass.
     // If we have no examus accesstoken (condition fails),
     // but the module is still avalible, this means we should not
