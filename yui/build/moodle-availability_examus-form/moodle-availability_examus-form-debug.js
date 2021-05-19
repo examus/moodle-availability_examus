@@ -91,7 +91,7 @@ M.availability_examus.form.getNode = function(json) {
         '<label for="' + isTrialId + '">' + getString('enable') + '</label> '
     );
 
-    html += formGroup(noProtectionId, getString('no_protection'),
+    html += formGroup(noProtectionId, getString('noprotection'),
         '<input type="checkbox" name="noprotection" id="' + noProtectionId + '" value="1">&nbsp;' +
         '<label for="' + noProtectionId + '">' + getString('enable') + '</label> '
     );
