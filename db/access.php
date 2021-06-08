@@ -50,4 +50,18 @@ $capabilities = [
         ]
     ],
 
+    'availability/examus:proctor_auth' => [
+        'riskbitmask' => RISK_PERSONAL,
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => []
+    ],
+
+    'availability/examus:reviewer_auth' => [
+        'riskbitmask' => RISK_PERSONAL,
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => []
+    ],
+
 ];

@@ -56,8 +56,17 @@ class condition extends \core_availability\condition {
     /** @var bool Reschedule when exam was missed */
     protected $autorescheduling = false;
 
+    /** @var bool Is trial exam */
+    protected $istrial = false;
+
     /** @var array Default exam rules */
     protected $rules = [];
+
+    /** @var string identification method **/
+    protected $identification;
+
+    /** @var bool No protection (shade) */
+    protected $noprotection = false;
 
     /**
      * @var array Apply condition to specified groups
@@ -90,12 +99,33 @@ class condition extends \core_availability\condition {
 
         if (!empty($structure->rules)) {
             $this->rules = $structure->rules;
+        }else {
+            $this->rules = (object)[];
+        }
+
+        if (!empty($structure->customrules)) {
+            $this->rules->custom_rules = $structure->customrules;
         }
 
         if (!empty($structure->groups)) {
             $this->groups = $structure->groups;
         }
 
+        if (!empty($structure->identification)) {
+            $this->identification = $structure->identification;
+        }
+
+        if (isset($structure->istrial)) {
+            $this->istrial = $structure->istrial;
+        } else {
+            $this->istrial = false;
+        }
+
+        if (isset($structure->noprotection)) {
+            $this->noprotection = $structure->noprotection;
+        } else {
+            $this->noprotection = false;
+        }
     }
 
     /**
@@ -201,6 +231,39 @@ class condition extends \core_availability\condition {
     }
 
     /**
+     * get identification mode
+     *
+     * @param \cm_info $cm Cm
+     * @return string
+     */
+    public static function get_identification($cm) {
+        $econds = self::get_examus_conditions($cm);
+        return $econds[0]->identification;
+    }
+
+    /**
+     * get is trial
+     *
+     * @param \cm_info $cm Cm
+     * @return bool
+     */
+    public static function get_is_trial($cm) {
+        $econds = self::get_examus_conditions($cm);
+        return (bool) $econds[0]->istrial;
+    }
+
+    /**
+     * get no protection
+     *
+     * @param \cm_info $cm Cm
+     * @return bool
+     */
+    public static function get_no_protection($cm) {
+        $econds = self::get_examus_conditions($cm);
+        return (bool) $econds[0]->noprotection;
+    }
+
+    /**
      * get examus conditions
      *
      * @param \cm_info $cm Cm
@@ -257,6 +320,7 @@ class condition extends \core_availability\condition {
             'auto_rescheduling' => (bool) $this->autorescheduling,
             'rules' => (array) $this->rules,
             'groups' => (array) $this->groups,
+            'noprotection' => (bool) $this->noprotection,
         ];
     }
 

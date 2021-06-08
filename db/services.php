@@ -63,6 +63,15 @@ $functions = [
         'services' => 'Examus',
     ],
 
+    'availability_examus_auth_access' => [
+        'classname' => 'availability_examus_external',
+        'methodname' => 'auth_access',
+        'classpath' => 'availability/condition/examus/externallib.php',
+        'description' => 'Returns Examus App authorization',
+        'type' => 'read',
+        'services' => 'Examus',
+    ],
+
 ];
 
 // We define the services to install as pre-build services. A pre-build service is not editable by administrator.

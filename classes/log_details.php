@@ -76,13 +76,13 @@ class log_details {
         }
 
         $titles = @json_decode($entry->warning_titles, true);
-        if(empty($titles) || !is_array($titles)) {
+        if (empty($titles) || !is_array($titles)) {
             $titles = [];
         }
 
         foreach ($warningsraw as $warningraw) {
             $warning = [];
-            if(is_string($warningraw)) {
+            if (is_string($warningraw)) {
                 $warning = @json_decode($warningraw, true);
                 if (!$warning) {
                     $warning = ['type' => $warningraw];
@@ -229,7 +229,7 @@ class log_details {
         $table->define_baseurl($this->url);
         $table->setup();
 
-        foreach($warnings as $warning) {
+        foreach ($warnings as $warning) {
             $table->add_data([
                 (isset($warning['type']) ? $warning['type'] : ''),
                 (isset($warning['title']) ? $warning['title'] : ''),

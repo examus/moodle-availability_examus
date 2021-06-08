@@ -28,6 +28,8 @@ defined('MOODLE_INTERNAL') || die();
 $string['examus:logaccess'] = 'Examus log access';
 $string['examus:logaccess_course'] = 'Examus log access for course';
 $string['examus:logaccess_all'] = 'Examus log access for all courses';
+$string['examus:proctor_auth'] = 'Authorize to Examus App as a proctor';
+$string['examus:reviewer_auth'] = 'Authorize to Examus App as a reviewer';
 
 $string['description'] = 'Allows students to use Examus proctoring service';
 $string['pluginname'] = 'Proctoring by Examus';
@@ -54,7 +56,16 @@ $string['normal_mode'] = 'Normal (Full human proctoring)';
 $string['olympics_mode'] = 'Olympics (Automatic)';
 $string['identification_mode'] = 'Identification (Human identification, automatic proctoring)';
 
+$string['identification'] = 'Identification mode';
+$string['face_passport_identification'] = 'Face & Passport';
+$string['passport_identification'] = 'Passport';
+$string['face_identification'] = 'Face';
+
+$string['is_trial'] = 'Trial exam';
+$string['noprotection'] = 'No protection against starting outside Examus APP';
+
 $string['rules'] = "Rules";
+$string['custom_rules'] = "Custom rules";
 
 $string['time_scheduled'] = 'Scheduled';
 $string['time_finish'] = 'Attempt finished at';

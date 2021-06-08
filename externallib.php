@@ -68,6 +68,8 @@ class availability_examus_external extends external_api {
             'scheduling_required' => condition::get_examus_scheduling($cm),
             'auto_rescheduling' => condition::get_auto_rescheduling($cm),
             'accesscode' => $entry->accesscode,
+            'identification' => condition::get_identification($cm),
+            'is_trial' => condition::get_is_trial($cm),
         ];
 
         $rules = condition::get_examus_rules($cm);
@@ -233,11 +235,14 @@ class availability_examus_external extends external_api {
                         'allow_absence_in_frame' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
                         'allow_voices' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
                         'allow_wrong_gaze_direction' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
+                        'custom_rules' => new external_value(PARAM_TEXT, 'Custom Rules', VALUE_OPTIONAL),
                     ], 'rules set', VALUE_OPTIONAL),
                     'is_proctored' => new external_value(PARAM_BOOL, 'module proctored'),
                     'accesscode' => new external_value(PARAM_TEXT, 'module code'),
                     'start' => new external_value(PARAM_INT, 'module start', VALUE_OPTIONAL),
                     'end' => new external_value(PARAM_INT, 'module end', VALUE_OPTIONAL),
+                    'identification' => new external_value(PARAM_TEXT, 'Identification mode', VALUE_OPTIONAL),
+                    'is_trial' => new external_value(PARAM_BOOL, 'Trial exam')
                 ], 'module')
             ),
         ]);
@@ -361,6 +366,64 @@ class availability_examus_external extends external_api {
         return new external_single_structure([
             'success' => new external_value(PARAM_BOOL, 'request success status'),
             'error' => new external_value(PARAM_TEXT, 'error message')
+        ]);
+    }
+
+    public static function auth_access($useremail) {
+        global $DB;
+        self::validate_parameters(self::auth_access_parameters(), [
+            'useremail' => $useremail,
+        ]);
+
+        $user = $DB->get_record('user', ['email' => $useremail]);
+
+        if (!$user) {
+            return [
+                'success' => false,
+                'error' => 'User not found'
+            ];
+        }
+
+        $courses = enrol_get_users_courses($user->id, true);
+
+        $reviewerauth = [];
+        $proctorauth = [];
+
+        foreach ($courses as $course) {
+            $coursecontext = \context_course::instance($course->id);
+            if (has_capability('availability/examus:reviewer_auth', $coursecontext, $user->id)) {
+                $reviewerauth [] = $course->id;
+            }
+            if (has_capability('availability/examus:proctor_auth', $coursecontext, $user->id)) {
+                $proctorauth [] = $course->id;
+            }
+        }
+
+        return [
+            'success' => true,
+            'error' => null,
+            'proctor_auth' => count($proctorauth) > 0,
+            'reviewer_auth' => count($reviewerauth) > 0
+        ];
+    }
+
+    public static function auth_access_parameters() {
+        return new external_function_parameters([
+            'useremail' => new external_value(PARAM_TEXT, 'User email'),
+        ]);
+    }
+
+    /**
+     * Returns description of method result value
+     *
+     * @return external_description
+     */
+    public static function auth_access_returns() {
+        return new external_single_structure([
+            'success' => new external_value(PARAM_BOOL, 'request success status'),
+            'error' => new external_value(PARAM_TEXT, 'error message'),
+            'proctor_auth' => new external_value(PARAM_BOOL, 'Has proctor access', VALUE_OPTIONAL),
+            'reviewer_auth' => new external_value(PARAM_BOOL, 'Has reviewer access', VALUE_OPTIONAL)
         ]);
     }
 
