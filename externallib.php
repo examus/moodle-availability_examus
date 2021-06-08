@@ -146,7 +146,11 @@ class availability_examus_external extends external_api {
             state::$apirequest = true;
 
             $user = $DB->get_record('user', ['email' => $useremail]);
-            $courses = enrol_get_users_courses($user->id, true);
+            if ($user) {
+                $courses = enrol_get_users_courses($user->id, true);
+            } else {
+                $courses = [];
+            }
 
             foreach ($courses as $course) {
                 $course = get_course($course->id);
