@@ -20,8 +20,6 @@ M.availability_examus.form.initInner = function(rules, groups) {
 M.availability_examus.form.instId = 0;
 
 M.availability_examus.form.getNode = function(json) {
-    var html, node, root, id, modeId, durationId, keyId;
-
     /**
      * @param {string} identifier A string identifier
      * @returns {string} A string from translations.
@@ -30,17 +28,22 @@ M.availability_examus.form.getNode = function(json) {
         return M.util.get_string(identifier, 'availability_examus');
     }
 
+    var html, node, root, value;
+
     M.availability_examus.form.instId += 1;
 
-    id = 'examus' + M.availability_examus.form.instId;
+    var id = 'examus' + M.availability_examus.form.instId;
+    var durationId = id + '_duration';
+    var modeId = id + '_mode';
+    var schedulingRequiredId = id + '_schedulingRequired';
+    var autoReschedulingId = id + '_autoRescheduling';
 
     html = '<label><strong>' + getString('title') + '</strong></label><br><br>';
 
-    durationId = id + '_duration';
+
     html += '<label for="' + durationId + '">' + getString('duration') + '</label> ';
     html += '<input type="text" name="duration" id="' + durationId + '">';
 
-    modeId = id + '_mode';
     html += '<br><label for="' + modeId + '">' + getString('mode') + '</label> ';
     html += '<select name="mode" id="' + modeId + '">';
     html += '  <option value="normal">' + getString('normal_mode') + '</option>';
@@ -48,15 +51,18 @@ M.availability_examus.form.getNode = function(json) {
     html += '  <option value="olympics">' + getString('olympics_mode') + '</option>';
     html += '</select>';
 
-    var autoReschedulingId = id + '_autoRescheduling';
+    html += '<br><label for="' +  schedulingRequiredId+ '">' + getString('scheduling_required') + '</label> ';
+    html += '<input type="checkbox" name="scheduling_required" id="' + schedulingRequiredId + '" value="1">&nbsp;';
+    html += '<label for="' + schedulingRequiredId + '">' + getString('enable') + '</label> ';
+
     html += '<br><label for="' + autoReschedulingId + '">' + getString('auto_rescheduling') + '</label> ';
-    html += '<input type="checkbox" name="auto_rescheduling" id="' + autoReschedulingId + '" value="1">';
+    html += '<input type="checkbox" name="auto_rescheduling" id="' + autoReschedulingId + '" value="1">&nbsp;';
     html += '<label for="' + autoReschedulingId + '">' + getString('enable') + '</label> ';
 
     html += '<div class="rules" style="padding-bottom:20px">';
     html += '<label>' + getString('rules') + '</label> ';
     for (var key in this.rules) {
-        keyId = id + '_' + key;
+        var keyId = id + '_' + key;
         html += '  <br><input type="checkbox" name="' + key + '" id="' + keyId + '" value="' + key + '" >';
         html += '  <label for="' + keyId + '">' + getString(key) + '</label>';
     }
@@ -81,7 +87,6 @@ M.availability_examus.form.getNode = function(json) {
         html += '</div>';
     }
 
-
     node = Y.Node.create('<span> ' + html + ' </span>');
     if (json.duration !== undefined) {
         node.one('input[name=duration]').set('value', json.duration);
@@ -92,8 +97,13 @@ M.availability_examus.form.getNode = function(json) {
     }
 
     if (json.auto_rescheduling !== undefined) {
-        var value = json.auto_rescheduling ? 'checked' : null;
+        value = json.auto_rescheduling ? 'checked' : null;
         node.one('#' + autoReschedulingId).set('checked', value);
+    }
+
+    if (json.scheduling_required !== undefined) {
+        value = json.scheduling_required ? 'checked' : null;
+        node.one('#' + schedulingRequiredId).set('checked', value);
     }
 
     if (json.rules === undefined) {
@@ -133,6 +143,7 @@ M.availability_examus.form.fillValue = function(value, node) {
     value.duration = node.one('input[name=duration]').get('value').trim();
     value.mode = node.one('select[name=mode]').get('value').trim();
     value.auto_rescheduling = node.one('input[name=auto_rescheduling]').get('checked');
+    value.scheduling_required = node.one('input[name=scheduling_required]').get('checked');
 
     value.rules = {};
     rulesInputs = node.all('.rules input');
