@@ -62,7 +62,7 @@ $string['passport_identification'] = 'Паспорт';
 $string['face_identification'] = 'Лицо';
 
 $string['is_trial'] = 'Пробный экзамен';
-$string['noprotection'] = 'Без защиты от сдачи вне приложения';
+$string['noprotection'] = 'Отключить защиту от сдачи без прокторинга';
 
 $string['rules'] = 'Правила';
 $string['custom_rules'] = "Нестандартные правила";
