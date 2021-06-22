@@ -44,6 +44,12 @@ class condition extends \core_availability\condition {
      */
     const EXPIRATION_SLACK = 15 * 60;
 
+    /** @var array List of (de-)serializable properties */
+    const PROPS = [
+        'duration', 'mode', 'schedulingrequired', 'autorescheduling',
+        'istrial', 'rules', 'identification', 'noprotection',
+    ];
+
     /** @var int Default exam duration */
     protected $duration = 60;
 
@@ -145,6 +151,54 @@ class condition extends \core_availability\condition {
             $this->auxiliarycamera = false;
         }
 
+    }
+
+    /**
+     * Export for external communication
+     *
+     * @return Array of properties of current condition
+     */
+    public function to_json() {
+        $result = [];
+        foreach ($this::PROPS as $prop) {
+            $result[$prop] = $this->{$prop};
+        }
+
+        if (!empty($result['rules'])) {
+            $rules = [];
+            foreach ($result['rules'] as $key => $value) {
+                $rules[] = ['key' => $key, 'value' => $value];
+            }
+            $result['rules'] = $rules;
+        }else{
+            $result['rules'] = [];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Import from external communication
+     *
+     * @return null
+     */
+    public function from_json($data){
+        foreach ($this::PROPS as $prop) {
+            if (in_array($prop, ['rules'])) {
+                continue;
+            }
+            if (isset($data[$prop])) {
+                $this->{$prop} = $data[$prop];
+            }
+        }
+
+        if (isset($data['rules']) && is_array($data['rules'])) {
+            foreach ($data['rules'] as $rule){
+                $key = $rule['key'];
+                $value = $rule['value'];
+                $this->rules->{$key} = $value;
+            }
+        }
     }
 
     /**
@@ -370,7 +424,7 @@ class condition extends \core_availability\condition {
     }
 
     /**
-     * save
+     * Export for moodle storage
      *
      * @return object
      */
