@@ -52,6 +52,7 @@ M.availability_examus.form.getNode = function(json) {
     var identificationId = id + '_identification';
     var customRulesId = id + '_customRules';
     var noProtectionId = id + '_noProtection';
+    var userAgreementId = id + 'userAgreement';
 
     html = '<label><strong>' + getString('title') + '</strong></label><br><br>';
 
@@ -65,6 +66,7 @@ M.availability_examus.form.getNode = function(json) {
         '  <option value="normal">' + getString('normal_mode') + '</option>' +
         '  <option value="identification">' + getString('identification_mode') + '</option>' +
         '  <option value="olympics">' + getString('olympics_mode') + '</option>' +
+        '  <option value="auto">' + getString('auto_mode') + '</option>' +
         '</select>'
     );
 
@@ -73,6 +75,7 @@ M.availability_examus.form.getNode = function(json) {
         '  <option value="passport">' + getString('passport_identification') + '</option>' +
         '  <option value="face">' + getString('face_identification') + '</option>' +
         '  <option value="face_and_passport">' + getString('face_passport_identification') + '</option>' +
+        '  <option value="skip">' + getString('skip_identification') + '</option>' +
         '</select>'
     );
 
@@ -94,6 +97,10 @@ M.availability_examus.form.getNode = function(json) {
     html += formGroup(noProtectionId, getString('noprotection'),
         '<input type="checkbox" name="noprotection" id="' + noProtectionId + '" value="1">&nbsp;' +
         '<label for="' + noProtectionId + '">' + getString('enable') + '</label> '
+    );
+
+    html += formGroup(userAgreementId, getString('user_agreement_url'),
+        '<input name="useragreementurl" id="' + userAgreementId + '" class="form-control" value="" />'
     );
 
     html += formGroup(customRulesId, getString('custom_rules'),
@@ -179,6 +186,9 @@ M.availability_examus.form.getNode = function(json) {
         node.one('#' + customRulesId).set('value', json.customrules);
     }
 
+    if (json.useragreementurl !== undefined) {
+        node.one('#' + userAgreementId).set('value', json.useragreementurl);
+    }
 
     if (!M.availability_examus.form.addedEvents) {
         M.availability_examus.form.addedEvents = true;
@@ -205,6 +215,7 @@ M.availability_examus.form.fillValue = function(value, node) {
     value.istrial = node.one('input[name=istrial]').get('checked');
     value.customrules = node.one('textarea[name=customrules]').get('value').trim();
     value.noprotection = node.one('input[name=noprotection]').get('checked');
+    value.useragreementurl = node.one('input[name=useragreementurl]').get('value').trim();
 
     value.rules = {};
     rulesInputs = node.all('.rules input');

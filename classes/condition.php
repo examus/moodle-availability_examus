@@ -68,6 +68,9 @@ class condition extends \core_availability\condition {
     /** @var bool No protection (shade) */
     protected $noprotection = false;
 
+    /** @var string User agreement URL */
+    protected $useragreementurl = null;
+
     /**
      * @var array Apply condition to specified groups
      */
@@ -86,7 +89,7 @@ class condition extends \core_availability\condition {
             $this->mode = $structure->mode;
         }
 
-        if (!empty($structure->scheduling_required)) {
+        if (isset($structure->scheduling_required) && $structure->scheduling_required !== null) {
             $this->schedulingrequired = $structure->scheduling_required;
         } else {
             $manualmodes = ['normal', 'identification'];
@@ -119,6 +122,10 @@ class condition extends \core_availability\condition {
             $this->istrial = $structure->istrial;
         } else {
             $this->istrial = false;
+        }
+
+        if (!empty($structure->useragreementurl)) {
+            $this->useragreementurl = $structure->useragreementurl;
         }
 
         if (isset($structure->noprotection)) {
@@ -250,6 +257,17 @@ class condition extends \core_availability\condition {
     public static function get_is_trial($cm) {
         $econds = self::get_examus_conditions($cm);
         return (bool) $econds[0]->istrial;
+    }
+
+    /**
+     * get user agreement url
+     *
+     * @param \cm_info $cm Cm
+     * @return bool
+     */
+    public static function get_user_agreement_url($cm) {
+        $econds = self::get_examus_conditions($cm);
+        return $econds[0]->useragreementurl;
     }
 
     /**
