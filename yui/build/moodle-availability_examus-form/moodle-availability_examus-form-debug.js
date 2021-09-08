@@ -39,6 +39,14 @@ M.availability_examus.form.getNode = function(json) {
             '</span>';
     }
 
+    function setSchedulingState(){
+        var manualmodes = ['normal', 'identification'];
+        var mode = node.one('select[name=mode]').get('value').trim();
+        var checked = manualmodes.indexOf(mode) >= 0;
+
+        node.one('#' + schedulingRequiredId).set('checked', checked);
+    }
+
     var html, node, root, value;
 
     M.availability_examus.form.instId += 1;
@@ -206,14 +214,21 @@ M.availability_examus.form.getNode = function(json) {
     if (!M.availability_examus.form.addedEvents) {
         M.availability_examus.form.addedEvents = true;
         root = Y.one(".availability-field");
+
         root.delegate('valuechange', function() {
             M.core_availability.form.update();
         }, '.availability_examus input,.availability_examus textarea,.availability_examus select');
+
         root.delegate('click', function() {
             M.core_availability.form.update();
         }, '.availability_examus input[type=checkbox],');
 
+        root.delegate('valuechange', function() {
+            setSchedulingState();
+        }, '.availability_examus #'+modeId);
     }
+
+    //setSchedulingState();
 
     return node;
 };
