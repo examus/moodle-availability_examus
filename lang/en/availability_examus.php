@@ -65,6 +65,7 @@ $string['skip_identification'] = 'Skip';
 
 $string['is_trial'] = 'Trial exam';
 $string['noprotection'] = 'No protection against starting outside Examus APP';
+$string['auxiliary_camera'] = 'Auxiliary camera (mobile) ';
 
 $string['rules'] = "Rules";
 $string['custom_rules'] = "Custom rules";

@@ -71,6 +71,7 @@ class availability_examus_external extends external_api {
             'identification' => condition::get_identification($cm),
             'is_trial' => condition::get_is_trial($cm),
             'user_agreement_url' => condition::get_user_agreement_url($cm),
+            'auxiliary_camera' => condition::get_auxiliarycamera($cm),
         ];
 
         $rules = condition::get_examus_rules($cm);
@@ -249,6 +250,7 @@ class availability_examus_external extends external_api {
                     'identification' => new external_value(PARAM_TEXT, 'Identification mode', VALUE_OPTIONAL),
                     'is_trial' => new external_value(PARAM_BOOL, 'Trial exam'),
                     'user_agreement_url' => new external_value(PARAM_TEXT, 'User agreement URL', VALUE_OPTIONAL),
+                    'auxiliary_camera' => new external_value(PARAM_BOOL, 'Auxiliary camera (mobile)'),
                 ], 'module')
             ),
         ]);

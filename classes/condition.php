@@ -71,6 +71,9 @@ class condition extends \core_availability\condition {
     /** @var string User agreement URL */
     protected $useragreementurl = null;
 
+    /** @var string Auxiliary camera enabled */
+    protected $auxiliarycamera = false;
+
     /**
      * @var array Apply condition to specified groups
      */
@@ -133,6 +136,13 @@ class condition extends \core_availability\condition {
         } else {
             $this->noprotection = false;
         }
+
+        if (isset($structure->auxiliarycamera)) {
+            $this->auxiliarycamera = $structure->auxiliarycamera;
+        } else {
+            $this->auxiliarycamera = false;
+        }
+
     }
 
     /**
@@ -282,6 +292,17 @@ class condition extends \core_availability\condition {
     }
 
     /**
+     * get auxiliarycamera
+     *
+     * @param \cm_info $cm Cm
+     * @return bool
+     */
+    public static function get_auxiliarycamera($cm) {
+        $econds = self::get_examus_conditions($cm);
+        return (bool) $econds[0]->auxiliarycamera;
+    }
+
+    /**
      * get examus conditions
      *
      * @param \cm_info $cm Cm
@@ -339,6 +360,7 @@ class condition extends \core_availability\condition {
             'rules' => (array) $this->rules,
             'groups' => (array) $this->groups,
             'noprotection' => (bool) $this->noprotection,
+            'auxiliarycamera' => (bool) $this->auxiliarycamera,
         ];
     }
 

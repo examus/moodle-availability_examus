@@ -65,6 +65,7 @@ $string['skip_identification'] = 'Пропустить';
 
 $string['is_trial'] = 'Пробный экзамен';
 $string['noprotection'] = 'Отключить защиту от сдачи без прокторинга';
+$string['auxiliary_camera'] = 'Дополнительная камера (смартфон)';
 
 $string['rules'] = 'Правила';
 $string['custom_rules'] = "Нестандартные правила";

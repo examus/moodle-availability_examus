@@ -47,7 +47,8 @@ class frontend extends \core_availability\frontend {
             'select_groups', 'auto_rescheduling', 'enable', 'scheduling_required',
             'identification', 'face_passport_identification', 'face_identification',
             'passport_identification', 'skip_identification',
-            'is_trial', 'custom_rules', 'noprotection', 'user_agreement_url'
+            'is_trial', 'custom_rules', 'noprotection', 'user_agreement_url',
+            'auxiliary_camera',
         ];
     }
 

@@ -52,6 +52,8 @@ M.availability_examus.form.getNode = function(json) {
     var identificationId = id + '_identification';
     var customRulesId = id + '_customRules';
     var noProtectionId = id + '_noProtection';
+    var auxiliaryCameraId = id + '_auxCamera';
+
     var userAgreementId = id + 'userAgreement';
 
     html = '<label><strong>' + getString('title') + '</strong></label><br><br>';
@@ -97,6 +99,11 @@ M.availability_examus.form.getNode = function(json) {
     html += formGroup(noProtectionId, getString('noprotection'),
         '<input type="checkbox" name="noprotection" id="' + noProtectionId + '" value="1">&nbsp;' +
         '<label for="' + noProtectionId + '">' + getString('enable') + '</label> '
+    );
+
+    html += formGroup(isTrialId, getString('auxiliary_camera'),
+        '<input type="checkbox" name="auxiliarycamera" id="' + auxiliaryCameraId + '" value="1">&nbsp;' +
+        '<label for="' + auxiliaryCameraId + '">' + getString('enable') + '</label> '
     );
 
     html += formGroup(userAgreementId, getString('user_agreement_url'),
@@ -167,6 +174,12 @@ M.availability_examus.form.getNode = function(json) {
         node.one('#' + isTrialId).set('checked', value);
     }
 
+
+    if (json.auxiliarycamera !== undefined) {
+        value = json.auxiliarycamera ? 'checked' : null;
+        node.one('#' + auxiliaryCameraId).set('checked', value);
+    }
+
     if (json.scheduling_required !== undefined) {
         value = json.scheduling_required ? 'checked' : null;
         node.one('#' + schedulingRequiredId).set('checked', value);
@@ -216,6 +229,7 @@ M.availability_examus.form.fillValue = function(value, node) {
     value.customrules = node.one('textarea[name=customrules]').get('value').trim();
     value.noprotection = node.one('input[name=noprotection]').get('checked');
     value.useragreementurl = node.one('input[name=useragreementurl]').get('value').trim();
+    value.auxiliarycamera = node.one('input[name=auxiliarycamera]').get('checked');
 
     value.rules = {};
     rulesInputs = node.all('.rules input');
