@@ -376,6 +376,10 @@ class condition extends \core_availability\condition {
     public function is_available($not,
             \core_availability\info $info, $grabthelot, $userid) {
 
+        if (!$info instanceof \core_availability\info_module) {
+            return true;
+        }
+
         $course = $info->get_course();
         $cm = $info->get_course_module();
 
