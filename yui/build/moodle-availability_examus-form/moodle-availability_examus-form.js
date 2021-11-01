@@ -15,6 +15,7 @@ M.availability_examus.form.rules = null;
 M.availability_examus.form.initInner = function(rules, groups) {
     this.rules = rules;
     this.groups = groups;
+    //this.scheduled_modes = ['normal', 'identification'];
 };
 
 M.availability_examus.form.instId = 0;
@@ -43,11 +44,10 @@ M.availability_examus.form.getNode = function(json) {
         var manualmodes = ['normal', 'identification'];
         var mode = node.one('select[name=mode]').get('value').trim();
         var checked = manualmodes.indexOf(mode) >= 0;
-
         node.one('#' + schedulingRequiredId).set('checked', checked);
     }
 
-    var html, node, root, value;
+    var html, node, value;
 
     M.availability_examus.form.instId += 1;
 
@@ -152,6 +152,10 @@ M.availability_examus.form.getNode = function(json) {
     }
 
 
+    if(json.creating){
+        json.mode = 'normal';
+        json.scheduling_required = true;
+    }
 
 
     node = Y.Node.create('<span> ' + html + ' </span>');
@@ -211,22 +215,18 @@ M.availability_examus.form.getNode = function(json) {
         node.one('#' + userAgreementId).set('value', json.useragreementurl);
     }
 
-    if (!M.availability_examus.form.addedEvents) {
-        M.availability_examus.form.addedEvents = true;
-        root = Y.one(".availability-field");
 
-        root.delegate('valuechange', function() {
-            M.core_availability.form.update();
-        }, '.availability_examus input,.availability_examus textarea,.availability_examus select');
+    node.delegate('valuechange', function() {
+        M.core_availability.form.update();
+    }, 'input,textarea,select');
 
-        root.delegate('click', function() {
-            M.core_availability.form.update();
-        }, '.availability_examus input[type=checkbox],');
+    node.delegate('click', function() {
+        M.core_availability.form.update();
+    }, 'input[type=checkbox]');
 
-        root.delegate('valuechange', function() {
-            setSchedulingState();
-        }, '.availability_examus #'+modeId);
-    }
+    node.delegate('valuechange', function() {
+        setSchedulingState();
+    }, '#'+modeId);
 
     //setSchedulingState();
 
