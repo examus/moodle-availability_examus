@@ -44,6 +44,10 @@ M.availability_examus.form.getNode = function(json) {
         node.one('#' + schedulingRequiredId).set('checked', checked);
     }
 
+    function nextTick(callback){
+        setTimeout(callback, 0);
+    }
+
     var html, node, value;
 
     M.availability_examus.form.instId += 1;
@@ -214,11 +218,11 @@ M.availability_examus.form.getNode = function(json) {
 
 
     node.delegate('valuechange', function() {
-        M.core_availability.form.update();
+        nextTick(function(){ M.core_availability.form.update(); });
     }, 'input,textarea,select');
 
     node.delegate('click', function() {
-        M.core_availability.form.update();
+        nextTick(function(){ M.core_availability.form.update(); });
     }, 'input[type=checkbox]');
 
     node.delegate('valuechange', function() {

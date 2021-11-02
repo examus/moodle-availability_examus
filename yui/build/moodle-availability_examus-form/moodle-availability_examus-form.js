@@ -15,7 +15,6 @@ M.availability_examus.form.rules = null;
 M.availability_examus.form.initInner = function(rules, groups) {
     this.rules = rules;
     this.groups = groups;
-    //this.scheduled_modes = ['normal', 'identification'];
 };
 
 M.availability_examus.form.instId = 0;
@@ -45,6 +44,10 @@ M.availability_examus.form.getNode = function(json) {
         var mode = node.one('select[name=mode]').get('value').trim();
         var checked = manualmodes.indexOf(mode) >= 0;
         node.one('#' + schedulingRequiredId).set('checked', checked);
+    }
+
+    function nextTick(callback){
+        setTimeout(callback, 0);
     }
 
     var html, node, value;
@@ -217,11 +220,11 @@ M.availability_examus.form.getNode = function(json) {
 
 
     node.delegate('valuechange', function() {
-        M.core_availability.form.update();
+        nextTick(function(){ M.core_availability.form.update(); });
     }, 'input,textarea,select');
 
     node.delegate('click', function() {
-        M.core_availability.form.update();
+        nextTick(function(){ M.core_availability.form.update(); });
     }, 'input[type=checkbox]');
 
     node.delegate('valuechange', function() {
