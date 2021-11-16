@@ -311,13 +311,22 @@ class condition extends \core_availability\condition {
      * @return array
      */
     private static function get_examus_conditions($cm) {
+        if($cm && isset(self::$cached_trees[$cm->id])){
+            return self::$cached_trees[$cm->id];
+        }
+
         $info = new info_module($cm);
         try {
             $tree = $info->get_availability_tree();
+            $tree = $tree->get_all_children('\\availability_examus\\condition');
+
+            self::$cached_trees[$cm->id] = $tree;
+
         } catch (moodle_exception $e) {
             return null;
         }
-        return $tree->get_all_children('\\availability_examus\\condition');
+
+        return $tree;
     }
 
     /**
