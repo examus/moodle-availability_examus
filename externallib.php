@@ -154,6 +154,8 @@ class availability_examus_external extends external_api {
                 $courses = [];
             }
 
+            $usergroups = $DB->get_records('groups_members', ['userid' => $user->id], null, 'groupid');
+
             foreach ($courses as $course) {
                 $course = get_course($course->id);
 
@@ -172,7 +174,7 @@ class availability_examus_external extends external_api {
                                 continue;
                             }
 
-                            if (!condition::user_in_proctored_groups($cm, $user->id)) {
+                            if (!condition::user_groups_intersect($cm, $usergroups)) {
                                 continue;
                             }
 

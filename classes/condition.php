@@ -79,6 +79,8 @@ class condition extends \core_availability\condition {
      */
     protected $groups = [];
 
+    private static $cached_trees = [];
+
     /**
      * Construct
      *
@@ -330,19 +332,32 @@ class condition extends \core_availability\condition {
     public static function user_in_proctored_groups($cm, $userid) {
         global $DB;
         $user = $DB->get_record('user', ['id' => $userid]);
+        $usergroups = $DB->get_records('groups_members', ['userid' => $user->id], null, 'groupid');
+        return user_groups_intersect($cm, $usergroups);
+    }
 
+    /**
+     * Check if condition is limiteted to groups, and at least one
+     * usergroup intersects with them
+     * There is possibility to make this method private and move it
+     * to has_examus_condition, or maybe something else.
+     *
+     * @param \cm_info $cm Cm
+     * @params array $usergroups Array of usergroups
+     */
+    public static function user_groups_intersect($cm, $usergroups){
         $selectedgroups = self::get_examus_groups($cm);
-        if (!empty($selectedgroups)) {
-            $usergroups = $DB->get_records('groups_members', ['userid' => $user->id], null, 'groupid');
-            foreach ($usergroups as $usergroup) {
-                if (in_array($usergroup->groupid, $selectedgroups)) {
-                    return true;
-                }
-            }
-            return false;
-        } else {
+
+        if(empty($selectedgroups)){
             return true;
         }
+
+        foreach ($usergroups as $usergroup) {
+            if (in_array($usergroup->groupid, $selectedgroups)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
