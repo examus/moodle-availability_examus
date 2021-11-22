@@ -70,6 +70,8 @@ class availability_examus_external extends external_api {
             'accesscode' => $entry->accesscode,
             'identification' => condition::get_identification($cm),
             'is_trial' => condition::get_is_trial($cm),
+            'user_agreement_url' => condition::get_user_agreement_url($cm),
+            'auxiliary_camera' => condition::get_auxiliarycamera($cm),
         ];
 
         $rules = condition::get_examus_rules($cm);
@@ -152,6 +154,8 @@ class availability_examus_external extends external_api {
                 $courses = [];
             }
 
+            $usergroups = $DB->get_records('groups_members', ['userid' => $user->id], null, 'groupid');
+
             foreach ($courses as $course) {
                 $course = get_course($course->id);
 
@@ -170,7 +174,7 @@ class availability_examus_external extends external_api {
                                 continue;
                             }
 
-                            if (!condition::user_in_proctored_groups($cm, $user->id)) {
+                            if (!condition::user_groups_intersect($cm, $usergroups)) {
                                 continue;
                             }
 
@@ -246,7 +250,9 @@ class availability_examus_external extends external_api {
                     'start' => new external_value(PARAM_INT, 'module start', VALUE_OPTIONAL),
                     'end' => new external_value(PARAM_INT, 'module end', VALUE_OPTIONAL),
                     'identification' => new external_value(PARAM_TEXT, 'Identification mode', VALUE_OPTIONAL),
-                    'is_trial' => new external_value(PARAM_BOOL, 'Trial exam')
+                    'is_trial' => new external_value(PARAM_BOOL, 'Trial exam'),
+                    'user_agreement_url' => new external_value(PARAM_TEXT, 'User agreement URL', VALUE_OPTIONAL),
+                    'auxiliary_camera' => new external_value(PARAM_BOOL, 'Auxiliary camera (mobile)'),
                 ], 'module')
             ),
         ]);

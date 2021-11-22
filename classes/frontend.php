@@ -40,13 +40,15 @@ class frontend extends \core_availability\frontend {
     protected function get_javascript_strings() {
         return [
             'title', 'error_setduration', 'duration', 'link', 'mode', 'normal_mode',
-            'rules', 'olympics_mode', 'identification_mode', 'allow_to_use_websites',
+            'rules', 'olympics_mode', 'identification_mode', 'auto_mode', 'allow_to_use_websites',
             'allow_to_use_books', 'allow_to_use_paper', 'allow_to_use_messengers',
             'allow_to_use_calculator', 'allow_to_use_excel', 'allow_to_use_human_assistant',
             'allow_absence_in_frame', 'allow_voices', 'allow_wrong_gaze_direction',
             'select_groups', 'auto_rescheduling', 'enable', 'scheduling_required',
             'identification', 'face_passport_identification', 'face_identification',
-            'passport_identification', 'is_trial', 'custom_rules', 'noprotection',
+            'passport_identification', 'skip_identification',
+            'is_trial', 'custom_rules', 'noprotection', 'user_agreement_url',
+            'auxiliary_camera',
         ];
     }
 

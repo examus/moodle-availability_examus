@@ -68,10 +68,18 @@ class condition extends \core_availability\condition {
     /** @var bool No protection (shade) */
     protected $noprotection = false;
 
+    /** @var string User agreement URL */
+    protected $useragreementurl = null;
+
+    /** @var string Auxiliary camera enabled */
+    protected $auxiliarycamera = false;
+
     /**
      * @var array Apply condition to specified groups
      */
     protected $groups = [];
+
+    private static $cached_trees = [];
 
     /**
      * Construct
@@ -86,7 +94,7 @@ class condition extends \core_availability\condition {
             $this->mode = $structure->mode;
         }
 
-        if (!empty($structure->scheduling_required)) {
+        if (isset($structure->scheduling_required) && $structure->scheduling_required !== null) {
             $this->schedulingrequired = $structure->scheduling_required;
         } else {
             $manualmodes = ['normal', 'identification'];
@@ -121,11 +129,22 @@ class condition extends \core_availability\condition {
             $this->istrial = false;
         }
 
+        if (!empty($structure->useragreementurl)) {
+            $this->useragreementurl = $structure->useragreementurl;
+        }
+
         if (isset($structure->noprotection)) {
             $this->noprotection = $structure->noprotection;
         } else {
             $this->noprotection = false;
         }
+
+        if (isset($structure->auxiliarycamera)) {
+            $this->auxiliarycamera = $structure->auxiliarycamera;
+        } else {
+            $this->auxiliarycamera = false;
+        }
+
     }
 
     /**
@@ -253,6 +272,17 @@ class condition extends \core_availability\condition {
     }
 
     /**
+     * get user agreement url
+     *
+     * @param \cm_info $cm Cm
+     * @return bool
+     */
+    public static function get_user_agreement_url($cm) {
+        $econds = self::get_examus_conditions($cm);
+        return $econds[0]->useragreementurl;
+    }
+
+    /**
      * get no protection
      *
      * @param \cm_info $cm Cm
@@ -264,19 +294,39 @@ class condition extends \core_availability\condition {
     }
 
     /**
+     * get auxiliarycamera
+     *
+     * @param \cm_info $cm Cm
+     * @return bool
+     */
+    public static function get_auxiliarycamera($cm) {
+        $econds = self::get_examus_conditions($cm);
+        return (bool) $econds[0]->auxiliarycamera;
+    }
+
+    /**
      * get examus conditions
      *
      * @param \cm_info $cm Cm
      * @return array
      */
     private static function get_examus_conditions($cm) {
+        if($cm && isset(self::$cached_trees[$cm->id])){
+            return self::$cached_trees[$cm->id];
+        }
+
         $info = new info_module($cm);
         try {
             $tree = $info->get_availability_tree();
+            $tree = $tree->get_all_children('\\availability_examus\\condition');
+
+            self::$cached_trees[$cm->id] = $tree;
+
         } catch (moodle_exception $e) {
             return null;
         }
-        return $tree->get_all_children('\\availability_examus\\condition');
+
+        return $tree;
     }
 
     /**
@@ -291,19 +341,32 @@ class condition extends \core_availability\condition {
     public static function user_in_proctored_groups($cm, $userid) {
         global $DB;
         $user = $DB->get_record('user', ['id' => $userid]);
+        $usergroups = $DB->get_records('groups_members', ['userid' => $user->id], null, 'groupid');
+        return user_groups_intersect($cm, $usergroups);
+    }
 
+    /**
+     * Check if condition is limiteted to groups, and at least one
+     * usergroup intersects with them
+     * There is possibility to make this method private and move it
+     * to has_examus_condition, or maybe something else.
+     *
+     * @param \cm_info $cm Cm
+     * @params array $usergroups Array of usergroups
+     */
+    public static function user_groups_intersect($cm, $usergroups){
         $selectedgroups = self::get_examus_groups($cm);
-        if (!empty($selectedgroups)) {
-            $usergroups = $DB->get_records('groups_members', ['userid' => $user->id], null, 'groupid');
-            foreach ($usergroups as $usergroup) {
-                if (in_array($usergroup->groupid, $selectedgroups)) {
-                    return true;
-                }
-            }
-            return false;
-        } else {
+
+        if(empty($selectedgroups)){
             return true;
         }
+
+        foreach ($usergroups as $usergroup) {
+            if (in_array($usergroup->groupid, $selectedgroups)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -321,6 +384,7 @@ class condition extends \core_availability\condition {
             'rules' => (array) $this->rules,
             'groups' => (array) $this->groups,
             'noprotection' => (bool) $this->noprotection,
+            'auxiliarycamera' => (bool) $this->auxiliarycamera,
         ];
     }
 
@@ -335,6 +399,10 @@ class condition extends \core_availability\condition {
      */
     public function is_available($not,
             \core_availability\info $info, $grabthelot, $userid) {
+
+        if (!$info instanceof \core_availability\info_module) {
+            return true;
+        }
 
         $course = $info->get_course();
         $cm = $info->get_course_module();

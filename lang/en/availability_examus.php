@@ -52,20 +52,25 @@ $string['entry_exist'] = 'New entry already exist';
 $string['date_modified'] = 'Date of last change';
 
 $string['mode'] = 'Proctoring mode';
-$string['normal_mode'] = 'Normal (Full human proctoring)';
-$string['olympics_mode'] = 'Olympics (Automatic)';
-$string['identification_mode'] = 'Identification (Human identification, automatic proctoring)';
+$string['normal_mode'] = 'Real-time proctoring';
+$string['olympics_mode'] = 'Post-review';
+$string['auto_mode'] = 'Fully automated';
+$string['identification_mode'] = 'Live identification';
 
 $string['identification'] = 'Identification mode';
 $string['face_passport_identification'] = 'Face & Passport';
 $string['passport_identification'] = 'Passport';
 $string['face_identification'] = 'Face';
+$string['skip_identification'] = 'Skip';
 
 $string['is_trial'] = 'Trial exam';
 $string['noprotection'] = 'No protection against starting outside Examus APP';
+$string['auxiliary_camera'] = 'Auxiliary camera (mobile) ';
 
 $string['rules'] = "Rules";
 $string['custom_rules'] = "Custom rules";
+
+$string['user_agreement_url'] = "User agreement URL";
 
 $string['time_scheduled'] = 'Scheduled';
 $string['time_finish'] = 'Attempt finished at';

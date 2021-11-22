@@ -52,17 +52,20 @@ $string['entry_exist'] = 'Новая запись уже существует';
 $string['date_modified'] = 'Дата последнего изменения';
 
 $string['mode'] = 'Режим прокторинга';
-$string['normal_mode'] = 'Нормальный (Ручной прокторинг)';
-$string['olympics_mode'] = 'Олимпиадный (Полностью автоматический)';
-$string['identification_mode'] = 'Идентификация (Ручная идентификация, автоматический прокторинг)';
+$string['normal_mode'] = 'Синхронный';
+$string['olympics_mode'] = 'Асинхронный';
+$string['auto_mode'] = 'Автоматический';
+$string['identification_mode'] = 'Идентификация';
 
 $string['identification'] = 'Режим идентификации';
 $string['face_passport_identification'] = 'Лицо и паспорт';
 $string['passport_identification'] = 'Паспорт';
 $string['face_identification'] = 'Лицо';
+$string['skip_identification'] = 'Пропустить';
 
 $string['is_trial'] = 'Пробный экзамен';
 $string['noprotection'] = 'Отключить защиту от сдачи без прокторинга';
+$string['auxiliary_camera'] = 'Дополнительная камера (смартфон)';
 
 $string['rules'] = 'Правила';
 $string['custom_rules'] = "Нестандартные правила";
