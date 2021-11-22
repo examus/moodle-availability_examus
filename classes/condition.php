@@ -342,7 +342,7 @@ class condition extends \core_availability\condition {
         global $DB;
         $user = $DB->get_record('user', ['id' => $userid]);
         $usergroups = $DB->get_records('groups_members', ['userid' => $user->id], null, 'groupid');
-        return user_groups_intersect($cm, $usergroups);
+        return self::user_groups_intersect($cm, $usergroups);
     }
 
     /**
