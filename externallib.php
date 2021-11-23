@@ -44,12 +44,20 @@ class availability_examus_external extends external_api {
      * @param \stdClass $entry
      * @return array Entry data, ready for serialization
      */
-    protected static function moduleanswer($entry) {
+    protected static function moduleanswer($entry, $course = null, $modinfo = null, $cm = null) {
         global $DB;
 
-        $course = get_course($entry->courseid);
-        $modinfo = get_fast_modinfo($course);
-        $cm = $modinfo->get_cm($entry->cmid);
+        if (!$course) {
+            $course = get_course($entry->courseid);
+        }
+
+        if (!$modinfo) {
+            $modinfo = get_fast_modinfo($course);
+        }
+
+        if (!$cm) {
+            $cm = $modinfo->get_cm($entry->cmid);
+        }
 
         $url = new moodle_url('/availability/condition/examus/entry.php', [
             'accesscode' => $entry->accesscode
@@ -183,7 +191,7 @@ class availability_examus_external extends external_api {
                                 continue;
                             }
 
-                            array_push($answer, self::moduleanswer($entry));
+                            array_push($answer, self::moduleanswer($entry, $course, $modinfo, $cm));
 
                         } else {
                             common::delete_empty_entries($user->id, $course->id, $cm->id);
