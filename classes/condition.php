@@ -506,16 +506,7 @@ class condition extends \core_availability\condition {
     private static function create_entry_if_not_exist($userid, $cm) {
         global $DB;
 
-        if ($cm->modname == 'quiz') {
-            $quizobj = quiz::create($cm->instance, $userid);
-            $allowedattempts = $quizobj->get_num_attempts_allowed();
-            $allowedattempts = $allowedattempts > 0 ? $allowedattempts : null;
-        } else {
-            $allowedattempts = null;
-        }
-
-        $course = $cm->get_course();
-        $courseid = $course->id;
+        $courseid = $cm->course;
 
         $autorescheduling = self::get_auto_rescheduling($cm);
 
@@ -548,6 +539,14 @@ class condition extends \core_availability\condition {
                 }
 
             }
+        }
+
+        if ($cm->modname == 'quiz') {
+            $quiz = \quiz_access_manager::load_quiz_and_settings($cm->instance);
+            $allowedattempts = $quiz->attempts;
+            $allowedattempts = $allowedattempts > 0 ? $allowedattempts : null;
+        } else {
+            $allowedattempts = null;
         }
 
         if ($allowedattempts == null || count($entries) < $allowedattempts) {
