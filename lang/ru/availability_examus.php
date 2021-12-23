@@ -57,7 +57,7 @@ $string['olympics_mode'] = 'Асинхронный';
 $string['auto_mode'] = 'Автоматический';
 $string['identification_mode'] = 'Идентификация';
 
-$string['identification'] = 'Режим идентификации';
+$string['identification'] = 'Режим фотографирования';
 $string['face_passport_identification'] = 'Лицо и паспорт';
 $string['passport_identification'] = 'Паспорт';
 $string['face_identification'] = 'Лицо';
@@ -75,13 +75,13 @@ $string['time_finish'] = 'Время попытки';
 $string['auto_rescheduling'] = 'Автоматический сброс при пропуске экзамена';
 $string['enable'] = 'Включить';
 
-$string['allow_to_use_websites'] = 'Разрешить использование веб-сайтов';
+$string['allow_to_use_websites'] = 'Разрешить веб-сайты';
 $string['allow_to_use_books'] = 'Разрешить использование книг';
-$string['allow_to_use_paper'] = 'Разрешить использование черновиков';
-$string['allow_to_use_messengers'] = 'Разрешить использование мессенджеров';
-$string['allow_to_use_calculator'] = 'Разрешить использование калькулятора';
+$string['allow_to_use_paper'] = 'Разрешить черновики';
+$string['allow_to_use_messengers'] = 'Разрешить мессенджеры';
+$string['allow_to_use_calculator'] = 'Разрешить калькулятор';
 $string['allow_to_use_excel'] = 'Разрешить использование Excel';
-$string['allow_to_use_human_assistant'] = 'Разрешить использование помощи людей';
+$string['allow_to_use_human_assistant'] = 'Разрешить помощь людей';
 $string['allow_absence_in_frame'] = 'Разрешить выход из комнаты';
 $string['allow_voices'] = 'Разрешить голоса';
 $string['allow_wrong_gaze_direction'] = 'Разрешить взгляд в сторону';
