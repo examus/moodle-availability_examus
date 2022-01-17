@@ -155,30 +155,6 @@ class condition extends \core_availability\condition {
     }
 
     /**
-     * Export for external communication
-     *
-     * @return Array of properties of current condition
-     */
-    public function to_json() {
-        $result = [];
-        foreach ($this::PROPS as $prop) {
-            $result[$prop] = $this->{$prop};
-        }
-
-        if (!empty($result['rules'])) {
-            $rules = [];
-            foreach ($result['rules'] as $key => $value) {
-                $rules[] = ['key' => $key, 'value' => $value];
-            }
-            $result['rules'] = $rules;
-        }else{
-            $result['rules'] = [];
-        }
-
-        return $result;
-    }
-
-    /**
      * Import from external communication
      *
      * @return null
@@ -224,30 +200,6 @@ class condition extends \core_availability\condition {
         }
 
         return $result;
-    }
-
-    /**
-     * Import from external communication
-     *
-     * @return null
-     */
-    public function from_json($data){
-        foreach ($this::PROPS as $prop) {
-            if (in_array($prop, ['rules'])) {
-                continue;
-            }
-            if (isset($data[$prop])) {
-                $this->{$prop} = $data[$prop];
-            }
-        }
-
-        if (isset($data['rules']) && is_array($data['rules'])) {
-            foreach ($data['rules'] as $rule){
-                $key = $rule['key'];
-                $value = $rule['value'];
-                $this->rules->{$key} = $value;
-            }
-        }
     }
 
     /**
