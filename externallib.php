@@ -146,7 +146,20 @@ class availability_examus_external extends external_api {
 
             state::$apirequest = true;
 
-            $user = $DB->get_record('user', ['email' => $useremail]);
+            list($emaillocal, $emaildomain) = explode('@', $useremail);
+            if(!$emaildomain){
+                return ['modules' => []];
+            }
+            list($emailname, $emailalias) = explode('+', $emaillocal);
+
+            if($emailalias){
+                $email = $emailname . '@' . $emaildomain;
+                $user = $DB->get_record('user', ['email' => $email, 'username' => $emailalias]);
+            }
+            if(empty($user)){
+                $user = $DB->get_record('user', ['email' => $useremail]);
+            }
+
             if ($user) {
                 $courses = enrol_get_users_courses($user->id, true);
             } else {
