@@ -48,6 +48,7 @@ class condition extends \core_availability\condition {
     const PROPS = [
         'duration', 'mode', 'schedulingrequired', 'autorescheduling',
         'istrial', 'rules', 'identification', 'noprotection',
+        'useragreementurl', 'auxiliarycamera',
     ];
 
     /** @var int Default exam duration */
