@@ -110,7 +110,7 @@ class log {
             'threshold',
         ];
 
-        $where = ['TRUE'];
+        $where = [];
         $params = $this->filters;
 
         if (isset($params['from[day]']) && isset($params['from[month]']) && isset($params['from[year]'])) {
@@ -158,7 +158,8 @@ class log {
         if (!empty($courseids)) {
             $where[] = 'courseid IN('.implode(',', $courseids).')';
         } else {
-            $where[] = 'FALSE';
+            // Always false condition. Can't use FALSE because of mssql.
+            $where[] = '1=0';
         }
 
         $orderby = $this->table->get_sql_sort();
@@ -166,14 +167,14 @@ class log {
         $query = 'SELECT '.implode(', ', $select).' FROM {availability_examus} e '
                . ' LEFT JOIN {user} u ON u.id=e.userid '
                . ' LEFT JOIN {quiz_attempts} a ON a.id=e.attemptid '
-               . ' WHERE '.implode(' AND ', $where)
+               . (count($where) ? ' WHERE '.implode(' AND ', $where) : '')
                . ($orderby ? ' ORDER BY '. $orderby : '')
                . ' LIMIT '.$this->perpage.' OFFSET '.($this->page * $this->perpage);
 
         $querycount = 'SELECT count(e.id) as count FROM {availability_examus} e '
                     . ' LEFT JOIN {user} u ON u.id=e.userid '
                     . ' LEFT JOIN {quiz_attempts} a ON a.id=e.attemptid '
-                    . ' WHERE '.implode(' AND ', $where);
+                    . (count($where) ? ' WHERE '.implode(' AND ', $where) : '');
 
         $this->entries = $DB->get_records_sql($query, $params);
 
