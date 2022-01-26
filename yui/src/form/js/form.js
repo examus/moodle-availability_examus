@@ -204,7 +204,10 @@ M.availability_examus.form.getNode = function(json) {
 
     for (var ruleKey in json.rules) {
         if (json.rules[ruleKey]) {
-            node.one('.rules input[name=' + ruleKey + ']').set('checked', 'checked');
+            var input = node.one('.rules input[name=' + ruleKey + ']');
+            if(input) {
+                input.set('checked', 'checked');
+            }
         }
     }
 
