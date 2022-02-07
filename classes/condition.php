@@ -517,19 +517,6 @@ class condition extends \core_availability\condition {
         return get_string('use_examus', 'availability_examus');
     }
 
-
-    /**
-     * create entry for cm
-     *
-     * @param int $userid User id
-     * @param stdClass $cm Cm
-     * @return stdClass
-     */
-    public static function create_entry_for_cm($userid, $cm) {
-        return self::create_entry_if_not_exist($userid, $cm);
-    }
-
-
     /**
      * Initialize new entry, ready to write to DB
      * @param integer $courseid
@@ -558,12 +545,10 @@ class condition extends \core_availability\condition {
      * @param integer $cm Cm id
      * @return stdClass
      */
-    private static function create_entry_if_not_exist($userid, $cm) {
+    public function create_entry_for_cm($userid, $cm) {
         global $DB;
 
         $courseid = $cm->course;
-
-        $autorescheduling = self::get_auto_rescheduling($cm);
 
         $entries = $DB->get_records('availability_examus', [
             'userid' => $userid,
@@ -578,7 +563,7 @@ class condition extends \core_availability\condition {
         }
 
         foreach ($entries as $entry) {
-            if ($autorescheduling) {
+            if ($this->autorescheduling) {
                 // Was schduled and not completed.
                 $scheduled = !$entry->attemptid && $entry->status == 'Scheduled';
                 // Consider expired, giving 15 minutes slack.
