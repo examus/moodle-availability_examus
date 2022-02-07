@@ -10,9 +10,10 @@ M.availability_examus.form = Y.Object(M.core_availability.plugin);
 
 M.availability_examus.form.rules = null;
 
-M.availability_examus.form.initInner = function(rules, groups) {
+M.availability_examus.form.initInner = function(rules, groups, warnings) {
     this.rules = rules;
     this.groups = groups;
+    this.warnings = warnings;
 };
 
 M.availability_examus.form.instId = 0;
@@ -37,15 +38,33 @@ M.availability_examus.form.getNode = function(json) {
             '</span>';
     }
 
-    function setSchedulingState(){
+    function setSchedulingState() {
         var manualmodes = ['normal', 'identification'];
         var mode = node.one('select[name=mode]').get('value').trim();
         var checked = manualmodes.indexOf(mode) >= 0;
         node.one('#' + schedulingRequiredId).set('checked', checked);
     }
 
-    function nextTick(callback){
+    function nextTick(callback) {
         setTimeout(callback, 0);
+    }
+
+    function switchTab(tab){
+        if(tab == 1) {
+            tabButtonOne.addClass('btn-primary');
+            tabButtonOne.removeClass('btn-secondary');
+            tabButtonTwo.addClass('btn-secondary');
+            tabButtonTwo.removeClass('btn-primary');
+            tabOne.removeClass('hidden');
+            tabTwo.addClass('hidden');
+        } else {
+            tabButtonTwo.addClass('btn-primary');
+            tabButtonTwo.removeClass('btn-secondary');
+            tabButtonOne.addClass('btn-secondary');
+            tabButtonOne.removeClass('btn-primary');
+            tabOne.addClass('hidden');
+            tabTwo.removeClass('hidden');
+        }
     }
 
     var html, node, value;
@@ -65,10 +84,7 @@ M.availability_examus.form.getNode = function(json) {
 
     var userAgreementId = id + 'userAgreement';
 
-    html = '<label><strong>' + getString('title') + '</strong></label><br><br>';
-
-
-    html += formGroup(durationId, getString('duration'),
+    html = formGroup(durationId, getString('duration'),
         '<input type="text" name="duration" id="' + durationId + '" class="form-control">'
     );
 
@@ -127,15 +143,14 @@ M.availability_examus.form.getNode = function(json) {
     var ruleOptions = '';
     for (var key in this.rules) {
         var keyId = id + '_' + key;
-        ruleOptions += '  <br><input type="checkbox" name="' + key + '" id="' + keyId + '" value="' + key + '" >';
-        ruleOptions += '  <label for="' + keyId + '">' + getString(key) + '</label>';
+        ruleOptions += '<br><input type="checkbox" name="' + key + '" id="' + keyId + '" value="' + key + '" >&nbsp;';
+        ruleOptions += '<label for="' + keyId + '" style="white-space: break-spaces">' + getString(key) + '</label>';
     }
 
-    html += formGroup(null, getString('rules'), '<div class="rules"' + ruleOptions + '</div>');
+    html += formGroup(null, getString('rules'), '<div class="rules" style="white-space:nowrap">' + ruleOptions + '</div>');
 
 
     if (this.groups) {
-
         var groupOptions = '';
         for (var i in this.groups) {
             id = this.groups[i].id;
@@ -153,13 +168,33 @@ M.availability_examus.form.getNode = function(json) {
     }
 
 
+    var warningOptions = '';
+    for (var wkey in this.warnings) {
+        var wkeyId = id + '_' + wkey;
+        warningOptions += '<br><input type="checkbox" name="' + wkey + '" id="' + wkeyId + '" value="' + wkey + '" >&nbsp;';
+        warningOptions += '<label for="' + wkeyId + '" style="white-space: break-spaces">' + getString(wkey) + '</label>';
+    }
+
+    var htmlTwo = formGroup(null, getString('visible_warnings'),
+                             '<div class="warnings" style="white-space: nowrap" ' + warningOptions + '</div>');
+
+    node = Y.Node.create('<span class="availibility_examus-tabs" style="position:relative"></span>');
+
+    node.setHTML('<label><strong>' + getString('title') + '</strong></label><br><br>');
+
+    var tabButtons = Y.Node.create('<div style="position:absolute; top: 0; right: 0;" class="availibility_examus-tab-btns"></div>').appendTo(node);
+    var tabButtonOne = Y.Node.create('<a href="#" class="btn btn-primary">1</a>').appendTo(tabButtons);
+    var tabButtonTwo = Y.Node.create('<a href="#" class="btn btn-secondary">2</a>').appendTo(tabButtons);
+
+    var tabOne = Y.Node.create('<div class="tab_content">' + html + '</div>').appendTo(node);
+    var tabTwo = Y.Node.create('<div class="tab_content hidden">' + htmlTwo + '</div>').appendTo(node);
+
+
     if(json.creating){
-        json.mode = 'normal';
+      json.mode = 'normal';
         json.scheduling_required = true;
     }
 
-
-    node = Y.Node.create('<span> ' + html + ' </span>');
     if (json.duration !== undefined) {
         node.one('input[name=duration]').set('value', json.duration);
     }
@@ -202,11 +237,30 @@ M.availability_examus.form.getNode = function(json) {
         json.rules = this.rules;
     }
 
+    if (json.warnings === undefined) {
+        json.warnings = this.warnings;
+    } else {
+        var warningRows = json.warnings;
+        json.warnings = this.warnings;
+        for(var wkey in warningRows) {
+            json.warnings[wkey] = warningRows[wkey];
+        }
+    }
+
     for (var ruleKey in json.rules) {
         if (json.rules[ruleKey]) {
             var input = node.one('.rules input[name=' + ruleKey + ']');
             if(input) {
                 input.set('checked', 'checked');
+            }
+        }
+    }
+
+    for (var warningKey in json.warnings) {
+        if (json.warnings[warningKey]) {
+            var winput = node.one('.warnings input[name=' + warningKey + ']');
+            if(winput) {
+                winput.set('checked', 'checked');
             }
         }
     }
@@ -232,13 +286,22 @@ M.availability_examus.form.getNode = function(json) {
         setSchedulingState();
     }, '#'+modeId);
 
+    tabButtonOne.on('click', function(e){
+        e.preventDefault();
+        switchTab(1);
+    });
+    tabButtonTwo.on('click', function(e){
+        e.preventDefault();
+        switchTab(2);
+    });
+
     //setSchedulingState();
 
     return node;
 };
 
 M.availability_examus.form.fillValue = function(value, node) {
-    var rulesInputs, key;
+    var rulesInputs, warningsInputs, key;
     value.duration = node.one('input[name=duration]').get('value').trim();
     value.mode = node.one('select[name=mode]').get('value').trim();
     value.identification = node.one('select[name=identification]').get('value').trim();
@@ -258,6 +321,17 @@ M.availability_examus.form.fillValue = function(value, node) {
             value.rules[key] = true;
         } else {
             value.rules[key] = false;
+        }
+    });
+
+    value.warnings = {};
+    warningsInputs = node.all('.warnings input');
+    Y.each(warningsInputs, function(warningInput) {
+        key = warningInput.get('value');
+        if (warningInput.get('checked') === true) {
+            value.warnings[key] = true;
+        } else {
+            value.warnings[key] = false;
         }
     });
 

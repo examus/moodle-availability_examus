@@ -78,6 +78,11 @@ class availability_examus_external extends external_api {
             $moduleanswer['rules'] = $rules;
         }
 
+        $warnings = condition::get_examus_warnings($cm);
+        if ($warnings) {
+            $moduleanswer['warnings'] = $warnings;
+        }
+
         switch ($cm->modname) {
             case 'quiz':
                 try {
@@ -232,6 +237,11 @@ class availability_examus_external extends external_api {
      * @return external_description
      */
     public static function user_proctored_modules_returns() {
+        $warnings = [];
+        foreach(condition::WARNINGS as $key => $val){
+            $warnings[$key] = new external_value(PARAM_BOOL, '', VALUE_OPTIONAL);
+        }
+
         return new external_single_structure([
             'modules' => new external_multiple_structure(
                 new external_single_structure([
@@ -260,6 +270,7 @@ class availability_examus_external extends external_api {
                         'allow_wrong_gaze_direction' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
                         'custom_rules' => new external_value(PARAM_TEXT, 'Custom Rules', VALUE_OPTIONAL),
                     ], 'rules set', VALUE_OPTIONAL),
+                    'warnings' => new external_single_structure($warnings, VALUE_OPTIONAL),
                     'is_proctored' => new external_value(PARAM_BOOL, 'module proctored'),
                     'identification' => new external_value(PARAM_TEXT, 'Identification mode', VALUE_OPTIONAL),
                     'is_trial' => new external_value(PARAM_BOOL, 'Trial exam'),

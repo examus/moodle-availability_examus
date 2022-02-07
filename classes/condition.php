@@ -51,6 +51,32 @@ class condition extends \core_availability\condition {
         'useragreementurl', 'auxiliarycamera',
     ];
 
+    const WARNINGS = [
+        'warning_extra_user_in_frame' => true,
+        'warning_substitution_user' => true,
+        'warning_no_user_in_frame' => true,
+        'warning_avert_eyes' => true,
+        'warning_timeout' => true,
+        'warning_change_active_window_on_computer' => true,
+        'warning_talk' => true,
+        'warning_forbidden_software' => true,
+        'warning_forbidden_device' => true,
+        'warning_voice_detected' => true,
+        'warning_extra_display' => true,
+        'warning_books' => true,
+        'warning_cheater' => true,
+        'warning_mic_muted' => true,
+        'warning_mic_no_sound' => true,
+        'warning_mic_no_device_connected' => true,
+        'warning_camera_no_picture' => true,
+        'warning_camera_no_device_connected' => true,
+        'warning_nonverbal' => true,
+        'warning_phone' => true,
+        'warning_phone_screen' => true,
+        'warning_no_ping' => true,
+        'warning_desktop_request_pending' => true,
+    ];
+
     /** @var int Default exam duration */
     protected $duration = 60;
 
@@ -68,6 +94,9 @@ class condition extends \core_availability\condition {
 
     /** @var array Default exam rules */
     protected $rules = [];
+
+    /** @var array Default exam rules */
+    protected $warnings = [];
 
     /** @var string identification method **/
     protected $identification;
@@ -112,6 +141,12 @@ class condition extends \core_availability\condition {
             $this->autorescheduling = $structure->auto_rescheduling;
         }
 
+        if (!empty($structure->warnings)) {
+            $warnings = array_merge(self::WARNINGS, (array)$structure->warnings);
+            $this->warnings = (object)$warnings;
+        }else {
+            $this->warnings = (object)self::WARNINGS;
+        }
         if (!empty($structure->rules)) {
             $this->rules = $structure->rules;
         }else {
@@ -269,6 +304,11 @@ class condition extends \core_availability\condition {
     public static function get_examus_rules($cm) {
         $econds = self::get_examus_conditions($cm);
         return (array) $econds[0]->rules;
+    }
+
+    public static function get_examus_warnings($cm) {
+        $econds = self::get_examus_conditions($cm);
+        return (array) $econds[0]->warnings;
     }
 
     /**
@@ -437,6 +477,7 @@ class condition extends \core_availability\condition {
             'scheduling_required' => (bool) $this->schedulingrequired,
             'auto_rescheduling' => (bool) $this->autorescheduling,
             'rules' => (array) $this->rules,
+            'warnings' => (array) $this->warnings,
             'groups' => (array) $this->groups,
             'noprotection' => (bool) $this->noprotection,
             'auxiliarycamera' => (bool) $this->auxiliarycamera,
