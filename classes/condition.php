@@ -48,7 +48,7 @@ class condition extends \core_availability\condition {
     const PROPS = [
         'duration', 'mode', 'schedulingrequired', 'autorescheduling',
         'istrial', 'rules', 'identification', 'noprotection',
-        'useragreementurl', 'auxiliarycamera',
+        'useragreementurl', 'auxiliarycamera', 'customrules',
     ];
 
     const WARNINGS = [
@@ -75,6 +75,19 @@ class condition extends \core_availability\condition {
         'warning_phone_screen' => true,
         'warning_no_ping' => true,
         'warning_desktop_request_pending' => true,
+    ];
+
+    const RULES = [
+        'allow_to_use_websites' => false,
+        'allow_to_use_books' => false,
+        'allow_to_use_paper' => true,
+        'allow_to_use_messengers' => false,
+        'allow_to_use_calculator' => true,
+        'allow_to_use_excel' => false,
+        'allow_to_use_human_assistant' => false,
+        'allow_absence_in_frame' => false,
+        'allow_voices' => false,
+        'allow_wrong_gaze_direction' => false,
     ];
 
     /** @var int Default exam duration */
@@ -109,6 +122,8 @@ class condition extends \core_availability\condition {
 
     /** @var string Auxiliary camera enabled */
     protected $auxiliarycamera = false;
+
+    protected $customrules = null;
 
     /**
      * @var array Apply condition to specified groups
@@ -148,13 +163,14 @@ class condition extends \core_availability\condition {
             $this->warnings = (object)self::WARNINGS;
         }
         if (!empty($structure->rules)) {
+            $rules = array_merge(self::RULES, (array)$structure->rules);
             $this->rules = $structure->rules;
         }else {
-            $this->rules = (object)[];
+            $this->rules = (object)self::RULES;
         }
 
         if (!empty($structure->customrules)) {
-            $this->rules->custom_rules = $structure->customrules;
+            $this->customrules = $structure->customrules;
         }
 
         if (!empty($structure->groups)) {
@@ -186,7 +202,27 @@ class condition extends \core_availability\condition {
         } else {
             $this->auxiliarycamera = false;
         }
+        $this->validate();
+    }
 
+    public function validate(){
+        $keys = array_keys(self::RULES);
+        foreach($this->rules as $key => $value) {
+            if(!in_array($key, $keys)) {
+                unset($this->rules->{$key});
+            } else {
+                $this->rules->{$key} = (bool) $this->rules->{$key};
+            }
+        }
+
+        $keys = array_keys(self::WARNINGS);
+        foreach($this->warnings as $key => $value) {
+            if(!in_array($key, $keys)) {
+                unset($this->warnings->{$key});
+            } else {
+                $this->warnings->{$key} = (bool) $this->warnings->{$key};
+            }
+        }
     }
 
     /**
@@ -205,12 +241,13 @@ class condition extends \core_availability\condition {
         }
 
         if (isset($data['rules']) && is_array($data['rules'])) {
-            foreach ($data['rules'] as $rule){
+            foreach ($data['rules'] as $rule) {
                 $key = $rule['key'];
                 $value = $rule['value'];
                 $this->rules->{$key} = $value;
             }
         }
+        $this->validate();
     }
 
     /**
@@ -479,8 +516,12 @@ class condition extends \core_availability\condition {
             'rules' => (array) $this->rules,
             'warnings' => (array) $this->warnings,
             'groups' => (array) $this->groups,
+            'istrial' => (bool) $this->istrial,
+            'identification' => $this->identification,
             'noprotection' => (bool) $this->noprotection,
+            'useragreementurl' => $this->useragreementurl,
             'auxiliarycamera' => (bool) $this->auxiliarycamera,
+            'customrules' => $this->customrules,
         ];
     }
 
