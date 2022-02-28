@@ -49,6 +49,7 @@ class condition extends \core_availability\condition {
         'duration', 'mode', 'schedulingrequired', 'autorescheduling',
         'istrial', 'rules', 'identification', 'noprotection',
         'useragreementurl', 'auxiliarycamera', 'customrules',
+        'groups',
     ];
 
     const WARNINGS = [
