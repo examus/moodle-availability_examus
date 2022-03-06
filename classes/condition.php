@@ -92,44 +92,45 @@ class condition extends \core_availability\condition {
     ];
 
     /** @var int Default exam duration */
-    protected $duration = 60;
+    public $duration = 60;
 
     /** @var string Default exam mode */
-    protected $mode = 'normal';
+    public $mode = 'normal';
 
     /** @var string Default calendar mode */
-    protected $schedulingrequired = true;
+    public $schedulingrequired = true;
 
     /** @var bool Reschedule when exam was missed */
-    protected $autorescheduling = false;
+    public $autorescheduling = false;
 
     /** @var bool Is trial exam */
-    protected $istrial = false;
+    public $istrial = false;
 
     /** @var array Default exam rules */
-    protected $rules = [];
+    public $rules = [];
 
     /** @var array Default exam rules */
-    protected $warnings = [];
+    public $warnings = [];
 
     /** @var string identification method **/
-    protected $identification;
+    public $identification;
 
     /** @var bool No protection (shade) */
-    protected $noprotection = false;
+    public $noprotection = false;
 
     /** @var string User agreement URL */
-    protected $useragreementurl = null;
+    public $useragreementurl = null;
 
     /** @var string Auxiliary camera enabled */
-    protected $auxiliarycamera = false;
+    public $auxiliarycamera = false;
 
-    protected $customrules = null;
+    /** @var string List of custom rules */
+    public $customrules = null;
 
     /**
      * @var array Apply condition to specified groups
      */
-    protected $groups = [];
+    public $groups = [];
 
     private static $cached_trees = [];
 
@@ -312,55 +313,6 @@ class condition extends \core_availability\condition {
     }
 
     /**
-     * get examus duration
-     *
-     * @param \cm_info $cm Cm
-     * @return int
-     */
-    public static function get_examus_duration($cm) {
-        $econds = self::get_examus_conditions($cm);
-        return (int) $econds[0]->duration;
-    }
-
-    /**
-     * get examus mode
-     *
-     * @param \cm_info $cm Cm
-     * @return string
-     */
-    public static function get_examus_mode($cm) {
-        $econds = self::get_examus_conditions($cm);
-        return (string) $econds[0]->mode;
-    }
-
-    /**
-     * get examus rules
-     *
-     * @param \cm_info $cm Cm
-     * @return array
-     */
-    public static function get_examus_rules($cm) {
-        $econds = self::get_examus_conditions($cm);
-        return (array) $econds[0]->rules;
-    }
-
-    public static function get_examus_warnings($cm) {
-        $econds = self::get_examus_conditions($cm);
-        return (array) $econds[0]->warnings;
-    }
-
-    /**
-     * get examus scheduling mode
-     *
-     * @param \cm_info $cm Cm
-     * @return bool
-     */
-    public static function get_examus_scheduling($cm) {
-        $econds = self::get_examus_conditions($cm);
-        return (bool) $econds[0]->schedulingrequired;
-    }
-
-    /**
      * get examus groups
      *
      * @param \cm_info $cm Cm
@@ -371,71 +323,6 @@ class condition extends \core_availability\condition {
         return (array) (isset($econds[0]->groups) ? $econds[0]->groups : []);
     }
 
-    /**
-     * get examus scheduling mode
-     *
-     * @param \cm_info $cm Cm
-     * @return bool
-     */
-    public static function get_auto_rescheduling($cm) {
-        $econds = self::get_examus_conditions($cm);
-        return (bool) $econds[0]->autorescheduling;
-    }
-
-    /**
-     * get identification mode
-     *
-     * @param \cm_info $cm Cm
-     * @return string
-     */
-    public static function get_identification($cm) {
-        $econds = self::get_examus_conditions($cm);
-        return $econds[0]->identification;
-    }
-
-    /**
-     * get is trial
-     *
-     * @param \cm_info $cm Cm
-     * @return bool
-     */
-    public static function get_is_trial($cm) {
-        $econds = self::get_examus_conditions($cm);
-        return (bool) $econds[0]->istrial;
-    }
-
-    /**
-     * get user agreement url
-     *
-     * @param \cm_info $cm Cm
-     * @return bool
-     */
-    public static function get_user_agreement_url($cm) {
-        $econds = self::get_examus_conditions($cm);
-        return $econds[0]->useragreementurl;
-    }
-
-    /**
-     * get no protection
-     *
-     * @param \cm_info $cm Cm
-     * @return bool
-     */
-    public static function get_no_protection($cm) {
-        $econds = self::get_examus_conditions($cm);
-        return (bool) $econds[0]->noprotection;
-    }
-
-    /**
-     * get auxiliarycamera
-     *
-     * @param \cm_info $cm Cm
-     * @return bool
-     */
-    public static function get_auxiliarycamera($cm) {
-        $econds = self::get_examus_conditions($cm);
-        return (bool) $econds[0]->auxiliarycamera;
-    }
 
     /**
      * get examus conditions
