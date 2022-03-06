@@ -44,6 +44,53 @@ class condition extends \core_availability\condition {
      */
     const EXPIRATION_SLACK = 15 * 60;
 
+    /** @var array List of (de-)serializable properties */
+    const PROPS = [
+        'duration', 'mode', 'schedulingrequired', 'autorescheduling',
+        'istrial', 'rules', 'identification', 'noprotection',
+        'useragreementurl', 'auxiliarycamera', 'customrules',
+        'groups',
+    ];
+
+    const WARNINGS = [
+        'warning_extra_user_in_frame' => true,
+        'warning_substitution_user' => true,
+        'warning_no_user_in_frame' => true,
+        'warning_avert_eyes' => true,
+        'warning_timeout' => true,
+        'warning_change_active_window_on_computer' => true,
+        'warning_talk' => true,
+        'warning_forbidden_software' => true,
+        'warning_forbidden_device' => true,
+        'warning_voice_detected' => true,
+        'warning_extra_display' => true,
+        'warning_books' => true,
+        'warning_cheater' => true,
+        'warning_mic_muted' => true,
+        'warning_mic_no_sound' => true,
+        'warning_mic_no_device_connected' => true,
+        'warning_camera_no_picture' => true,
+        'warning_camera_no_device_connected' => true,
+        'warning_nonverbal' => true,
+        'warning_phone' => true,
+        'warning_phone_screen' => true,
+        'warning_no_ping' => true,
+        'warning_desktop_request_pending' => true,
+    ];
+
+    const RULES = [
+        'allow_to_use_websites' => false,
+        'allow_to_use_books' => false,
+        'allow_to_use_paper' => true,
+        'allow_to_use_messengers' => false,
+        'allow_to_use_calculator' => true,
+        'allow_to_use_excel' => false,
+        'allow_to_use_human_assistant' => false,
+        'allow_absence_in_frame' => false,
+        'allow_voices' => false,
+        'allow_wrong_gaze_direction' => false,
+    ];
+
     /** @var int Default exam duration */
     protected $duration = 60;
 
@@ -62,6 +109,9 @@ class condition extends \core_availability\condition {
     /** @var array Default exam rules */
     protected $rules = [];
 
+    /** @var array Default exam rules */
+    protected $warnings = [];
+
     /** @var string identification method **/
     protected $identification;
 
@@ -73,6 +123,8 @@ class condition extends \core_availability\condition {
 
     /** @var string Auxiliary camera enabled */
     protected $auxiliarycamera = false;
+
+    protected $customrules = null;
 
     /**
      * @var array Apply condition to specified groups
@@ -105,14 +157,21 @@ class condition extends \core_availability\condition {
             $this->autorescheduling = $structure->auto_rescheduling;
         }
 
+        if (!empty($structure->warnings)) {
+            $warnings = array_merge(self::WARNINGS, (array)$structure->warnings);
+            $this->warnings = (object)$warnings;
+        }else {
+            $this->warnings = (object)self::WARNINGS;
+        }
         if (!empty($structure->rules)) {
+            $rules = array_merge(self::RULES, (array)$structure->rules);
             $this->rules = $structure->rules;
         }else {
-            $this->rules = (object)[];
+            $this->rules = (object)self::RULES;
         }
 
         if (!empty($structure->customrules)) {
-            $this->rules->custom_rules = $structure->customrules;
+            $this->customrules = $structure->customrules;
         }
 
         if (!empty($structure->groups)) {
@@ -144,7 +203,76 @@ class condition extends \core_availability\condition {
         } else {
             $this->auxiliarycamera = false;
         }
+        $this->validate();
+    }
 
+    public function validate(){
+        $keys = array_keys(self::RULES);
+        foreach($this->rules as $key => $value) {
+            if(!in_array($key, $keys)) {
+                unset($this->rules->{$key});
+            } else {
+                $this->rules->{$key} = (bool) $this->rules->{$key};
+            }
+        }
+
+        $keys = array_keys(self::WARNINGS);
+        foreach($this->warnings as $key => $value) {
+            if(!in_array($key, $keys)) {
+                unset($this->warnings->{$key});
+            } else {
+                $this->warnings->{$key} = (bool) $this->warnings->{$key};
+            }
+        }
+    }
+
+    /**
+     * Import from external communication
+     *
+     * @return null
+     */
+    public function from_json($data){
+        foreach ($this::PROPS as $prop) {
+            if (in_array($prop, ['rules'])) {
+                continue;
+            }
+            if (isset($data[$prop])) {
+                $this->{$prop} = $data[$prop];
+            }
+        }
+
+        if (isset($data['rules']) && is_array($data['rules'])) {
+            foreach ($data['rules'] as $rule) {
+                $key = $rule['key'];
+                $value = $rule['value'];
+                $this->rules->{$key} = $value;
+            }
+        }
+        $this->validate();
+    }
+
+    /**
+     * Export for external communication
+     *
+     * @return Array of properties of current condition
+     */
+    public function to_json() {
+        $result = [];
+        foreach ($this::PROPS as $prop) {
+            $result[$prop] = $this->{$prop};
+        }
+
+        if (!empty($result['rules'])) {
+            $rules = [];
+            foreach ($result['rules'] as $key => $value) {
+                $rules[] = ['key' => $key, 'value' => $value];
+            }
+            $result['rules'] = $rules;
+        }else{
+            $result['rules'] = [];
+        }
+
+        return $result;
     }
 
     /**
@@ -214,6 +342,11 @@ class condition extends \core_availability\condition {
     public static function get_examus_rules($cm) {
         $econds = self::get_examus_conditions($cm);
         return (array) $econds[0]->rules;
+    }
+
+    public static function get_examus_warnings($cm) {
+        $econds = self::get_examus_conditions($cm);
+        return (array) $econds[0]->warnings;
     }
 
     /**
@@ -370,7 +503,7 @@ class condition extends \core_availability\condition {
     }
 
     /**
-     * save
+     * Export for moodle storage
      *
      * @return object
      */
@@ -382,9 +515,14 @@ class condition extends \core_availability\condition {
             'scheduling_required' => (bool) $this->schedulingrequired,
             'auto_rescheduling' => (bool) $this->autorescheduling,
             'rules' => (array) $this->rules,
+            'warnings' => (array) $this->warnings,
             'groups' => (array) $this->groups,
+            'istrial' => (bool) $this->istrial,
+            'identification' => $this->identification,
             'noprotection' => (bool) $this->noprotection,
+            'useragreementurl' => $this->useragreementurl,
             'auxiliarycamera' => (bool) $this->auxiliarycamera,
+            'customrules' => $this->customrules,
         ];
     }
 

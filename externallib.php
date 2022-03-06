@@ -37,7 +37,6 @@ use availability_examus\state;
  * External API
  */
 class availability_examus_external extends external_api {
-
     /**
      * Prepares entry data for outside world
      *
@@ -63,11 +62,11 @@ class availability_examus_external extends external_api {
             'course_id' => $course->id,
             'cm_id' => $entry->cmid,
             'is_proctored' => true,
+            'accesscode' => $entry->accesscode,
             'time_limit_mins' => condition::get_examus_duration($cm),
             'mode' => condition::get_examus_mode($cm),
             'scheduling_required' => condition::get_examus_scheduling($cm),
             'auto_rescheduling' => condition::get_auto_rescheduling($cm),
-            'accesscode' => $entry->accesscode,
             'identification' => condition::get_identification($cm),
             'is_trial' => condition::get_is_trial($cm),
             'user_agreement_url' => condition::get_user_agreement_url($cm),
@@ -77,6 +76,11 @@ class availability_examus_external extends external_api {
         $rules = condition::get_examus_rules($cm);
         if ($rules) {
             $moduleanswer['rules'] = $rules;
+        }
+
+        $warnings = condition::get_examus_warnings($cm);
+        if ($warnings) {
+            $moduleanswer['warnings'] = $warnings;
         }
 
         switch ($cm->modname) {
@@ -147,7 +151,20 @@ class availability_examus_external extends external_api {
 
             state::$apirequest = true;
 
-            $user = $DB->get_record('user', ['email' => $useremail]);
+            list($emaillocal, $emaildomain) = explode('@', $useremail);
+            if(!$emaildomain){
+                return ['modules' => []];
+            }
+            list($emailname, $emailalias) = explode('+', $emaillocal);
+
+            if($emailalias){
+                $email = $emailname . '@' . $emaildomain;
+                $user = $DB->get_record('user', ['email' => $email, 'username' => $emailalias]);
+            }
+            if(empty($user)){
+                $user = $DB->get_record('user', ['email' => $useremail]);
+            }
+
             if ($user) {
                 $courses = enrol_get_users_courses($user->id, true);
             } else {
@@ -220,6 +237,11 @@ class availability_examus_external extends external_api {
      * @return external_description
      */
     public static function user_proctored_modules_returns() {
+        $warnings = [];
+        foreach(condition::WARNINGS as $key => $val){
+            $warnings[$key] = new external_value(PARAM_BOOL, '', VALUE_OPTIONAL);
+        }
+
         return new external_single_structure([
             'modules' => new external_multiple_structure(
                 new external_single_structure([
@@ -228,6 +250,9 @@ class availability_examus_external extends external_api {
                     'url' => new external_value(PARAM_TEXT, 'module url'),
                     'status' => new external_value(PARAM_TEXT, 'status'),
                     'course_name' => new external_value(PARAM_TEXT, 'module course name'),
+                    'start' => new external_value(PARAM_INT, 'module start', VALUE_OPTIONAL),
+                    'end' => new external_value(PARAM_INT, 'module end', VALUE_OPTIONAL),
+                    'accesscode' => new external_value(PARAM_TEXT, 'module code'),
                     'time_limit_mins' => new external_value(PARAM_INT, 'module duration', VALUE_OPTIONAL),
                     'mode' => new external_value(PARAM_TEXT, 'module proctoring mode'),
                     'scheduling_required' => new external_value(PARAM_BOOL, 'module calendar mode'),
@@ -245,10 +270,8 @@ class availability_examus_external extends external_api {
                         'allow_wrong_gaze_direction' => new external_value(PARAM_BOOL, 'proctoring rule', VALUE_OPTIONAL),
                         'custom_rules' => new external_value(PARAM_TEXT, 'Custom Rules', VALUE_OPTIONAL),
                     ], 'rules set', VALUE_OPTIONAL),
+                    'warnings' => new external_single_structure($warnings, VALUE_OPTIONAL),
                     'is_proctored' => new external_value(PARAM_BOOL, 'module proctored'),
-                    'accesscode' => new external_value(PARAM_TEXT, 'module code'),
-                    'start' => new external_value(PARAM_INT, 'module start', VALUE_OPTIONAL),
-                    'end' => new external_value(PARAM_INT, 'module end', VALUE_OPTIONAL),
                     'identification' => new external_value(PARAM_TEXT, 'Identification mode', VALUE_OPTIONAL),
                     'is_trial' => new external_value(PARAM_BOOL, 'Trial exam'),
                     'user_agreement_url' => new external_value(PARAM_TEXT, 'User agreement URL', VALUE_OPTIONAL),

@@ -38,7 +38,7 @@ class frontend extends \core_availability\frontend {
      * @return array
      */
     protected function get_javascript_strings() {
-        return [
+        $strings = [
             'title', 'error_setduration', 'duration', 'link', 'mode', 'normal_mode',
             'rules', 'olympics_mode', 'identification_mode', 'auto_mode', 'allow_to_use_websites',
             'allow_to_use_books', 'allow_to_use_paper', 'allow_to_use_messengers',
@@ -48,8 +48,14 @@ class frontend extends \core_availability\frontend {
             'identification', 'face_passport_identification', 'face_identification',
             'passport_identification', 'skip_identification',
             'is_trial', 'custom_rules', 'noprotection', 'user_agreement_url',
-            'auxiliary_camera',
+            'auxiliary_camera', 'visible_warnings'
         ];
+
+        foreach(condition::WARNINGS as $key => $value) {
+            $strings[] = $key;
+        }
+
+        return $strings;
     }
 
     /**
@@ -63,23 +69,15 @@ class frontend extends \core_availability\frontend {
     protected function get_javascript_init_params($course, \cm_info $cm = null,
             \section_info $section = null) {
         global $DB;
-        $rules['allow_to_use_websites'] = false;
-        $rules['allow_to_use_books'] = false;
-        $rules['allow_to_use_paper'] = true;
-        $rules['allow_to_use_messengers'] = false;
-        $rules['allow_to_use_calculator'] = true;
-        $rules['allow_to_use_excel'] = false;
-        $rules['allow_to_use_human_assistant'] = false;
-        $rules['allow_absence_in_frame'] = false;
-        $rules['allow_voices'] = false;
-        $rules['allow_wrong_gaze_direction'] = false;
+        $rules = condition::RULES;
+        $warnings = condition::WARNINGS;
 
         $courseid = $course->id;
 
         $groups = [];
         $groups = $DB->get_records('groups', ['courseid' => $courseid], 'name', 'id,name');
 
-        return [$rules, $groups];
+        return [$rules, $groups, $warnings];
     }
 
     /**
