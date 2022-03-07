@@ -100,63 +100,43 @@ class availability_examus_external extends external_api {
         ]);
 
         //var_dump($conditiondata);
-        echo("\n------------------ moodleanswer =====================\n");
+        //echo("\n------------------ moodleanswer =====================\n");
 
-        $moduleanswer = [
+        $result = [
             'id' => $entry->id,
             'name' => $cm->get_formatted_name(),
             'url' => $url->out(),
+            'status' => $entry->status,
             'course_name' => $course->fullname,
             'course_id' => $course->id,
             'cm_id' => $entry->cmid,
             'is_proctored' => true,
             'accesscode' => $entry->accesscode,
-            'time_limit_mins' => $conditiondata->duration,
-            //'mode' => condition::get_examus_mode($cm),
-            //'scheduling_required' => condition::get_examus_scheduling($cm),
-            //'auto_rescheduling' => condition::get_auto_rescheduling($cm),
-            //'identification' => condition::get_identification($cm),
-            //'is_trial' => condition::get_is_trial($cm),
-            //'user_agreement_url' => condition::get_user_agreement_url($cm),
-            //'auxiliary_camera' => condition::get_auxiliarycamera($cm),
+            'time_limit_mins' => $conditiondata['duration'],
+            'mode' => $conditiondata['mode'],
+            'scheduling_required' => $conditiondata['schedulingrequired'],
+            'auto_rescheduling' => $conditiondata['autorescheduling'],
+            'identification' => $conditiondata['identification'],
+            'is_trial' => $conditiondata['istrial'],
+            'user_agreement_url' => $conditiondata['useragreementurl'],
+            'auxiliary_camera' => $conditiondata['auxiliarycamera'],
+
         ];
 
         $rules = [];//condition::get_examus_rules($cm);
         if ($rules) {
-            $moduleanswer['rules'] = $rules;
+            $result['rules'] = $rules;
         }
 
-        // switch ($cm->modname) {
-        //     case 'quiz':
-        //         try {
-        //             $quiz = $DB->get_record('quiz', ['id' => $cm->instance]);
-        //             $moduleanswer['start'] = $quiz->timeopen;
-        //             $moduleanswer['end'] = $quiz->timeclose;
-        //         } catch (\dml_missing_record_exception $ex) {
-        //             // We dont want this handled.
-        //         }
-        //         break;
-        //     case 'assign':
-        //         try {
-        //             $assign = $DB->get_record('assign', ['id' => $cm->instance]);
-        //             $moduleanswer['start'] = $assign->allowsubmissionsfromdate;
-        //             $moduleanswer['end'] = $assign->duedate;
-        //         } catch (\dml_missing_record_exception $ex) {
-        //             // We dont want this handled.
-        //         }
-        //         break;
-        // }
-        if($timebracket){
-            array_merge($moduleanswer, $timebracket);
-        }
-        $warnings = condition::get_examus_warnings($cm);
-        if ($warnings) {
-            $moduleanswer['warnings'] = $warnings;
-        }
+        $warnings = $conditiondata->warnings;
+        $result['warnings'] = $warnings ? $warnings : [];
 
-        $moduleanswer['status'] = $entry->status;
+        if(!$timebracket){
+            $timebracket = ['start' => null, 'end' => null];
+        }
+        array_merge($result, $timebracket);
 
-        return $moduleanswer;
+        return $result;
     }
 
     /**
@@ -237,7 +217,7 @@ class availability_examus_external extends external_api {
                     foreach ($instances as $cm) {
                         $timebracket = isset($timebrackets[$cm->instance]) ? $timebrackets[$cm->instance] : [];
                         $availibilityinfo = new info_module($cm);
-                        var_dump($timebracket);
+                        //var_dump($timebracket);
                         if($cm->availability) {
                             $tree = $availibilityinfo->get_availability_tree();
                             $conds = $tree->get_all_children('\\availability_examus\\condition');
@@ -312,6 +292,8 @@ class availability_examus_external extends external_api {
                     'url' => new external_value(PARAM_TEXT, 'module url'),
                     'status' => new external_value(PARAM_TEXT, 'status'),
                     'course_name' => new external_value(PARAM_TEXT, 'module course name'),
+                    'course_id' => new external_value(PARAM_INT, 'course id'),
+                    'cm_id' => new external_value(PARAM_INT, 'course-module id'),
                     'start' => new external_value(PARAM_INT, 'module start', VALUE_OPTIONAL),
                     'end' => new external_value(PARAM_INT, 'module end', VALUE_OPTIONAL),
                     'accesscode' => new external_value(PARAM_TEXT, 'module code'),
