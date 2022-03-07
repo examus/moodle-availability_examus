@@ -159,7 +159,7 @@ class availability_examus_external extends external_api {
     public static function user_proctored_modules($useremail, $accesscode) {
         global $DB;
 
-        $DB->set_debug(true);
+        //$DB->set_debug(true);
         $answer = [];
 
         self::validate_parameters(self::user_proctored_modules_parameters(), [
@@ -209,6 +209,17 @@ class availability_examus_external extends external_api {
             get_fast_modinfo(0, 0, true);
 
             foreach ($courses as $course) {
+                $entries = $DB->get_records('availability_examus', [
+                    'userid' => $user->id,
+                    'courseid' => $course->id,
+                ], 'id');
+                $userentries = [];
+                foreach($entries as $entry){
+                    if(!isset($userentries[$entry->cmid])){
+                        $userentries[$entry->cmid] = [];
+                    }
+                    $userentries[$entry->cmid][] = $entry;
+                }
 
                 $modinfo = get_fast_modinfo($course->id, $user->id);
                 $instancesbytypes = $modinfo->get_instances();
@@ -218,7 +229,7 @@ class availability_examus_external extends external_api {
                     foreach ($instances as $cm) {
                         $timebracket = isset($timebrackets[$cm->instance]) ? $timebrackets[$cm->instance] : [];
                         $availibilityinfo = new info_module($cm);
-                        //var_dump($timebracket);
+
                         if($cm->availability) {
                             $tree = $availibilityinfo->get_availability_tree();
                             $conds = $tree->get_all_children('\\availability_examus\\condition');
@@ -238,7 +249,7 @@ class availability_examus_external extends external_api {
                                 continue;
                             }
 
-                            $entry = $condition->create_entry_for_cm($user->id, $cm);
+                            $entry = $condition->create_entry_for_cm($user->id, $cm, $userentries);
                             if ($entry == null) {
                                 continue;
                             }

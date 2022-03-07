@@ -513,18 +513,23 @@ class condition extends \core_availability\condition {
      *
      * @param integer $userid User id
      * @param integer $cm Cm id
+     * @param array $userentries Pre-collected list of user entries, indexed by cmid
      * @return stdClass
      */
-    public function create_entry_for_cm($userid, $cm) {
+    public function create_entry_for_cm($userid, $cm, $userentries = null) {
         global $DB;
 
         $courseid = $cm->course;
 
-        $entries = $DB->get_records('availability_examus', [
-            'userid' => $userid,
-            'courseid' => $courseid,
-            'cmid' => $cm->id,
-        ], 'id');
+        if($userentries) {
+            $entries = isset($userentries[$cm->id]) ? $userentries[$cm->id] : [];
+        } else {
+            $entries = $DB->get_records('availability_examus', [
+                'userid' => $userid,
+                'courseid' => $courseid,
+                'cmid' => $cm->id,
+            ], 'id');
+        }
 
         foreach ($entries as $entry) {
             if ($entry->status == 'Not inited') {
