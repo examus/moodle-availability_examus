@@ -55,7 +55,7 @@ class availability_examus_external extends external_api {
                 }
                 break;
             case 'assign':
-                $assign = $DB->get_records_list('assign', 'id', $ids);
+                $assigns = $DB->get_records_list('assign', 'id', $ids);
                 foreach($assigns as $assign) {
                     $results[$assign->id] = [
                         'start' => $assign->allowsubmissionsfromdate,
@@ -123,7 +123,7 @@ class availability_examus_external extends external_api {
 
         ];
 
-        $rusles = $condition->rules;
+        $rules = $condition->rules;
         $result['rules'] = $rules ? $rules : [];
 
         $warnings = $condition->warnings;
