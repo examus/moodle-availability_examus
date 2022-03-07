@@ -123,12 +123,10 @@ class availability_examus_external extends external_api {
 
         ];
 
-        $rules = [];//condition::get_examus_rules($cm);
-        if ($rules) {
-            $result['rules'] = $rules;
-        }
+        $rusles = $condition->rules;
+        $result['rules'] = $rules ? $rules : [];
 
-        $warnings = $conditiondata->warnings;
+        $warnings = $condition->warnings;
         $result['warnings'] = $warnings ? $warnings : [];
 
         if(!$timebracket){
@@ -186,7 +184,10 @@ class availability_examus_external extends external_api {
             if(!$emaildomain){
                 return ['modules' => []];
             }
-            list($emailname, $emailalias) = explode('+', $emaillocal);
+
+            $emaillocalparts = explode('+', $emaillocal);
+            $emailname = $emaillocalparts[0];
+            $emailalias = isset($emaillocalparts[1]) ? $emaillocalparts[1] : null;
 
             if($emailalias){
                 $email = $emailname . '@' . $emaildomain;
