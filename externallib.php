@@ -72,20 +72,8 @@ class availability_examus_external extends external_api {
      * @param \stdClass $entry
      * @return array Entry data, ready for serialization
      */
-    protected static function moduleanswer($entry, $course = null, $modinfo = null, $cm = null, $condition = null, $timebracket = null) {
+    protected static function moduleanswer($entry, $course, $modinfo, $cm, $timebracket, $condition = null) {
         global $DB;
-
-        if (!$course) {
-            $course = get_course($entry->courseid);
-        }
-
-        if (!$modinfo) {
-            $modinfo = get_fast_modinfo($course);
-        }
-
-        if (!$cm) {
-            $cm = $modinfo->get_cm($entry->cmid);
-        }
 
         if (!$condition) {
             $info = new info_module($cm);
@@ -98,9 +86,6 @@ class availability_examus_external extends external_api {
         $url = new moodle_url('/availability/condition/examus/entry.php', [
             'accesscode' => $entry->accesscode
         ]);
-
-        //var_dump($conditiondata);
-        //echo("\n------------------ moodleanswer =====================\n");
 
         $result = [
             'id' => $entry->id,
@@ -173,7 +158,18 @@ class availability_examus_external extends external_api {
             ]);
 
             foreach ($entries as $entry) {
-                array_push($answer, self::moduleanswer($entry));
+                $course = get_course($entry->courseid);
+                $modinfo = get_fast_modinfo($course->id, $user->id);
+                $cm = $modinfo->get_cm($entry->cmid);
+
+                $type = $cm->modname;
+                $instancesbytype = $modinfo->get_instances();
+                $instances = $instancesbytype[$type];
+
+                $timebrackets = self::get_timebrackets_for_cms($type, $instances);
+                $timebracket = $timebrackets[0];
+
+                array_push($answer, self::moduleanswer($entry, $course, $modinfo, $cm, $timebracket));
             }
 
         } else if ($useremail) {
@@ -254,7 +250,7 @@ class availability_examus_external extends external_api {
                                 continue;
                             }
 
-                            array_push($answer, self::moduleanswer($entry, $course, $modinfo, $cm, $condition, $timebracket));
+                            array_push($answer, self::moduleanswer($entry, $course, $modinfo, $cm, $timebracket, $condition));
 
                         } else {
                             common::delete_empty_entries($user->id, $course->id, $cm->id);
@@ -271,11 +267,11 @@ class availability_examus_external extends external_api {
             foreach ($courses as $course) {
                 $modinfo = get_fast_modinfo($course);
                 $instancesbytypes = $modinfo->get_instances();
-                foreach ($instancesbytypes as $instances) {
+                foreach ($instancesbytypes as $type => $instances) {
                     foreach ($instances as $cm) {
                         if (condition::has_examus_condition($cm)) {
                             $entry = condition::make_entry($course->id, $cm->id);
-                            array_push($answer, self::moduleanswer($entry));
+                            array_push($answer, self::moduleanswer($entry, $course, $modinfo, $cm, null, null));
                         }
                     }
                 }
