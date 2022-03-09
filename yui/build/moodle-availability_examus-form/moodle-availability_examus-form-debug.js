@@ -155,9 +155,13 @@ M.availability_examus.form.getNode = function(json) {
     if (this.groups) {
         var groupOptions = '';
         for (var i in this.groups) {
-            id = this.groups[i].id;
             var name = this.groups[i].name;
-            var checked = (json.groups instanceof Array && json.groups.indexOf(id) > -1) ? 'checked' : '';
+            var groups = (json.groups instanceof Array) ? json.groups : [];
+
+            id = parseInt(this.groups[i].id);
+            groups = groups.map(function(gid){ return parseInt(gid)});
+
+            var checked = groups.indexOf(id) > -1 ? 'checked' : '';
 
             groupOptions += '<br>'
                 + '<label>'
