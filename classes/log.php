@@ -244,10 +244,14 @@ class log {
 
                 $course = get_course($entry->courseid);
                 $modinfo = get_fast_modinfo($course);
-                $cm = $modinfo->get_cm($entry->cmid);
+                try {
+                    $cm = $modinfo->get_cm($entry->cmid);
+                } catch (\moodle_exception $e) {
+                    $cm = null;
+                }
 
                 $row[] = $course->fullname;
-                $row[] = $cm->get_formatted_name();
+                $row[] = $cm ? $cm->get_formatted_name() : '';
                 $row[] = $entry->status;
                 if ($entry->review_link !== null) {
                     $row[] = "<a href='" . $entry->review_link . "'>" . get_string('link', 'availability_examus') . "</a>";
