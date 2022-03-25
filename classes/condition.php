@@ -324,6 +324,18 @@ class condition extends \core_availability\condition {
     }
 
 
+
+    /**
+     * get examus conditions
+     *
+     * @param \cm_info $cm Cm
+     * @return array
+     */
+    public static function get_examus_condition($cm) {
+        $conds = self::get_examus_conditions($cm);
+        return $econds && isset($conds[0]) ? $conds[0] : null;
+    }
+
     /**
      * get examus conditions
      *
@@ -331,7 +343,7 @@ class condition extends \core_availability\condition {
      * @return array
      */
     private static function get_examus_conditions($cm) {
-        if($cm && isset(self::$cached_trees[$cm->id])){
+        if($cm && isset(self::$cached_trees[$cm->id])) {
             return self::$cached_trees[$cm->id];
         }
 
