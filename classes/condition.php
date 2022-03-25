@@ -333,7 +333,7 @@ class condition extends \core_availability\condition {
      */
     public static function get_examus_condition($cm) {
         $conds = self::get_examus_conditions($cm);
-        return $econds && isset($conds[0]) ? $conds[0] : null;
+        return $conds && isset($conds[0]) ? $conds[0] : null;
     }
 
     /**
