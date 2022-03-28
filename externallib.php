@@ -117,7 +117,7 @@ class availability_examus_external extends external_api {
         if(!$timebracket){
             $timebracket = ['start' => null, 'end' => null];
         }
-        array_merge($result, $timebracket);
+        $result = array_merge($result, $timebracket);
 
         return $result;
     }
@@ -167,7 +167,7 @@ class availability_examus_external extends external_api {
                 $instances = $instancesbytype[$type];
 
                 $timebrackets = self::get_timebrackets_for_cms($type, $instances);
-                $timebracket = $timebrackets[0];
+                $timebracket = $timebrackets[$cm->instance];
 
                 array_push($answer, self::moduleanswer($entry, $course, $modinfo, $cm, $timebracket));
             }
