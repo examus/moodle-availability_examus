@@ -12,10 +12,11 @@ M.availability_examus.form = Y.Object(M.core_availability.plugin);
 
 M.availability_examus.form.rules = null;
 
-M.availability_examus.form.initInner = function(rules, groups, warnings) {
+M.availability_examus.form.initInner = function(rules, groups, warnings, scoring) {
     this.rules = rules;
     this.groups = groups;
     this.warnings = warnings;
+    this.scoring = scoring;
 };
 
 M.availability_examus.form.instId = 0;
@@ -25,16 +26,42 @@ M.availability_examus.form.getNode = function(json) {
      * @param {string} identifier A string identifier
      * @returns {string} A string from translations.
      */
-    function getString(identifier) {
-        return M.util.get_string(identifier, 'availability_examus');
+    function getString(identifier, module) {
+        module = module || 'availability_examus';
+        return M.util.get_string(identifier, module);
     }
 
-    function formGroup(id, label, content) {
+    function moreLess(content){
+        var showmore = getString('showmore', 'core_form');
+        var showless = getString('showless', 'core_form');
+
+        return '<a href="#" class="examus-moreless" data-more="' + showmore + '" data-less="' + showless + '">' +
+            showmore +
+            '</a><div class="hidden col-md-12">' + content + '</div>';
+    }
+
+    function switchMoreLessState(target){
+      var next = target.next();
+      var hidden = next.hasClass('hidden');
+
+      if(hidden) {
+          next.removeClass('hidden');
+          target.setContent(target.getAttribute('data-less'));
+      } else {
+          next.addClass('hidden');
+          target.setContent(target.getAttribute('data-more'));
+      }
+    }
+
+    function formGroup(id, label, content, fullwidth) {
+        var labelcols = fullwidth ? 10 : 5;
+        var fieldcols = fullwidth ? 10 : 7;
+
         return '<span class="availability-group form-group mb-2">' +
-            '<div class="col-md-5 col-form-label d-flex pb-0 pr-md-0">' +
+            '<div class="col-md-'+labelcols+' col-form-label d-flex pb-0 pr-md-0">' +
             '  <label for="' + id + '">' + label + '</label>' +
             '</div>' +
-            '<div class="col-md-7 form-inline align-items-start felement">' +
+            '<div class="col-md-'+fieldcols+' form-inline align-items-start felement">' +
             content +
             '</div>' +
             '</span>';
@@ -177,12 +204,35 @@ M.availability_examus.form.getNode = function(json) {
     var warningOptions = '';
     for (var wkey in this.warnings) {
         var wkeyId = id + '_' + wkey;
-        warningOptions += '<br><input type="checkbox" name="' + wkey + '" id="' + wkeyId + '" value="' + wkey + '" >&nbsp;';
-        warningOptions += '<label for="' + wkeyId + '" style="white-space: break-spaces">' + getString(wkey) + '</label>';
+        warningOptions += '<input type="checkbox" name="' + wkey + '" id="' + wkeyId + '" value="' + wkey + '" >&nbsp;';
+        warningOptions += '<label for="' + wkeyId + '" style="white-space: break-spaces">' + getString(wkey) + '</label><br>';
+    }
+    var scoringOptions = '';
+    for (var skey in this.scoring) {
+        var skeyId = id + '_' + skey;
+        var smin = this.scoring[skey]['min'];
+        var smax = this.scoring[skey]['max'];
+        var scoringInputHTML = '<input type="number" class="examus-scoring-input" value=""' +
+            'name="' + skey + '"' +
+            'id="scoring_' + skeyId + '"' +
+            'min="' + smin + '" max="' + smax + '">';
+
+        scoringOptions +=formGroup(skeyId, getString('scoring_'+skey), scoringInputHTML);
+        //scoringOptions += '<label for="scoring_' + skeyId + '" style="white-space: break-spaces">' + getString('scoring_'+skey) + '</label>&nbsp;';
+        //scoringOptions += '<input type="number" name="' + skey + '" id="scoring_' + skeyId + '" value="" min="' + smin + '" max="' + smax + '"><br>';
     }
 
-    var htmlTwo = formGroup(null, getString('visible_warnings'),
-                             '<div class="warnings" style="white-space: nowrap" ' + warningOptions + '</div>');
+
+    var htmlTwo = '';
+    htmlTwo += formGroup(null, getString('visible_warnings'),
+                 '<div class="warnings" style="white-space: nowrap" >' + moreLess(warningOptions) + '</div>',
+                 true);
+
+    htmlTwo += formGroup(null, getString('visible_warnings'),
+                 moreLess(scoringOptions),
+                 true);
+
+
 
     node = Y.Node.create('<span class="availibility_examus-tabs" style="position:relative"></span>');
 
@@ -197,7 +247,7 @@ M.availability_examus.form.getNode = function(json) {
 
 
     if(json.creating){
-      json.mode = 'normal';
+        json.mode = 'normal';
         json.scheduling_required = true;
     }
 
@@ -271,6 +321,17 @@ M.availability_examus.form.getNode = function(json) {
         }
     }
 
+    json.scoring = json.scoring || {};
+    for (var scoringKey in json.scoring) {
+        if (json.scoring[scoringKey]) {
+            var sinput = node.one('.examus-scoring-input[name=' + scoringKey + ']');
+            if(sinput) {
+                sinput.set('value', json.scoring[scoringKey]);
+            }
+        }
+    }
+
+
     if (json.customrules !== undefined) {
         node.one('#' + customRulesId).set('value', json.customrules);
     }
@@ -300,6 +361,11 @@ M.availability_examus.form.getNode = function(json) {
         e.preventDefault();
         switchTab(2);
     });
+    node.delegate('click', function(e) {
+        e.preventDefault();
+        switchMoreLessState(e.target);
+    }, '.examus-moreless');
+
 
     //setSchedulingState();
 
@@ -307,7 +373,7 @@ M.availability_examus.form.getNode = function(json) {
 };
 
 M.availability_examus.form.fillValue = function(value, node) {
-    var rulesInputs, warningsInputs, key;
+    var rulesInputs, warningsInputs, scoringInputs, key;
     value.duration = node.one('input[name=duration]').get('value').trim();
     value.mode = node.one('select[name=mode]').get('value').trim();
     value.identification = node.one('select[name=identification]').get('value').trim();
@@ -341,6 +407,19 @@ M.availability_examus.form.fillValue = function(value, node) {
         }
     });
 
+    value.scoring = {};
+    scoringInputs = node.all('.examus-scoring-input');
+    Y.each(scoringInputs, function(scoringInput) {
+        key = scoringInput.get('name');
+        var scoringValue = scoringInput.get('value').trim();
+        if (scoringValue.length > 0) {
+            value.scoring[key] = parseInt(scoringValue);
+        } else {
+            value.scoring[key] = null;
+        }
+    });
+
+
     value.groups = [];
     rulesInputs = node.all('.groups input');
     Y.each(rulesInputs, function(ruleInput) {
@@ -349,6 +428,7 @@ M.availability_examus.form.fillValue = function(value, node) {
             value.groups.push(id);
         }
     });
+    console.log(value);
 
 };
 

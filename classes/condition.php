@@ -49,7 +49,7 @@ class condition extends \core_availability\condition {
         'duration', 'mode', 'schedulingrequired', 'autorescheduling',
         'istrial', 'rules', 'identification', 'noprotection',
         'useragreementurl', 'auxiliarycamera', 'customrules',
-        'groups',
+        'scoring', 'groups',
     ];
 
     const WARNINGS = [
@@ -91,6 +91,19 @@ class condition extends \core_availability\condition {
         'allow_wrong_gaze_direction' => false,
     ];
 
+    // Scoring params with minmax values.
+    const SCORING = [
+        'cheater_level' => ['min' => 0, 'max' => 100, 'default' => null],
+        'extra_user' => ['min' => 0, 'max' => 10, 'default' => null],
+        'user_replaced' => ['min' => 0, 'max' => 10, 'default' => null],
+        'absent_user' => ['min' => 0, 'max' => 10, 'default' => null],
+        'look_away' => ['min' => 0, 'max' => 10, 'default' => null],
+        'active_window_changed' => ['min' => 0, 'max' => 10, 'default' => null],
+        'forbidden_device' => ['min' => 0, 'max' => 10, 'default' => null],
+        'voice' => ['min' => 0, 'max' => 10, 'default' => null],
+        'phone' => ['min' => 0, 'max' => 10, 'default' => null],
+    ];
+
     /** @var int Default exam duration */
     public $duration = 60;
 
@@ -106,11 +119,14 @@ class condition extends \core_availability\condition {
     /** @var bool Is trial exam */
     public $istrial = false;
 
-    /** @var array Default exam rules */
+    /** @var array exam rules */
     public $rules = [];
 
-    /** @var array Default exam rules */
+    /** @var array warning rules */
     public $warnings = [];
+
+    /** @var array scoring rules */
+    public $scoring  = [];
 
     /** @var string identification method **/
     public $identification;
@@ -140,6 +156,11 @@ class condition extends \core_availability\condition {
      * @param stdClass $structure Structure
      */
     public function __construct($structure) {
+        $scoringdefaults = [];
+        foreach($scoringdefaults as $key => $row){
+            $scoringdefaults = isset($row['default']) ? $row['default'] : null;
+        }
+
         if (!empty($structure->duration)) {
             $this->duration = $structure->duration;
         }
@@ -164,11 +185,19 @@ class condition extends \core_availability\condition {
         }else {
             $this->warnings = (object)self::WARNINGS;
         }
+
         if (!empty($structure->rules)) {
             $rules = array_merge(self::RULES, (array)$structure->rules);
             $this->rules = $structure->rules;
         }else {
             $this->rules = (object)self::RULES;
+        }
+
+        if (!empty($structure->scoring)) {
+            $scoring = array_merge($scoringdefaults, (array)$structure->scoring);
+            $this->scoring = (object)$scoring;
+        }else {
+            $this->scoring = (object)$scoringdefaults;
         }
 
         if (!empty($structure->customrules)) {
@@ -225,6 +254,23 @@ class condition extends \core_availability\condition {
                 $this->warnings->{$key} = (bool) $this->warnings->{$key};
             }
         }
+
+        $keys = array_keys(self::SCORING);
+        foreach($this->scoring as $key => $value) {
+            if(!in_array($key, $keys)) {
+                unset($this->scoring->{$key});
+            } else {
+                $specs = self::SCORING[$key];
+                if($value !== null) {
+                    $value = intval($value);
+                    $value = min($specs['max'], $value);
+                    $value = max($specs['min'], $value);
+                }
+
+                $this->scoring->{$key} = $value;
+            }
+        }
+
     }
 
     /**
@@ -415,6 +461,7 @@ class condition extends \core_availability\condition {
             'auto_rescheduling' => (bool) $this->autorescheduling,
             'rules' => (array) $this->rules,
             'warnings' => (array) $this->warnings,
+            'scoring' => (array) $this->scoring,
             'groups' => (array) $this->groups,
             'istrial' => (bool) $this->istrial,
             'identification' => $this->identification,

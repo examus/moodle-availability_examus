@@ -89,6 +89,17 @@ $string['allow_absence_in_frame'] = 'Allow absence in frame';
 $string['allow_voices'] = 'Allow voices';
 $string['allow_wrong_gaze_direction'] = 'Allow wrong gaze direction';
 
+$string['scoring_params_header'] = 'Параметры расчета скоринга';
+$string['scoring_cheater_level'] = 'Порог нарушителя';
+$string['scoring_extra_user'] = 'Наличие еще одного человека в кадре';
+$string['scoring_user_replaced'] = 'Подмена тестируемого';
+$string['scoring_absent_user'] = 'Отсутствие тестируемого';
+$string['scoring_look_away'] = 'Увод взгляда с экрана';
+$string['scoring_active_window_changed'] = 'Смена активного окна на компьютере';
+$string['scoring_forbidden_device'] = 'Запрещенное оборудование';
+$string['scoring_voice'] = 'Звуки голосов в трансляции';
+$string['scoring_phone'] = 'Использование телефона';
+
 $string['select_groups'] = 'Use Examus only for selected groups';
 $string['scheduling_required'] = 'A calendar entry is required';
 $string['apply_filter'] = 'Apply filter';

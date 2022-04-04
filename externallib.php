@@ -114,6 +114,9 @@ class availability_examus_external extends external_api {
         $warnings = $condition->warnings;
         $result['warnings'] = $warnings ? $warnings : [];
 
+        $scoring = $condition->scoring;
+        $result['scoring'] = $scoring ? $scoring : [];
+
         if(!$timebracket){
             $timebracket = ['start' => null, 'end' => null];
         }
@@ -292,6 +295,11 @@ class availability_examus_external extends external_api {
             $warnings[$key] = new external_value(PARAM_BOOL, '', VALUE_OPTIONAL);
         }
 
+        $scoring = [];
+        foreach(condition::SCORING as $key => $val){
+            $scoring[$key] = new external_value(PARAM_INT, $key, VALUE_OPTIONAL);
+        }
+
         return new external_single_structure([
             'modules' => new external_multiple_structure(
                 new external_single_structure([
@@ -323,6 +331,7 @@ class availability_examus_external extends external_api {
                         'custom_rules' => new external_value(PARAM_TEXT, 'Custom Rules', VALUE_OPTIONAL),
                     ], 'rules set', VALUE_OPTIONAL),
                     'warnings' => new external_single_structure($warnings, VALUE_OPTIONAL),
+                    'scoring' => new external_single_structure($scoring, VALUE_OPTIONAL),
                     'is_proctored' => new external_value(PARAM_BOOL, 'module proctored'),
                     'identification' => new external_value(PARAM_TEXT, 'Identification mode', VALUE_OPTIONAL),
                     'is_trial' => new external_value(PARAM_BOOL, 'Trial exam'),
