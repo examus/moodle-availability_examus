@@ -78,11 +78,13 @@ function availability_examus_before_standard_html_head() {
         return '';
     }
 
-    if (!condition::has_examus_condition($cm)) {
+    $condition = condition::get_examus_condition($cm);
+
+    if (!$condition) {
         return '';
     }
 
-    if (condition::get_no_protection($cm)) {
+    if ($condition->noprotection) {
         return '';
     }
 

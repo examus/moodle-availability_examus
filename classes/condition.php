@@ -49,7 +49,7 @@ class condition extends \core_availability\condition {
         'duration', 'mode', 'schedulingrequired', 'autorescheduling',
         'istrial', 'rules', 'identification', 'noprotection',
         'useragreementurl', 'auxiliarycamera', 'customrules',
-        'groups',
+        'scoring', 'groups',
     ];
 
     const WARNINGS = [
@@ -91,45 +91,62 @@ class condition extends \core_availability\condition {
         'allow_wrong_gaze_direction' => false,
     ];
 
+    // Scoring params with minmax values.
+    const SCORING = [
+        'cheater_level' => ['min' => 0, 'max' => 100, 'default' => null],
+        'extra_user' => ['min' => 0, 'max' => 10, 'default' => null],
+        'user_replaced' => ['min' => 0, 'max' => 10, 'default' => null],
+        'absent_user' => ['min' => 0, 'max' => 10, 'default' => null],
+        'look_away' => ['min' => 0, 'max' => 10, 'default' => null],
+        'active_window_changed' => ['min' => 0, 'max' => 10, 'default' => null],
+        'forbidden_device' => ['min' => 0, 'max' => 10, 'default' => null],
+        'voice' => ['min' => 0, 'max' => 10, 'default' => null],
+        'phone' => ['min' => 0, 'max' => 10, 'default' => null],
+    ];
+
     /** @var int Default exam duration */
-    protected $duration = 60;
+    public $duration = 60;
 
     /** @var string Default exam mode */
-    protected $mode = 'normal';
+    public $mode = 'normal';
 
     /** @var string Default calendar mode */
-    protected $schedulingrequired = true;
+    public $schedulingrequired = true;
 
     /** @var bool Reschedule when exam was missed */
-    protected $autorescheduling = false;
+    public $autorescheduling = false;
 
     /** @var bool Is trial exam */
-    protected $istrial = false;
+    public $istrial = false;
 
-    /** @var array Default exam rules */
-    protected $rules = [];
+    /** @var array exam rules */
+    public $rules = [];
 
-    /** @var array Default exam rules */
-    protected $warnings = [];
+    /** @var array warning rules */
+    public $warnings = [];
+
+    /** @var array scoring rules */
+    public $scoring  = [];
 
     /** @var string identification method **/
-    protected $identification;
+    public $identification;
 
     /** @var bool No protection (shade) */
-    protected $noprotection = false;
+    public $noprotection = false;
 
     /** @var string User agreement URL */
-    protected $useragreementurl = null;
+    public $useragreementurl = null;
 
     /** @var string Auxiliary camera enabled */
-    protected $auxiliarycamera = false;
+    public $auxiliarycamera = false;
 
-    protected $customrules = null;
+    /** @var string List of custom rules */
+    public $customrules = null;
 
     /**
      * @var array Apply condition to specified groups
      */
-    protected $groups = [];
+    public $groups = [];
 
     private static $cached_trees = [];
 
@@ -139,6 +156,11 @@ class condition extends \core_availability\condition {
      * @param stdClass $structure Structure
      */
     public function __construct($structure) {
+        $scoringdefaults = [];
+        foreach($scoringdefaults as $key => $row){
+            $scoringdefaults = isset($row['default']) ? $row['default'] : null;
+        }
+
         if (!empty($structure->duration)) {
             $this->duration = $structure->duration;
         }
@@ -163,11 +185,19 @@ class condition extends \core_availability\condition {
         }else {
             $this->warnings = (object)self::WARNINGS;
         }
+
         if (!empty($structure->rules)) {
             $rules = array_merge(self::RULES, (array)$structure->rules);
             $this->rules = $structure->rules;
         }else {
             $this->rules = (object)self::RULES;
+        }
+
+        if (!empty($structure->scoring)) {
+            $scoring = array_merge($scoringdefaults, (array)$structure->scoring);
+            $this->scoring = (object)$scoring;
+        }else {
+            $this->scoring = (object)$scoringdefaults;
         }
 
         if (!empty($structure->customrules)) {
@@ -224,6 +254,23 @@ class condition extends \core_availability\condition {
                 $this->warnings->{$key} = (bool) $this->warnings->{$key};
             }
         }
+
+        $keys = array_keys(self::SCORING);
+        foreach($this->scoring as $key => $value) {
+            if(!in_array($key, $keys)) {
+                unset($this->scoring->{$key});
+            } else {
+                $specs = self::SCORING[$key];
+                if($value !== null) {
+                    $value = intval($value);
+                    $value = min($specs['max'], $value);
+                    $value = max($specs['min'], $value);
+                }
+
+                $this->scoring->{$key} = $value;
+            }
+        }
+
     }
 
     /**
@@ -312,55 +359,6 @@ class condition extends \core_availability\condition {
     }
 
     /**
-     * get examus duration
-     *
-     * @param \cm_info $cm Cm
-     * @return int
-     */
-    public static function get_examus_duration($cm) {
-        $econds = self::get_examus_conditions($cm);
-        return (int) $econds[0]->duration;
-    }
-
-    /**
-     * get examus mode
-     *
-     * @param \cm_info $cm Cm
-     * @return string
-     */
-    public static function get_examus_mode($cm) {
-        $econds = self::get_examus_conditions($cm);
-        return (string) $econds[0]->mode;
-    }
-
-    /**
-     * get examus rules
-     *
-     * @param \cm_info $cm Cm
-     * @return array
-     */
-    public static function get_examus_rules($cm) {
-        $econds = self::get_examus_conditions($cm);
-        return (array) $econds[0]->rules;
-    }
-
-    public static function get_examus_warnings($cm) {
-        $econds = self::get_examus_conditions($cm);
-        return (array) $econds[0]->warnings;
-    }
-
-    /**
-     * get examus scheduling mode
-     *
-     * @param \cm_info $cm Cm
-     * @return bool
-     */
-    public static function get_examus_scheduling($cm) {
-        $econds = self::get_examus_conditions($cm);
-        return (bool) $econds[0]->schedulingrequired;
-    }
-
-    /**
      * get examus groups
      *
      * @param \cm_info $cm Cm
@@ -371,70 +369,17 @@ class condition extends \core_availability\condition {
         return (array) (isset($econds[0]->groups) ? $econds[0]->groups : []);
     }
 
-    /**
-     * get examus scheduling mode
-     *
-     * @param \cm_info $cm Cm
-     * @return bool
-     */
-    public static function get_auto_rescheduling($cm) {
-        $econds = self::get_examus_conditions($cm);
-        return (bool) $econds[0]->autorescheduling;
-    }
+
 
     /**
-     * get identification mode
+     * get examus conditions
      *
      * @param \cm_info $cm Cm
-     * @return string
+     * @return array
      */
-    public static function get_identification($cm) {
-        $econds = self::get_examus_conditions($cm);
-        return $econds[0]->identification;
-    }
-
-    /**
-     * get is trial
-     *
-     * @param \cm_info $cm Cm
-     * @return bool
-     */
-    public static function get_is_trial($cm) {
-        $econds = self::get_examus_conditions($cm);
-        return (bool) $econds[0]->istrial;
-    }
-
-    /**
-     * get user agreement url
-     *
-     * @param \cm_info $cm Cm
-     * @return bool
-     */
-    public static function get_user_agreement_url($cm) {
-        $econds = self::get_examus_conditions($cm);
-        return $econds[0]->useragreementurl;
-    }
-
-    /**
-     * get no protection
-     *
-     * @param \cm_info $cm Cm
-     * @return bool
-     */
-    public static function get_no_protection($cm) {
-        $econds = self::get_examus_conditions($cm);
-        return (bool) $econds[0]->noprotection;
-    }
-
-    /**
-     * get auxiliarycamera
-     *
-     * @param \cm_info $cm Cm
-     * @return bool
-     */
-    public static function get_auxiliarycamera($cm) {
-        $econds = self::get_examus_conditions($cm);
-        return (bool) $econds[0]->auxiliarycamera;
+    public static function get_examus_condition($cm) {
+        $conds = self::get_examus_conditions($cm);
+        return $conds && isset($conds[0]) ? $conds[0] : null;
     }
 
     /**
@@ -444,7 +389,7 @@ class condition extends \core_availability\condition {
      * @return array
      */
     private static function get_examus_conditions($cm) {
-        if($cm && isset(self::$cached_trees[$cm->id])){
+        if($cm && isset(self::$cached_trees[$cm->id])) {
             return self::$cached_trees[$cm->id];
         }
 
@@ -516,6 +461,7 @@ class condition extends \core_availability\condition {
             'auto_rescheduling' => (bool) $this->autorescheduling,
             'rules' => (array) $this->rules,
             'warnings' => (array) $this->warnings,
+            'scoring' => (array) $this->scoring,
             'groups' => (array) $this->groups,
             'istrial' => (bool) $this->istrial,
             'identification' => $this->identification,
@@ -600,19 +546,6 @@ class condition extends \core_availability\condition {
         return get_string('use_examus', 'availability_examus');
     }
 
-
-    /**
-     * create entry for cm
-     *
-     * @param int $userid User id
-     * @param stdClass $cm Cm
-     * @return stdClass
-     */
-    public static function create_entry_for_cm($userid, $cm) {
-        return self::create_entry_if_not_exist($userid, $cm);
-    }
-
-
     /**
      * Initialize new entry, ready to write to DB
      * @param integer $courseid
@@ -639,29 +572,23 @@ class condition extends \core_availability\condition {
      *
      * @param integer $userid User id
      * @param integer $cm Cm id
+     * @param array $userentries Pre-collected list of user entries, indexed by cmid
      * @return stdClass
      */
-    private static function create_entry_if_not_exist($userid, $cm) {
+    public function create_entry_for_cm($userid, $cm, $userentries = null) {
         global $DB;
 
-        if ($cm->modname == 'quiz') {
-            $quizobj = quiz::create($cm->instance, $userid);
-            $allowedattempts = $quizobj->get_num_attempts_allowed();
-            $allowedattempts = $allowedattempts > 0 ? $allowedattempts : null;
+        $courseid = $cm->course;
+
+        if($userentries) {
+            $entries = isset($userentries[$cm->id]) ? $userentries[$cm->id] : [];
         } else {
-            $allowedattempts = null;
+            $entries = $DB->get_records('availability_examus', [
+                'userid' => $userid,
+                'courseid' => $courseid,
+                'cmid' => $cm->id,
+            ], 'id');
         }
-
-        $course = $cm->get_course();
-        $courseid = $course->id;
-
-        $autorescheduling = self::get_auto_rescheduling($cm);
-
-        $entries = $DB->get_records('availability_examus', [
-            'userid' => $userid,
-            'courseid' => $courseid,
-            'cmid' => $cm->id,
-        ], 'id');
 
         foreach ($entries as $entry) {
             if ($entry->status == 'Not inited') {
@@ -670,7 +597,7 @@ class condition extends \core_availability\condition {
         }
 
         foreach ($entries as $entry) {
-            if ($autorescheduling) {
+            if ($this->autorescheduling) {
                 // Was schduled and not completed.
                 $scheduled = !$entry->attemptid && $entry->status == 'Scheduled';
                 // Consider expired, giving 15 minutes slack.
@@ -686,6 +613,14 @@ class condition extends \core_availability\condition {
                 }
 
             }
+        }
+
+        if ($cm->modname == 'quiz') {
+            $quiz = \quiz_access_manager::load_quiz_and_settings($cm->instance);
+            $allowedattempts = $quiz->attempts;
+            $allowedattempts = $allowedattempts > 0 ? $allowedattempts : null;
+        } else {
+            $allowedattempts = null;
         }
 
         if ($allowedattempts == null || count($entries) < $allowedattempts) {

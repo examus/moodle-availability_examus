@@ -48,11 +48,15 @@ class frontend extends \core_availability\frontend {
             'identification', 'face_passport_identification', 'face_identification',
             'passport_identification', 'skip_identification',
             'is_trial', 'custom_rules', 'noprotection', 'user_agreement_url',
-            'auxiliary_camera', 'visible_warnings'
+            'auxiliary_camera', 'visible_warnings', 'scoring_params_header',
         ];
 
         foreach(condition::WARNINGS as $key => $value) {
             $strings[] = $key;
+        }
+
+        foreach(condition::SCORING as $key => $value) {
+            $strings[] = 'scoring_'.$key;
         }
 
         return $strings;
@@ -71,13 +75,14 @@ class frontend extends \core_availability\frontend {
         global $DB;
         $rules = condition::RULES;
         $warnings = condition::WARNINGS;
+        $scoring = condition::SCORING;
 
         $courseid = $course->id;
 
         $groups = [];
         $groups = $DB->get_records('groups', ['courseid' => $courseid], 'name', 'id,name');
 
-        return [$rules, $groups, $warnings];
+        return [$rules, $groups, $warnings, $scoring];
     }
 
     /**
