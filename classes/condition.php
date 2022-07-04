@@ -157,8 +157,8 @@ class condition extends \core_availability\condition {
      */
     public function __construct($structure) {
         $scoringdefaults = [];
-        foreach($scoringdefaults as $key => $row){
-            $scoringdefaults = isset($row['default']) ? $row['default'] : null;
+        foreach(self::SCORING as $key => $row){
+            $scoringdefaults[$key] = isset($row['default']) ? $row['default'] : null;
         }
 
         if (!empty($structure->duration)) {
@@ -256,13 +256,14 @@ class condition extends \core_availability\condition {
         }
 
         $keys = array_keys(self::SCORING);
+
         foreach($this->scoring as $key => $value) {
             if(!in_array($key, $keys)) {
                 unset($this->scoring->{$key});
             } else {
                 $specs = self::SCORING[$key];
                 if($value !== null) {
-                    $value = intval($value);
+                    $value = floatval($value);
                     $value = min($specs['max'], $value);
                     $value = max($specs['min'], $value);
                 }

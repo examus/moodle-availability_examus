@@ -186,7 +186,7 @@ M.availability_examus.form.getNode = function(json) {
             var groups = (json.groups instanceof Array) ? json.groups : [];
 
             id = parseInt(this.groups[i].id);
-            groups = groups.map(function(gid){ return parseInt(gid)});
+            groups = groups.map(function(gid){ return parseInt(gid); });
 
             var checked = groups.indexOf(id) > -1 ? 'checked' : '';
 
@@ -197,7 +197,7 @@ M.availability_examus.form.getNode = function(json) {
                 + '</label>';
         }
 
-        html += formGroup(null, getString('select_groups'), '<div class="groups"' + groupOptions + '</div>');
+        html += formGroup(null, getString('select_groups'), '<div class="groups">' + groupOptions + '</div>');
     }
 
 
@@ -210,16 +210,15 @@ M.availability_examus.form.getNode = function(json) {
     var scoringOptions = '';
     for (var skey in this.scoring) {
         var skeyId = id + '_' + skey;
-        var smin = this.scoring[skey]['min'];
-        var smax = this.scoring[skey]['max'];
+        var smin = this.scoring[skey].min;
+        var smax = this.scoring[skey].max;
         var scoringInputHTML = '<input type="number" class="examus-scoring-input" value=""' +
-            'name="' + skey + '"' +
-            'id="scoring_' + skeyId + '"' +
+            'step="0.01" ' +
+            'name="' + skey + '" ' +
+            'id="scoring_' + skeyId + '" ' +
             'min="' + smin + '" max="' + smax + '">';
 
-        scoringOptions +=formGroup(skeyId, getString('scoring_'+skey), scoringInputHTML);
-        //scoringOptions += '<label for="scoring_' + skeyId + '" style="white-space: break-spaces">' + getString('scoring_'+skey) + '</label>&nbsp;';
-        //scoringOptions += '<input type="number" name="' + skey + '" id="scoring_' + skeyId + '" value="" min="' + smin + '" max="' + smax + '"><br>';
+        scoringOptions += formGroup(skeyId, getString('scoring_'+skey), scoringInputHTML);
     }
 
 
@@ -413,7 +412,7 @@ M.availability_examus.form.fillValue = function(value, node) {
         key = scoringInput.get('name');
         var scoringValue = scoringInput.get('value').trim();
         if (scoringValue.length > 0) {
-            value.scoring[key] = parseInt(scoringValue);
+            value.scoring[key] = parseFloat(scoringValue);
         } else {
             value.scoring[key] = null;
         }
@@ -428,8 +427,6 @@ M.availability_examus.form.fillValue = function(value, node) {
             value.groups.push(id);
         }
     });
-    console.log(value);
-
 };
 
 M.availability_examus.form.fillErrors = function(errors, node) {

@@ -297,7 +297,7 @@ class availability_examus_external extends external_api {
 
         $scoring = [];
         foreach(condition::SCORING as $key => $val){
-            $scoring[$key] = new external_value(PARAM_INT, $key, VALUE_OPTIONAL);
+            $scoring[$key] = new external_value(PARAM_FLOAT, $key, VALUE_OPTIONAL);
         }
 
         return new external_single_structure([
