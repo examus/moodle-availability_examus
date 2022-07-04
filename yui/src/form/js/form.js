@@ -225,7 +225,7 @@ M.availability_examus.form.getNode = function(json) {
                  '<div class="warnings" style="white-space: nowrap" >' + moreLess(warningOptions) + '</div>',
                  true);
 
-    htmlTwo += formGroup(null, getString('visible_warnings'),
+    htmlTwo += formGroup(null, getString('scoring_params_header'),
                  moreLess(scoringOptions),
                  true);
 
