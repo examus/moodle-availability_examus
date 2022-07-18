@@ -109,7 +109,8 @@ class availability_examus_external extends external_api {
         ];
 
         $rules = $condition->rules;
-        $result['rules'] = $rules ? $rules : [];
+        $result['rules'] = $rules ? $rules : ((object)[]);
+        $result['rules']->custom_rules = $condition->customrules;
 
         $warnings = $condition->warnings;
         $result['warnings'] = $warnings ? $warnings : [];
