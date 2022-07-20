@@ -320,7 +320,7 @@ M.availability_examus.form.getNode = function(json) {
 
     json.scoring = json.scoring || {};
     for (var scoringKey in json.scoring) {
-        if (json.scoring[scoringKey]) {
+        if (!isNaN(json.scoring[scoringKey])) {
             var sinput = node.one('.examus-scoring-input[name=' + scoringKey + ']');
             if(sinput) {
                 sinput.set('value', json.scoring[scoringKey]);
