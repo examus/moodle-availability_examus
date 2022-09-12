@@ -118,9 +118,29 @@ class availability_examus_external extends external_api {
         $scoring = $condition->scoring;
         $result['scoring'] = $scoring ? $scoring : [];
 
-        if(!$timebracket){
-            $timebracket = ['start' => null, 'end' => null];
+        if (!$timebracket) {
+            $timebracket = [];
         }
+        if (empty($timebracket['start'])) {
+            $timebracket['start'] = null;
+        }
+        if (empty($timebracket['end'])) {
+            $timebracket['end'] = null;
+        }
+
+        if (!empty($course->startdate)) {
+            $start = max($timebracket['start'], $course->startdate);
+            if ($start > 0){
+                $timebracket['start'] = $start;
+            }
+        }
+        if (!empty($course->enddate)) {
+            $end = max($timebracket['end'], $course->enddate);
+            if ($end > 0){
+                $timebracket['end'] = $end;
+            }
+        }
+
         $result = array_merge($result, $timebracket);
 
         return $result;
@@ -198,7 +218,7 @@ class availability_examus_external extends external_api {
             }
 
             if ($user) {
-                $courses = enrol_get_users_courses($user->id, true);
+                $courses = enrol_get_users_courses($user->id, true, 'enddate');
             } else {
                 $courses = [];
             }
@@ -213,6 +233,7 @@ class availability_examus_external extends external_api {
                     'userid' => $user->id,
                     'courseid' => $course->id,
                 ], 'id');
+
                 $userentries = [];
                 foreach($entries as $entry){
                     if(!isset($userentries[$entry->cmid])){
