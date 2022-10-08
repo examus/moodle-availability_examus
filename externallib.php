@@ -135,7 +135,12 @@ class availability_examus_external extends external_api {
             }
         }
         if (!empty($course->enddate)) {
-            $end = max($timebracket['end'], $course->enddate);
+            if (!empty($timebracket['end'])) {
+                $end = min($timebracket['end'], $course->enddate);
+            } else {
+                $end = $course->enddate;
+            }
+
             if ($end > 0){
                 $timebracket['end'] = $end;
             }
